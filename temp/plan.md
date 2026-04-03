@@ -142,7 +142,7 @@ Do not duplicate Codex's work. Do not edit files Codex is actively working on. I
 A working repo at `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents` where:
 - One command (`./me.sh`) boots a Claude + Codex duo with ACK handshake
 - Peer helpers let you add more agents on demand
-- 17 Skills are present and readable by agents
+- 16 canonical Skills are present and readable by agents
 - Direct live comms work via tmux injection with identity stamping
 - `comms.md` is the running human-readable session record
 - Everything else is in `ROADMAP.md`, nothing dropped
