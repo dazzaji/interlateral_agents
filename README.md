@@ -27,6 +27,20 @@ This boots:
 
 The duo launcher performs the ACK handshake and waits for both agents to print `Ready to Rock!`.
 
+If you want to run `me.sh` from anywhere as `me.sh` instead of `./me.sh`, add this repo to your shell `PATH` in `~/.zshrc` or the equivalent startup file for your shell:
+
+```bash
+export PATH="$PATH:/Users/dazzagreenwood/Documents/GitHub/interlateral_agents"
+```
+
+Reload your shell config after editing it:
+
+```bash
+source ~/.zshrc
+```
+
+`me.sh` resolves its own repo root, so once the repo directory is on `PATH` you do not need to `cd` into the repo before launching it.
+
 ## Adding More Agents
 
 Launch more peers on the same socket:
