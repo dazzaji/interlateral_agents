@@ -410,13 +410,11 @@ That means:
 - Rewrite now: `adherence-check`, `dev-collaboration`, `dev-competition`, `search-synth`
 - Remove from v0.1: `create-skin`, `evals`, `hyperdomo`, `test-4-series`
 
-### Dazza Decision Needed Up Front
+### Dazza Rulings (2026-04-02, human project owner)
 
-- Choose the repo license:
-  - Option A: keep root `LICENSE` as Apache 2.0 and update `interlateral_dna/package.json`
-  - Option B: change the repo to MIT everywhere
-
-Do not let agents guess this.
+- **License:** Apache 2.0. Keep root `LICENSE` as-is, update `interlateral_dna/package.json` to `"license": "Apache-2.0"`.
+- **Nice-to-haves promoted to required:** All NH items (NH-1 through NH-4) are now part of the implementation scope.
+- **Authority:** These rulings come from Dazza Greenwood, the human project owner. Do not re-decide.
 
 ### Ordered Work Packets
 
@@ -641,6 +639,27 @@ After all work packets are complete:
    - one peer launch helper
    - `scripts/deploy-skills.sh`
    - `scripts/shutdown.sh`
+
+#### WP-9. Nice-to-Have Items (Promoted to Required by Dazza)
+
+Owner: any agent
+
+Files:
+- `interlateral_dna/leadership.json`
+- `scripts/launch-codex-peer.sh`
+- `scripts/launch-cc-peer.sh`
+- `scripts/launch-gemini-peer.sh`
+- `scripts/tmux-config.sh`
+
+Tasks:
+- NH-1: Add a comment to `leadership.json` noting it is reference-only documentation, not read by any code
+- NH-3: Add input validation to peer launch scripts — reject session names containing `/`, `..`, or other path-unsafe characters
+- NH-4: Set `umask 077` before tmux socket creation in `tmux-config.sh` (or in `me.sh` before the first `run_tmux` call)
+
+Done criteria:
+- `leadership.json` has a clear "this file is documentation-only" note
+- peer launch scripts reject unsafe session names with a clear error
+- tmux socket is created with owner-only permissions
 
 ### What Next Agents Should Not Re-Decide
 
