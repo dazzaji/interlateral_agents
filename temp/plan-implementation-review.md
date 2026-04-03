@@ -191,3 +191,124 @@ The repo is close, but I would not ship it as "good to go" yet. The biggest prob
 
 - `test-4-series`
   - Depends on `hyperdomo`, eval infrastructure, traces, `.observability`, and AG-era project-skill machinery.
+
+## Second-Pass Consolidated Skill Triage
+
+This is my tightened release-ready recommendation after a second pass and after reading Claude's skill findings.
+
+### 1. Keep As-Is In v0.1
+
+- `add-comments`
+  - Safe, self-contained, and directly useful in the starter repo.
+
+- `competition`
+  - Generic coordination pattern. Heavy, but not coupled to excluded infrastructure.
+
+- `constitutional`
+  - Generic structured drafting protocol. No hard dependency on excluded systems.
+
+- `democratic`
+  - Generic voting pattern. Safe as documentation and runnable as-is.
+
+- `hierarchical`
+  - Generic boss/worker protocol. Fits the peer-launch-helper model.
+
+- `negotiation`
+  - Generic consensus protocol. No dead references found.
+
+- `peer-collaboration`
+  - Clean two-agent pattern and a good match for the starter repo.
+
+- `publication-pipeline`
+  - Heavy but still generic. The role count is high, but that is a usage/scoping issue, not a missing-infrastructure issue.
+
+### 2. Keep In v0.1 But Rewrite Now
+
+- `adherence-check`
+  - Rewrite target:
+    - Must require `artifact_path`
+    - Must require `spec_path`
+    - Must require `report_path`
+  - v0.1-safe framing:
+    - "Use this when you have an artifact and an explicit source-of-truth spec to check it against."
+    - If `spec_path` is not supplied or missing, stop and report the missing prerequisite.
+  - Keep:
+    - The current structured PASS / FAIL / WARN / N/A reporting format
+    - The add-comments delivery pattern
+
+- `dev-collaboration`
+  - Rewrite target:
+    - Remove AG-specific wording and examples
+    - Remove old `projects/Skills_Capability/...` references
+    - Explicitly support `claude`, `codex`, and `gemini` as interchangeable role-holders
+  - v0.1-safe framing:
+    - "Three-role collaboration pattern: Drafter, Reviewer, Breaker."
+    - Require `artifact_path` and explicit role assignment.
+    - If only two agents are available, require the prompt to assign one dual-hatted role.
+  - Keep:
+    - Ledger + direct notification discipline
+    - Reviewer / Breaker separation
+    - Change-log requirement in the resulting artifact
+
+- `dev-competition`
+  - Rewrite target:
+    - Remove AG-specific examples and legacy workspace paths
+    - Normalize messaging examples to `cc.js`, `codex.js`, `gemini.js`
+  - v0.1-safe framing:
+    - Require `competition_dir`, `requirement_path`, and named Implementer A, Implementer B, and Judge
+    - State clearly that the skill is usable only when at least three agents are available
+  - Keep:
+    - Blind dual implementation
+    - Judge evaluates against requirement, not style
+    - Isolation / blindness rules
+
+- `search-synth`
+  - Rewrite target:
+    - Remove AG/browser assumptions
+    - Remove assumption that every assigned agent definitely has search capability
+  - v0.1-safe framing:
+    - Require `topic`, `output_file`, and explicit participating agent list
+    - Require the user or launcher context to confirm which participating agents have web-search capability
+    - If the assigned roster cannot actually search, stop instead of improvising
+  - Keep:
+    - Multi-agent research
+    - Cross-fact-checking
+    - Final synthesized response
+
+### 3. Cut From v0.1
+
+- `create-skin`
+  - Cut reason:
+    - It is a dashboard-production skill, not a starter-repo skill.
+    - Depends on excluded dashboard UI, courier, AG, browser checks, and conformance docs.
+  - Recommendation:
+    - Move to roadmap-era catalog or a future "full mesh / dashboard" profile.
+
+- `evals`
+  - Cut reason:
+    - Depends on excluded `.observability`, OTEL traces, eval scripts, Python stack, and Lake Merritt assets.
+  - Recommendation:
+    - Restore only when the eval subsystem is actually shipped.
+
+- `hyperdomo`
+  - Cut reason:
+    - It is an orchestration framework, not a starter-scope skill.
+    - Depends on excluded wake-up scripts, AG, `.observability`, state/lock files, and manager runtime primitives.
+  - Recommendation:
+    - Keep for post-v0.1 roadmap work once router/session/orchestration layers exist.
+
+- `test-4-series`
+  - Cut reason:
+    - It is a project-skill for the excluded HyperDomo/evals stack, not a generic starter-repo skill.
+  - Recommendation:
+    - Remove from v0.1 catalog entirely and restore only with HyperDomo + eval support.
+
+## Final Release Recommendation For Skills
+
+If the goal is "right and ready" for v0.1, the skill decision should be:
+
+- Ship now as-is: `add-comments`, `competition`, `constitutional`, `democratic`, `hierarchical`, `negotiation`, `peer-collaboration`, `publication-pipeline`
+- Rewrite now before release: `adherence-check`, `dev-collaboration`, `dev-competition`, `search-synth`
+- Exclude from v0.1: `create-skin`, `evals`, `hyperdomo`, `test-4-series`
+
+That gives v0.1 a clean 12-skill catalog if the rewrites happen now, or a clean 8-skill catalog if the repo needs to ship immediately without more skill editing.
