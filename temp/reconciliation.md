@@ -107,7 +107,7 @@
 | `leadership.json` | interlateral_alpha | No changes |
 | `LIVE_COMMS.md` | Merge: platform_alpha clarity + interlateral_alpha breadth | Normalize direct-first, courier-fallback |
 
-**Skills:** Keep in `.agent/skills/` (canonical, per Codex's convention-preserving approach) with deploy copies to `.claude/skills/` and `.codex/skills/`. But add a top-level `SKILLS.md` index that is comprehensive and human-friendly (per my proposal). Carry all 17 skills from `interlateral_alpha`.
+**Skills:** Keep in `.agent/skills/` (canonical, per Codex's convention-preserving approach) with deploy copies to `.claude/skills/` and `.codex/skills/`. But add a top-level `SKILLS.md` index that is comprehensive and human-friendly (per my proposal). Carry all 16 skills from `interlateral_alpha`.
 
 **Worker pool helpers (from Codex, which I missed):**
 
@@ -1108,7 +1108,7 @@ OK Dazza, here's the clean split. I went through every capability across all fiv
 
 **Peer launch helpers for spinning up more agents.** `scripts/launch-codex-peer.sh` and `scripts/send-codex-peer.sh` from `platform_alpha` — lets you spin up additional Codex instances and message them. `scripts/launch-gemini-peer.sh` (new, simple, based on the Gemini bootstrap logic from `interlateral_alpha`) — same thing for Gemini CLI instances. A simple `scripts/launch-cc-peer.sh` for additional Claude Code sessions. This is how you scale from duo to as many CLI agents as you want without needing the full mesh launcher infrastructure.
 
-**The full Skills catalog.** `.agent/skills/` as the canonical location, containing all 16–17 skills from `interlateral_alpha`: peer-collaboration, negotiation, hierarchical, democratic, competition, constitutional, dev-collaboration, dev-competition, publication-pipeline, add-comments, adherence-check, hyperdomo, test-4-series, evals, search-synth, create-skin. Deploy copies go to `.claude/skills/` and `.codex/skills/` so each agent can read them. `SKILLS.md` at the root as the human-readable index. `scripts/deploy-skills.sh` to push canonical copies to agent directories.
+**The full Skills catalog.** `.agent/skills/` as the canonical location, containing all 16 canonical skills from `interlateral_alpha`: peer-collaboration, negotiation, hierarchical, democratic, competition, constitutional, dev-collaboration, dev-competition, publication-pipeline, add-comments, adherence-check, hyperdomo, test-4-series, evals, search-synth, create-skin. Deploy copies go to `.claude/skills/` and `.codex/skills/` so each agent can read them. `SKILLS.md` at the root as the human-readable index. `scripts/deploy-skills.sh` to push canonical copies to agent directories.
 
 **Basic tmux config.** `scripts/tmux-config.sh` — shared socket path, session names, and the essential helpers from `platform_alpha`: `agent_send`, `codex_send_clean`, long-prompt paste support, and pane capture. This is the glue that makes the launcher and peer scripts work consistently.
 
@@ -1846,7 +1846,7 @@ _______________
 
 ## Top-Line Scope Summary
 
-v0.1 is a bite-sized, working multi-agent starter. It has exactly five things: a fast duo launcher (`me.sh`), peer launch helpers to spin up more CLI agents on demand, the full 17-skill collaboration catalog, direct live comms via tmux injection, and basic `comms.md` session logging. Everything else is deferred to `ROADMAP.md` — nothing is dropped, nothing is forgotten.
+v0.1 is a bite-sized, working multi-agent starter. It has exactly five things: a fast duo launcher (`me.sh`), peer launch helpers to spin up more CLI agents on demand, the full 16-skill collaboration catalog, direct live comms via tmux injection, and basic `comms.md` session logging. Everything else is deferred to `ROADMAP.md` — nothing is dropped, nothing is forgotten.
 
 An agent reading this section should be able to build the entire v0.1 repo from the file structure, donor map, and build plan below.
 
@@ -1874,7 +1874,7 @@ Spin up additional Codex, Claude Code, or Gemini CLI agents on demand. All reuse
 ## 3. Full Skills catalog
 
 ```
-/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/          # canonical source (all 17 skills)
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/          # canonical source (all 16 skills)
 /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.claude/skills/          # deployed copy for Claude Code
 /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.codex/skills/           # deployed copy for Codex
 /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/SKILLS.md               # human-readable index
@@ -1967,7 +1967,7 @@ Everything below is intentionally excluded from v0.1 and captured in ROADMAP.md.
 │   ├── comms.md                             # session ledger (fresh each run)
 │   └── package.json                         # metadata
 │
-├── .agent/skills/                           # canonical Skills (17 skills)
+├── .agent/skills/                           # canonical Skills (16 skills)
 │   ├── peer-collaboration/SKILL.md
 │   ├── negotiation/SKILL.md
 │   ├── hierarchical/SKILL.md
