@@ -312,3 +312,339 @@ If the goal is "right and ready" for v0.1, the skill decision should be:
 - Exclude from v0.1: `create-skin`, `evals`, `hyperdomo`, `test-4-series`
 
 That gives v0.1 a clean 12-skill catalog if the rewrites happen now, or a clean 8-skill catalog if the repo needs to ship immediately without more skill editing.
+
+---
+
+# Claude Code Review of Codex's Findings
+
+**Date:** 2026-04-02
+**Reviewer:** Claude Code (ipa-claude)
+
+## Verdict on Codex's Analysis
+
+Codex's skill triage is excellent and I endorse it fully. The "keep as-is / rewrite now / cut" breakdown is the right call. The rewrite specs for `adherence-check`, `dev-collaboration`, `dev-competition`, and `search-synth` are detailed and actionable.
+
+However, Codex's "Minimum Changes" list (3 items) is incomplete. It covers skills, comms.md tracking, and Node script hardening — but misses several items that both reviews independently found or that only my review caught. Below is the consolidated, single-source action list.
+
+## CONSOLIDATED v0.1 RELEASE ACTION LIST
+
+This is the single complete list. An agent tasked with getting this repo to v0.1 should do every item below.
+
+### MUST FIX (blocking release)
+
+**MF-1. Remove tracked runtime artifacts from git.**
+```bash
+cd /Users/dazzagreenwood/Documents/GitHub/interlateral_agents
+git rm --cached interlateral_dna/comms.md
+git rm --cached --ignore-unmatch '*.DS_Store' '.agent/.DS_Store' '.claude/.DS_Store' '.codex/.DS_Store'
+```
+Why: `.gitignore` has entries for these but they were committed before the ignore was added. The repo will churn dirty on every `me.sh` run and risk leaking session transcripts.
+
+**MF-2. Fix license inconsistency.**
+Root `LICENSE` file says Apache 2.0. `interlateral_dna/package.json` says `"license": "MIT"`. Pick one and make them match. (Dazza decides which.)
+
+**MF-3. Skill triage — cut 4 skills from v0.1 catalog.**
+Remove from `.agent/skills/`, `.claude/skills/`, `.codex/skills/`, and update `SKILLS.md`:
+- `create-skin` — depends on excluded dashboard, courier, AG transport
+- `evals` — depends on excluded OTEL, eval packs, Python tooling, Lake Merritt
+- `hyperdomo` — depends on excluded orchestration, preflight scripts, `.observability`
+- `test-4-series` — depends on excluded HyperDomo + eval infrastructure
+
+Move each to a `ROADMAP.md` note so nothing is lost.
+
+**MF-4. Skill triage — rewrite 4 skills for v0.1 safety.**
+Rewrite per Codex's detailed specs above:
+- `adherence-check` — make parameter-driven (`artifact_path`, `spec_path`, `report_path`), remove hardcoded conformance doc reference
+- `dev-collaboration` — remove AG/tri-agent framing, support `claude`/`codex`/`gemini` as interchangeable role-holders, remove old workspace paths
+- `dev-competition` — remove AG examples and legacy paths, normalize to `cc.js`/`codex.js`/`gemini.js` messaging
+- `search-synth` — remove AG/browser assumptions, require explicit agent list with confirmed search capability
+
+After cuts and rewrites, update `SKILLS.md` to reflect a 12-skill catalog.
+
+### SHOULD FIX (quality / safety)
+
+**SF-1. Align Node control scripts with tmux-config.sh hardening.**
+`cc.js`, `codex.js`, and `gemini.js` send raw text then Enter. `tmux-config.sh` sends Escape before Enter to dismiss autocomplete overlays. The Node scripts should match. Add an Escape send before the final Enter in each script's `send()` function.
+
+**SF-2. Dead-code if/else in peer launch scripts.**
+In `scripts/launch-cc-peer.sh` (lines 42-46) and `scripts/launch-gemini-peer.sh` (lines 55-59), both branches of the if/else do the identical thing. Remove the dead conditional — just call `agent_send_long` unconditionally.
+
+**SF-3. Add session-kill guard to `me.sh`.**
+Lines 100-101 unconditionally `kill_if_exists` on `ia-claude`/`ia-codex`. If Terminal.app windows are attached, they die instantly with no warning. Add: check if sessions exist AND are attached, warn the user, and require confirmation or a `--force` flag before killing.
+
+**SF-4. Harmonize `maxBuffer` across DNA scripts.**
+`gemini.js` sets `maxBuffer: 10 * 1024 * 1024`. `cc.js` and `codex.js` use Node's default (1MB). Set all three to 10MB for consistency.
+
+**SF-5. Add security notice to README.md.**
+Both agents launch in fully permissive mode (`--dangerously-skip-permissions`, `--yolo`). Add a short, prominent warning in the README so anyone cloning the repo understands what `me.sh` does.
+
+**SF-6. Consolidate `gemini_send_long` into `tmux-config.sh`.**
+`launch-gemini-peer.sh` defines its own `gemini_send_long` that duplicates `agent_send_long` but with a 1-second delay. Add a delay parameter to `agent_send_long` in `tmux-config.sh` and remove the duplicate.
+
+### NICE TO HAVE (polish, non-blocking)
+
+**NH-1.** `leadership.json` is not read by any code. Either wire it to `me.sh` (e.g., drive `ack_timeout_seconds`) or add a comment in the file saying it is reference-only documentation.
+
+**NH-2.** `cc.js` and `codex.js` lack the `read()` command that `gemini.js` has. Add for API parity.
+
+**NH-3.** Validate user-supplied session names in peer launch scripts. Reject names containing `/`, `..`, or other path-unsafe characters to prevent log file path traversal.
+
+**NH-4.** Set `umask 077` before tmux socket creation in `tmux-config.sh`, or document that the socket is only safe on single-user machines.
+
+## Summary
+
+Codex nailed the skill analysis. This consolidated list adds 6 items Codex missed (license, .DS_Store, dead code, session-kill guard, maxBuffer, README security warning) and merges everything into one actionable checklist. Total: 4 must-fix, 6 should-fix, 4 nice-to-have.
+
+The repo is close. The must-fixes are mostly quick (git rm, license line, skill cuts). The skill rewrites are the biggest effort but Codex's specs above are detailed enough to execute directly.
+
+## Codex Revision Brief For Next Agents
+
+This section is the execution-oriented version of the review above. It is written for the next implementation agents so they can make the repo release-ready without re-deciding the scope.
+
+### Release Decision To Use
+
+Use the **12-skill v0.1 target**, not the 8-skill emergency target.
+
+That means:
+- Keep as-is: `add-comments`, `competition`, `constitutional`, `democratic`, `hierarchical`, `negotiation`, `peer-collaboration`, `publication-pipeline`
+- Rewrite now: `adherence-check`, `dev-collaboration`, `dev-competition`, `search-synth`
+- Remove from v0.1: `create-skin`, `evals`, `hyperdomo`, `test-4-series`
+
+### Dazza Decision Needed Up Front
+
+- Choose the repo license:
+  - Option A: keep root `LICENSE` as Apache 2.0 and update `interlateral_dna/package.json`
+  - Option B: change the repo to MIT everywhere
+
+Do not let agents guess this.
+
+### Ordered Work Packets
+
+#### WP-1. Release Hygiene
+
+Owner: any single agent
+
+Files:
+- `interlateral_dna/comms.md`
+- tracked `.DS_Store` files if still present in git
+- `interlateral_dna/package.json`
+- `README.md`
+
+Tasks:
+- Untrack `interlateral_dna/comms.md`
+- Untrack any committed `.DS_Store` files
+- Resolve the license mismatch
+- Add a short README warning that `me.sh` launches agents in permissive mode
+
+Done criteria:
+- `git status` no longer shows tracked runtime artifacts after a fresh `./me.sh` run
+- license metadata matches root `LICENSE`
+- README visibly states the permissive launch behavior
+
+#### WP-2. Skill Catalog Cut For v0.1
+
+Owner: one agent with ownership of skill catalog files
+
+Files:
+- `.agent/skills/create-skin/`
+- `.agent/skills/evals/`
+- `.agent/skills/hyperdomo/`
+- `.agent/skills/test-4-series/`
+- matching deployed copies in `.claude/skills/` and `.codex/skills/`
+- `SKILLS.md`
+- `ROADMAP.md`
+
+Tasks:
+- Remove those four skills from the shipped v0.1 catalog
+- Remove their deployed copies
+- Update `SKILLS.md` to describe the remaining catalog only
+- Add a short note in `ROADMAP.md` preserving each removed skill as deferred functionality
+
+Done criteria:
+- canonical skill count is 12
+- `.claude/skills/` count is 12
+- `.codex/skills/` count is 12
+- `SKILLS.md` no longer advertises removed skills as current v0.1 skills
+
+#### WP-3. Rewrite `adherence-check`
+
+Owner: one agent, this file only
+
+Files:
+- `.agent/skills/adherence-check/SKILL.md`
+- deployed copies after `scripts/deploy-skills.sh`
+
+Required rewrite:
+- Remove all hardcoded references to `interlateral_comms_monitor/docs/INTERNALS_CONFORMANCE.md`
+- Remove old `projects/Skills_Capability/...` invocation examples
+- Require these explicit inputs:
+  - `artifact_path`
+  - `spec_path`
+  - `report_path`
+- State clearly:
+  - if `spec_path` is missing or file does not exist, STOP and report the missing prerequisite
+- Keep:
+  - the structured PASS / FAIL / WARN / N/A evaluation model
+  - the report template
+  - add-comments delivery
+
+Done criteria:
+- a cold agent can run the skill in any repo that has an artifact and an explicit spec file
+- there are no repo-specific missing-path assumptions left in the skill
+
+#### WP-4. Rewrite `dev-collaboration`
+
+Owner: one agent, this file only
+
+Files:
+- `.agent/skills/dev-collaboration/SKILL.md`
+- deployed copies after `scripts/deploy-skills.sh`
+
+Required rewrite:
+- Remove AG-specific framing and examples
+- Remove old workspace-path references
+- Recast the skill as a role pattern:
+  - `DRAFTER`
+  - `REVIEWER`
+  - `BREAKER`
+- Allow any available v0.1 agents to hold roles:
+  - `claude`
+  - `codex`
+  - `gemini`
+- Require:
+  - explicit role assignment
+  - `artifact_path`
+- State clearly:
+  - if only two agents are available, the prompt must explicitly assign a dual-hatted role
+- Keep:
+  - ledger + direct-notification requirement
+  - reviewer / breaker separation
+  - change-log requirement
+
+Done criteria:
+- the skill reads as valid in a CLI-only repo with no AG
+- the default example uses only v0.1-supported agents and paths
+
+#### WP-5. Rewrite `dev-competition`
+
+Owner: one agent, this file only
+
+Files:
+- `.agent/skills/dev-competition/SKILL.md`
+- deployed copies after `scripts/deploy-skills.sh`
+
+Required rewrite:
+- Remove AG examples
+- Remove legacy workspace-path examples
+- Normalize examples to `cc.js`, `codex.js`, and `gemini.js`
+- Require:
+  - `competition_dir`
+  - `requirement_path`
+  - Implementer A
+  - Implementer B
+  - Judge
+- State clearly:
+  - the skill requires at least three available agents
+- Keep:
+  - blind dual implementation
+  - isolation rules
+  - judge-against-requirement rule
+
+Done criteria:
+- a cold agent can run the skill in this repo without reaching for AG or excluded files
+
+#### WP-6. Rewrite `search-synth`
+
+Owner: one agent, this file only
+
+Files:
+- `.agent/skills/search-synth/SKILL.md`
+- deployed copies after `scripts/deploy-skills.sh`
+
+Required rewrite:
+- Remove AG/browser-specific assumptions
+- Remove the assumption that every named participant automatically has search capability
+- Require:
+  - `topic`
+  - `output_file`
+  - explicit participating agent list
+- State clearly:
+  - the assigned roster must actually have web-search capability
+  - if not, STOP and report the mismatch
+- Keep:
+  - multi-agent research
+  - fact-checking of peer findings
+  - final synthesized output
+
+Done criteria:
+- the skill is truthful about prerequisites and does not silently assume non-v0.1 infrastructure
+
+#### WP-7. DNA Script Hardening
+
+Owner: one agent for comms/runtime files
+
+Files:
+- `interlateral_dna/cc.js`
+- `interlateral_dna/codex.js`
+- `interlateral_dna/gemini.js`
+- optionally `scripts/tmux-config.sh`
+
+Tasks:
+- Add Escape-based input hardening to all Node `send()` paths so they match the safer helper behavior
+- Harmonize `maxBuffer` across all three DNA scripts
+- Optional parity improvement: add `read()` to `cc.js` and `codex.js`
+
+Done criteria:
+- all three DNA scripts behave consistently on send
+- large pane captures do not rely on Node defaults
+
+#### WP-8. Launcher Safety Cleanup
+
+Owner: one agent for shell launchers
+
+Files:
+- `me.sh`
+- `scripts/launch-cc-peer.sh`
+- `scripts/launch-gemini-peer.sh`
+- optionally `scripts/tmux-config.sh`
+
+Tasks:
+- Add a guard to `me.sh` before killing attached sessions
+  - warning + `--force`, or equivalent explicit override
+- Remove dead conditionals in `launch-cc-peer.sh` and `launch-gemini-peer.sh`
+- Optional cleanup: generalize Gemini long-send behavior into shared helper code
+
+Done criteria:
+- rerunning `me.sh` does not silently kill attached human windows without warning
+- peer launch scripts no longer contain no-op conditionals
+
+### Final Verification Checklist For Release
+
+After all work packets are complete:
+
+1. Skill counts:
+   - `.agent/skills/` = 12
+   - `.claude/skills/` = 12
+   - `.codex/skills/` = 12
+2. Static checks:
+   - `bash -n me.sh scripts/*.sh`
+   - `node --check interlateral_dna/cc.js interlateral_dna/codex.js interlateral_dna/gemini.js interlateral_dna/identity.js`
+3. Repo hygiene:
+   - `git status` clean after normal launcher use
+   - `interlateral_dna/comms.md` not tracked
+4. Docs:
+   - `SKILLS.md` reflects the 12-skill v0.1 catalog
+   - README includes permissive-mode warning
+   - license metadata is consistent
+5. Runtime smoke:
+   - `./me.sh`
+   - one peer launch helper
+   - `scripts/deploy-skills.sh`
+   - `scripts/shutdown.sh`
+
+### What Next Agents Should Not Re-Decide
+
+- Do not re-open the question of whether `create-skin`, `evals`, `hyperdomo`, or `test-4-series` belong in v0.1. They do not.
+- Do not keep the current repo-specific dead references in the four rewrite-now skills.
+- Do not ship the repo with `comms.md` still tracked.
+- Do not silently choose a license without Dazza's explicit decision.
