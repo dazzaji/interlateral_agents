@@ -1,12 +1,10 @@
 #!/bin/bash
-# Launch a fresh Codex peer in a repo-scoped tmux session with visible scrollback and logging.
-
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-RUNTIME_DIR="$REPO_ROOT/.runtime/agent_boot"
-DEFAULT_PROMPT="Read docs/ops/comms/CLI_FIRST.md first, then wait for instructions."
+DNA_DIR="$REPO_ROOT/interlateral_dna"
+DEFAULT_PROMPT="Read AGENTS.md first, then wait for instructions."
 
 source "$SCRIPT_DIR/tmux-config.sh"
 unset TMUX
@@ -14,16 +12,12 @@ unset TMUX
 usage() {
     cat <<'EOF'
 Usage:
-  scripts/launch-codex-peer.sh <session-name> [startup-prompt]
+  scripts/launch-codex-peer.sh [session-name] [startup-prompt]
 
 Examples:
-  scripts/launch-codex-peer.sh CX_Impl_02
-  scripts/launch-codex-peer.sh CX_Impl_02 "Read docs/ops/comms/CLI_FIRST.md first, then report for duty."
-
-Notes:
-  - Uses TMUX_SOCKET=/tmp/interlateral-platform-alpha-tmux.sock
-  - Refuses to overwrite an existing session
-  - Writes a pane log to .runtime/agent_boot/<session-name>.log
+  scripts/launch-codex-peer.sh
+  scripts/launch-codex-peer.sh ia-codex-peer-02
+  scripts/launch-codex-peer.sh ia-codex-peer-03 "Read AGENTS.md, then report ready."
 EOF
 }
 
@@ -32,15 +26,16 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     exit 0
 fi
 
-if [[ $# -lt 1 ]]; then
-    usage
-    exit 1
+SESSION_NAME="${1:-}"
+if [[ -n "$SESSION_NAME" ]]; then
+    shift
+else
+    SESSION_NAME="$(next_peer_session_name "ia-codex-peer")"
 fi
-
-SESSION_NAME="$1"
-shift
 STARTUP_PROMPT="${*:-$DEFAULT_PROMPT}"
-LOG_FILE="$RUNTIME_DIR/${SESSION_NAME}.log"
+LOG_FILE="$DNA_DIR/${SESSION_NAME}.log"
+TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
+SESSION_ID="${INTERLATERAL_SESSION_ID:-peer_$(date +%s)}"
 printf -v QUOTED_STARTUP_PROMPT '%q' "$STARTUP_PROMPT"
 
 for cmd in tmux codex; do
@@ -50,12 +45,8 @@ for cmd in tmux codex; do
     fi
 done
 
-mkdir -p "$RUNTIME_DIR"
-
 if run_tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     echo "Session '$SESSION_NAME' already exists on $TMUX_SOCKET" >&2
-    echo "Use a new session name or kill it first:" >&2
-    echo "  tmux -S '$TMUX_SOCKET' kill-session -t '$SESSION_NAME'" >&2
     exit 1
 fi
 
@@ -63,7 +54,7 @@ run_tmux new-session -d -s "$SESSION_NAME" -c "$REPO_ROOT"
 : > "$LOG_FILE"
 run_tmux pipe-pane -o -t "$SESSION_NAME" "cat >> '$LOG_FILE'"
 
-LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' CODEX_TMUX_SESSION='$SESSION_NAME' && codex --no-alt-screen -m gpt-5.4 -c model_reasoning_effort='high' --dangerously-bypass-approvals-and-sandbox -C '$REPO_ROOT' $QUOTED_STARTUP_PROMPT"
+LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$TEAM_ID' INTERLATERAL_SENDER='codex-peer' INTERLATERAL_AGENT_TYPE='codex' INTERLATERAL_SESSION_ID='${SESSION_ID}_${SESSION_NAME}' CC_TMUX_SESSION='$CC_SESSION' CODEX_TMUX_SESSION='$SESSION_NAME' GEMINI_TMUX_SESSION='$GEMINI_SESSION' && codex --no-alt-screen -m gpt-5.4 --yolo -C '$REPO_ROOT' $QUOTED_STARTUP_PROMPT"
 
 run_tmux send-keys -t "$SESSION_NAME" "$LAUNCH_CMD" Enter
 
@@ -71,9 +62,3 @@ echo "Launched Codex peer"
 echo "Socket: $TMUX_SOCKET"
 echo "Session: $SESSION_NAME"
 echo "Log: $LOG_FILE"
-echo
-echo "Next commands:"
-echo "  tmux -S '$TMUX_SOCKET' has-session -t '$SESSION_NAME' 2>/dev/null && echo ALIVE || echo DEAD"
-echo "  tmux -S '$TMUX_SOCKET' capture-pane -t '$SESSION_NAME' -p -S -200"
-echo "  tmux -S '$TMUX_SOCKET' attach -t '$SESSION_NAME'"
-echo "  TMUX_SOCKET='$TMUX_SOCKET' '$SCRIPT_DIR/open-tmux-window.sh' '$SESSION_NAME' '$SESSION_NAME'"
