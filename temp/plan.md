@@ -4,26 +4,7 @@
 **Target repo:** `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents`
 **Source of truth:** `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/temp/reconciliation.md` — section `# BEST AND FINAL 0.1 VERSION FOLLOWS`
 
----
-
-## 1. What's better in Codex's prompt vs mine
-
-Codex's prompt had several improvements over my initial version:
-
-- **Explicit priority ordering.** Codex sequences the build (me.sh first, then DNA, then peers, then Skills, then docs, then shutdown, then verify). My prompt said "execute step by step" but Codex makes the priority explicit. Better for a fresh agent that needs to know what to do first.
-- **"Do not commit unless I explicitly ask."** I missed this guardrail. Important.
-- **"Before editing, read only the source-of-truth section and the donor files actually needed for the current step."** Prevents context bloat in the fresh agent. Smart.
-- **Explicit negative scope list by name.** Codex lists every deferred item (AG, mesh launchers, dashboard, router.js, etc.) so the builder can't accidentally pull them in. More bulletproof than my generic "do not add files not listed in the spec."
-- **"Send me a concise build report with blockers."** Good explicit deliverable.
-- **Claude's reviewer prompt is tighter.** Codex scopes it to specific duties: scope protection, docs clarity, Skills usability, donor-file checking, drift catching. Mine just said "review the result."
-
-My prompt had one thing Codex's didn't: **"If something is ambiguous, flag it and keep moving."** Useful for velocity. Incorporated below.
-
-The best-and-final prompts below merge both, keeping Codex's structural discipline and my velocity clause.
-
----
-
-## 2. BEST AND FINAL PROMPT — for ipa-codex (lead builder)
+## 1. BEST AND FINAL PROMPT — for ipa-codex (lead builder)
 
 ```
 Build Interlateral Agents v0.1 in:
@@ -78,7 +59,7 @@ When done, send Dazza a concise build report listing: what was built, what was a
 
 ---
 
-## 3. BEST AND FINAL PROMPT — for ipa-claude (secondary reviewer)
+## 2. BEST AND FINAL PROMPT — for ipa-claude (secondary reviewer)
 
 ```
 You are the secondary reviewer for the Interlateral Agents v0.1 build in:
@@ -106,7 +87,7 @@ Do not duplicate Codex's work. Do not edit files Codex is actively working on. I
 
 ---
 
-## 4. BEST AND FINAL GENERAL PLAN
+## 3. BEST AND FINAL GENERAL PLAN
 
 ### Who does what
 
