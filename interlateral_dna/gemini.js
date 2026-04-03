@@ -87,6 +87,8 @@ function send(message) {
 
   runTmux(['send-keys', '-t', SESSION, '-l', stamped]);
   sleep(1000);
+  runTmux(['send-keys', '-t', SESSION, 'Escape']);
+  sleep(100);
   runTmux(['send-keys', '-t', SESSION, 'Enter']);
   appendLedger('@Gemini', stamped);
 }

@@ -1,11 +1,9 @@
 ---
 name: search-synth
-description: Multi-agent web research with fact-checking and verified synthesis. Each agent searches, writes response, then fact-checks others. Chief author produces final verified response.
+description: Multi-agent web research with cross-fact-checking and verified synthesis.
 metadata:
   owner: interlateral
-  version: "1.1"
-  weight: heavy
-compatibility: Requires 4 agents (manager + 3 searchers). All agents need web search capability.
+  version: "0.1"
 ---
 
 # Search-Synth: Multi-Agent Research with Fact-Checking
@@ -14,37 +12,56 @@ compatibility: Requires 4 agents (manager + 3 searchers). All agents need web se
 
 Conduct thorough web research on a topic using multiple agents, cross-verify findings through fact-checking, and produce a synthesized "Best and Verified" response.
 
+## Required Inputs
+
+| Parameter | Description |
+|-----------|-------------|
+| `topic` | The research question or subject to investigate. |
+| `output_file` | File path where the synthesized result will be written. |
+| `agents` | Explicit list of participating agents, with each agent's search capability noted (see below). |
+
+## Agent Roster and Search Capability
+
+The invoker must declare which agents will participate and confirm which ones have web-search capability. Example:
+
+```
+agents:
+  - name: CC
+    role: MANAGER
+    can_search: false
+  - name: Codex
+    role: SEARCHER
+    can_search: true
+    search_tool: web.run
+  - name: Gemini
+    role: SEARCHER
+    can_search: true
+    search_tool: google_web_search
+```
+
+### Pre-flight Check (Mandatory)
+
+Before starting any phase, MANAGER must verify the roster:
+
+1. At least two agents must have `can_search: true`.
+2. At least one agent must be designated MANAGER (the MANAGER does not search).
+3. A CHIEF_AUTHOR must be designated (defaults to MANAGER if not specified).
+
+**If the roster cannot satisfy search requirements -- for example, no agent has web search, or fewer than two searchers are available -- STOP immediately and report the mismatch. Do not improvise, simulate, or pretend to search.**
+
 ## Roles
 
-| Role | Agent | Responsibilities |
-|------|-------|------------------|
-| **MANAGER** | CC (instance 1) | Orchestrates phases, assigns tasks, does NOT search |
-| **SEARCHER** | AG, Codex, Gemini | Web search, write expository response, fact-check others |
-| **CHIEF_AUTHOR** | CC (default, configurable) | Writes final "Best and Verified" synthesis |
-
-**Note:** CHIEF_AUTHOR can be reassigned via prompt (e.g., `CHIEF_AUTHOR=AG`).
-
-## CLI-Specific Search Methods
-
-Each agent uses its native search capability:
-
-| Agent | Search Tool | Notes |
-|-------|-------------|-------|
-| **CC** | `brave_web_search` (MCP) | Requires brave-search MCP. Verify: `claude mcp list` |
-| **Codex** | `web.run` | Built-in. Must use this tool explicitly for searches |
-| **Gemini** | `google_web_search` | Built-in grounding. Use gemini-3-pro for better citations |
-| **AG** | Browser-based | Uses Puppeteer/CDP for web access |
-
-**CC Setup (if MCP missing):**
-```bash
-claude mcp add brave-search -- npx -y @modelcontextprotocol/server-brave-search
-```
+| Role | Responsibilities |
+|------|------------------|
+| **MANAGER** | Orchestrates phases, assigns tasks, does NOT search. |
+| **SEARCHER** | Uses its declared search tool to research, writes expository response, fact-checks peers. |
+| **CHIEF_AUTHOR** | Writes the final "Best and Verified" synthesis. Defaults to MANAGER; can be reassigned. |
 
 ## Protocol
 
 ### Phase 1: Search and Respond
 
-MANAGER assigns topic to all SEARCHERS:
+MANAGER assigns the topic to all SEARCHERS:
 
 ```
 [AGENT] - MANAGER here. TASK: Research "[TOPIC]"
@@ -68,21 +85,16 @@ All SEARCHERS work in parallel.
 
 ### Phase 2: Fact-Check
 
-After all SEARCHERS signal [PHASE1_DONE], MANAGER assigns fact-checking:
+After all SEARCHERS signal [PHASE1_DONE], MANAGER assigns fact-checking. Each SEARCHER fact-checks every other SEARCHER's response:
 
 ```
 [AGENT] - MANAGER here. TASK: Fact-check the other responses.
-1. Read the responses from [OTHER_AGENT_1] and [OTHER_AGENT_2]
+1. Read the responses from [OTHER_AGENTS]
 2. For EACH assertion/claim, verify via web search
-3. Add your fact-checks to [OUTPUT_FILE] under "## Fact Checks" → "### [AGENT] Fact-Check of [OTHER]"
-4. Format: Claim → Verdict (VERIFIED / FALSE / UNVERIFIABLE) → Source
+3. Add your fact-checks to [OUTPUT_FILE] under "## Fact Checks" -> "### [AGENT] Fact-Check of [OTHER]"
+4. Format: Claim -> Verdict (VERIFIED / FALSE / UNVERIFIABLE) -> Source
 5. Signal [PHASE2_DONE] when complete
 ```
-
-Each SEARCHER fact-checks the other two:
-- AG fact-checks Codex and Gemini
-- Codex fact-checks AG and Gemini
-- Gemini fact-checks AG and Codex
 
 ### Phase 3: Best and Verified Synthesis
 
@@ -97,7 +109,7 @@ CHIEF_AUTHOR - MANAGER here. TASK: Write the "Best and Verified" response.
    - EXCLUDES any assertions marked FALSE by fact-checkers
    - Synthesizes into a coherent, authoritative answer
 4. Add an "### Unverified Claims" section listing assertions that:
-   - May be true but couldn't be verified from authoritative sources
+   - May be true but could not be verified from authoritative sources
    - Are widely reported but not officially documented
 5. Add to [OUTPUT_FILE] under "## Best and Verified Response"
 6. Signal [DONE] when complete
@@ -110,72 +122,51 @@ CHIEF_AUTHOR - MANAGER here. TASK: Write the "Best and Verified" response.
 
 **Skill:** search-synth
 **Date:** [DATE]
-**Searchers:** AG, Codex, Gemini
-**Chief Author:** CC
+**Searchers:** [list of SEARCHER agents]
+**Chief Author:** [CHIEF_AUTHOR agent]
 
 ---
 
 ## Phase 1: Initial Responses
 
-### AG Response
+### [Agent A] Response
 [expository response]
 
-#### AG Search Terms & Raw Results
+#### [Agent A] Search Terms & Raw Results
 **Query:** "[search terms]"
 | URL | Title/Blurb |
 |-----|-------------|
 | ... | ... |
 
-### Codex Response
-[expository response]
-
-#### Codex Search Terms & Raw Results
-...
-
-### Gemini Response
-[expository response]
-
-#### Gemini Search Terms & Raw Results
+### [Agent B] Response
 ...
 
 ---
 
 ## Phase 2: Fact Checks
 
-### AG Fact-Check of Codex
+### [Agent A] Fact-Check of [Agent B]
 | Claim | Verdict | Source |
 |-------|---------|--------|
 | ... | VERIFIED/FALSE/UNVERIFIABLE | ... |
 
-### AG Fact-Check of Gemini
-...
-
-### Codex Fact-Check of AG
-...
-
-### Codex Fact-Check of Gemini
-...
-
-### Gemini Fact-Check of AG
-...
-
-### Gemini Fact-Check of Codex
+### [Agent B] Fact-Check of [Agent A]
 ...
 
 ---
 
 ## Phase 3: Best and Verified Response
 
-**Chief Author:** CC
+**Chief Author:** [CHIEF_AUTHOR]
 
 [Final synthesized response incorporating all verified information]
 
 ### Unverified Claims
 
-The following assertions appear plausible but could not be verified from authoritative sources:
+The following assertions appear plausible but could not be verified
+from authoritative sources:
 
-- [Claim 1] — Reported by [source], not officially documented
-- [Claim 2] — Widely observed behavior, no authoritative confirmation
+- [Claim 1] -- Reported by [source], not officially documented
 - ...
 
 ---
@@ -191,14 +182,19 @@ The following assertions appear plausible but could not be verified from authori
 | `[PHASE2_DONE]` | Searcher completed fact-checks of others |
 | `[DONE]` | Chief author completed final synthesis |
 | `[BLOCK]` | Cannot proceed (missing input, agent unresponsive) |
+| `[MISMATCH]` | Roster does not satisfy search requirements; skill halted |
 
-## Communication
+## Error Handling
 
-Default: `comms.md` + control scripts (`ag.js`, `codex.js`, `gemini.js`)
+### Search Capability Mismatch
 
-## Error Handling & POKE Mechanism
+If MANAGER determines that the roster lacks sufficient search capability (fewer than two agents with `can_search: true`), the skill must:
 
-### Timeout with POKE (Preferred)
+1. Signal `[MISMATCH]`.
+2. Report which agents were provided and what capabilities they declared.
+3. Halt. Do not attempt to proceed with insufficient search coverage.
+
+### Timeout with POKE
 
 Instead of immediately abandoning slow agents, MANAGER sends a POKE:
 
@@ -210,46 +206,50 @@ If blocked, signal [BLOCK] with reason.
 ```
 
 **At 120s (final timeout):**
-- If still no response after POKE: MANAGER signals `[BLOCK]` and proceeds without that agent
+- If still no response after POKE: MANAGER signals `[BLOCK]` and proceeds without that agent.
 - Log: "[AGENT] unresponsive after POKE, proceeding with available agents"
 
 ### Other Error Conditions
 
-- If fewer than 2 searchers complete Phase 1: Skill exits with `[INCOMPLETE]`
-- If CHIEF_AUTHOR unavailable: MANAGER may reassign to next available agent
+- If fewer than 2 searchers complete Phase 1: skill exits with `[INCOMPLETE]`.
+- If CHIEF_AUTHOR unavailable: MANAGER may reassign to next available agent.
 
-### Citation Requirements
+## Citation Requirements
 
 All agents must:
-- Use proper citations [1] for non-common facts derived from web sources
-- Avoid raw markdown links in narrative text — use citation format instead
-- Include full URLs only in the "Raw Results" table section
+- Use proper citations [1] for non-common facts derived from web sources.
+- Avoid raw markdown links in narrative text; use citation format instead.
+- Include full URLs only in the "Raw Results" table section.
 
 ## Example Prompts
 
-### Basic (topic in prompt)
-```
-Use search-synth to research "What is retrieval-augmented generation (RAG)?"
-Output: projects/research/rag-synthesis.md
-```
-
-### With work file
+### Basic
 ```
 Use search-synth.
-Work: projects/research/quantum-computing/work.md
-Output: projects/research/quantum-computing/synthesis.md
+Topic: "What is retrieval-augmented generation (RAG)?"
+Output: projects/research/rag-synthesis.md
+Agents:
+  - CC (MANAGER, no search)
+  - Codex (SEARCHER, web.run)
+  - Gemini (SEARCHER, google_web_search)
+Chief author: CC
 ```
 
-### With custom chief author
+### Two searchers with explicit capability
 ```
-Use search-synth to research "History of computational law"
-CHIEF_AUTHOR=AG
+Use search-synth.
+Topic: "History of computational law"
 Output: projects/research/complaw-history.md
+Agents:
+  - CC (MANAGER + CHIEF_AUTHOR, no search)
+  - Gemini (SEARCHER, google_web_search)
+  - CC-instance-2 (SEARCHER, brave_web_search via MCP)
 ```
 
 ## Notes
 
-- **No scaffolding code** — This skill relies on well-written instructions, not automation
-- **Manager is orchestrator only** — Does not participate in search/fact-check
-- **Parallel execution** — Phase 1 searchers work simultaneously
-- **Sequential phases** — Phase 2 starts only after all Phase 1 complete
+- **No scaffolding code** -- this skill relies on well-written instructions, not automation.
+- **Manager is orchestrator only** -- does not participate in search or fact-checking.
+- **Parallel execution** -- Phase 1 searchers work simultaneously.
+- **Sequential phases** -- Phase 2 starts only after all Phase 1 signals are received.
+- **Explicit capability** -- never assume an agent can search; the roster must declare it.

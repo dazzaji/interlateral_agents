@@ -1,4 +1,5 @@
 {
+  "_note": "This file is reference-only documentation. No code currently reads it. Values like ack_timeout_seconds are informational and do not drive runtime behavior.",
   "version": "1.0",
   "description": "Leadership configuration for the Interlateral Agents v0.1 CLI trio",
   "lead": "cc",

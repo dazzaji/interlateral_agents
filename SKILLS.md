@@ -9,7 +9,7 @@ Deployed copies:
 
 Use `scripts/deploy-skills.sh` after editing the canonical copy.
 
-v0.1 includes the full 16-skill canonical set from `interlateral_alpha`. The files are present and deployable in this repo. Some heavier skills still describe roadmap-era systems such as evals, dashboard skins, or advanced orchestration; those references are preserved for continuity, but the v0.1 starter scope is centered on the duo launcher, peer helpers, direct tmux comms, and readable skill files.
+v0.1 ships a 12-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
 
 `projects/` is reserved for downstream user work. Do not put system skills there.
 
@@ -21,18 +21,14 @@ v0.1 includes the full 16-skill canonical set from `interlateral_alpha`. The fil
 | `adherence-check` | `.agent/skills/adherence-check/SKILL.md` | Conformance-style validation workflow |
 | `competition` | `.agent/skills/competition/SKILL.md` | Parallel competition pattern |
 | `constitutional` | `.agent/skills/constitutional/SKILL.md` | Federated drafting and ratification |
-| `create-skin` | `.agent/skills/create-skin/SKILL.md` | Refers to deferred dashboard skin work |
 | `democratic` | `.agent/skills/democratic/SKILL.md` | Equal-vote decision process |
 | `dev-collaboration` | `.agent/skills/dev-collaboration/SKILL.md` | Drafter / reviewer / breaker workflow |
 | `dev-competition` | `.agent/skills/dev-competition/SKILL.md` | Dual implementation + judge |
-| `evals` | `.agent/skills/evals/SKILL.md` | Refers to deferred eval/trace tooling |
 | `hierarchical` | `.agent/skills/hierarchical/SKILL.md` | Boss / worker delegation pattern |
-| `hyperdomo` | `.agent/skills/hyperdomo/SKILL.md` | Refers to advanced orchestration |
 | `negotiation` | `.agent/skills/negotiation/SKILL.md` | Structured trade-off process |
 | `peer-collaboration` | `.agent/skills/peer-collaboration/SKILL.md` | Two-peer collaboration loop |
 | `publication-pipeline` | `.agent/skills/publication-pipeline/SKILL.md` | Editorial multi-round pipeline |
 | `search-synth` | `.agent/skills/search-synth/SKILL.md` | Search and synthesis workflow |
-| `test-4-series` | `.agent/skills/test-4-series/SKILL.md` | Test/eval project skill |
 
 ## Typical Usage
 

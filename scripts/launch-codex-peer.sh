@@ -32,6 +32,10 @@ if [[ -n "$SESSION_NAME" ]]; then
 else
     SESSION_NAME="$(next_peer_session_name "ia-codex-peer")"
 fi
+if [[ "$SESSION_NAME" =~ [/\.\.]|^\.\. ]]; then
+    echo "Error: session name must not contain '/' or '..': $SESSION_NAME" >&2
+    exit 1
+fi
 STARTUP_PROMPT="${*:-$DEFAULT_PROMPT}"
 LOG_FILE="$DNA_DIR/${SESSION_NAME}.log"
 TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"

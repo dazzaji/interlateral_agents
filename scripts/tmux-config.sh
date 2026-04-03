@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Restrict tmux socket permissions to owner-only (single-user dev assumption)
+umask 077
+
 export INTERLATERAL_TMUX_SOCKET="${INTERLATERAL_TMUX_SOCKET:-/tmp/interlateral-agents-tmux.sock}"
 export TMUX_SOCKET="${TMUX_SOCKET:-$INTERLATERAL_TMUX_SOCKET}"
 export CC_SESSION="${CC_SESSION:-ia-claude}"
@@ -42,6 +45,22 @@ agent_send_long() {
     run_tmux paste-buffer -t "$session" -b "$buffer"
     run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
     sleep 0.3
+    run_tmux send-keys -t "$session" Escape
+    sleep 0.1
+    run_tmux send-keys -t "$session" Enter
+}
+
+agent_send_long_delayed() {
+    local session="${1:?session name required}"
+    local prompt="${2:?prompt required}"
+    local delay="${3:-0.3}"
+    local buffer="${4:-agent_send_long_delayed_$$}"
+    run_tmux send-keys -t "$session" Escape
+    sleep 0.3
+    printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -
+    run_tmux paste-buffer -t "$session" -b "$buffer"
+    run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
+    sleep "$delay"
     run_tmux send-keys -t "$session" Escape
     sleep 0.1
     run_tmux send-keys -t "$session" Enter
@@ -96,6 +115,7 @@ export -f run_tmux 2>/dev/null || true
 export -f agent_send 2>/dev/null || true
 export -f codex_send_clean 2>/dev/null || true
 export -f agent_send_long 2>/dev/null || true
+export -f agent_send_long_delayed 2>/dev/null || true
 export -f agent_capture_recent 2>/dev/null || true
 export -f agent_capture_deep 2>/dev/null || true
 export -f pane_idle 2>/dev/null || true

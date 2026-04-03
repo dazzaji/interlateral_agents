@@ -97,6 +97,24 @@ Codex session: $CODEX_SESSION
 Launch session id: $LAUNCH_SESSION_ID
 EOF
 
+if [[ "${1:-}" != "--force" ]]; then
+    ATTACHED=""
+    if run_tmux has-session -t "$CLAUDE_SESSION" 2>/dev/null; then
+        CLIENTS="$(run_tmux list-clients -t "$CLAUDE_SESSION" -F '#{client_name}' 2>/dev/null || true)"
+        [[ -n "$CLIENTS" ]] && ATTACHED="$ATTACHED $CLAUDE_SESSION"
+    fi
+    if run_tmux has-session -t "$CODEX_SESSION" 2>/dev/null; then
+        CLIENTS="$(run_tmux list-clients -t "$CODEX_SESSION" -F '#{client_name}' 2>/dev/null || true)"
+        [[ -n "$CLIENTS" ]] && ATTACHED="$ATTACHED $CODEX_SESSION"
+    fi
+    if [[ -n "$ATTACHED" ]]; then
+        echo "WARNING: The following sessions have attached terminals:$ATTACHED"
+        echo "Killing them will close those terminal windows immediately."
+        read -r -p "Continue? (y/N or re-run with --force): " confirm
+        [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 1; }
+    fi
+fi
+
 kill_if_exists "$CLAUDE_SESSION"
 kill_if_exists "$CODEX_SESSION"
 

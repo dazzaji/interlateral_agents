@@ -54,6 +54,24 @@ Everything below is intentionally excluded from v0.1. Nothing has been dropped.
 
 ## 3. Skills Infrastructure
 
+### 3.0 Deferred Skills (removed from v0.1 catalog)
+
+The following reusable skills were removed from the v0.1 catalog and are deferred until their supporting infrastructure ships. Absolute paths are included so future agents can find the source material directly when it is time to restore them:
+
+- **create-skin** — dashboard skin generation (depends on comms monitor / skins system, see 4.3)
+  - Current repo path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/create-skin/SKILL.md`
+  - Restored only when dashboard / skin infrastructure is back in scope
+
+- **evals** — eval and trace tooling (depends on Lake Merritt eval system, see 5.1)
+  - Current repo path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/evals/SKILL.md`
+  - Restored only when traces, eval packs, and supporting scripts are back in scope
+
+- **hyperdomo** — advanced manager-agent orchestration (depends on router.js, session.js, skills registry, see 6.1)
+  - Current repo path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/hyperdomo/SKILL.md`
+  - Restored only when manager/worker orchestration infrastructure is back in scope
+
+`test-4-series` is intentionally not listed here as a deferred reusable skill. It was a one-off project/test skill and is considered complete rather than something to restore into the standing v0.1 catalog.
+
 ### 3.1 Machine-Readable Skills Registry
 - .agent/skills/registry.json generated from SKILL.md files
 - Fields: name, description, roles, expected outputs, launcher compatibility

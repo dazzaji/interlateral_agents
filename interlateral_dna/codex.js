@@ -17,6 +17,7 @@ function runTmux(args, options = {}) {
   return execFileSync('tmux', ['-S', TMUX_SOCKET, ...args], {
     encoding: 'utf8',
     timeout: 5000,
+    maxBuffer: 10 * 1024 * 1024,
     ...options,
   });
 }
@@ -61,6 +62,14 @@ function getStatus() {
   console.log(JSON.stringify(payload, null, 2));
 }
 
+function read() {
+  if (!sessionExists()) {
+    console.error(`tmux session '${SESSION}' not found on ${TMUX_SOCKET}`);
+    process.exit(1);
+  }
+  process.stdout.write(runTmux(['capture-pane', '-t', SESSION, '-p', '-S', '-']));
+}
+
 function send(message) {
   if (!message) {
     console.error('Usage: node interlateral_dna/codex.js send "message"');
@@ -78,12 +87,14 @@ function send(message) {
 
   runTmux(['send-keys', '-t', SESSION, '-l', stamped]);
   sleep(1000);
+  runTmux(['send-keys', '-t', SESSION, 'Escape']);
+  sleep(100);
   runTmux(['send-keys', '-t', SESSION, 'Enter']);
   appendLedger('@Codex', stamped);
 }
 
 function showUsage() {
-  console.log('Usage: node interlateral_dna/codex.js send "message" | status');
+  console.log('Usage: node interlateral_dna/codex.js send "message" | status | read');
 }
 
 const [, , command, ...args] = process.argv;
@@ -94,6 +105,9 @@ switch (command) {
     break;
   case 'status':
     getStatus();
+    break;
+  case 'read':
+    read();
     break;
   case 'help':
   case '--help':

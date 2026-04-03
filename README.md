@@ -1,6 +1,6 @@
 # Interlateral Agents
 
-Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives you a fast Claude Code + Codex duo launcher, peer helpers for adding more CLI agents on the same tmux socket, a canonical 16-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
+Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives you a fast Claude Code + Codex duo launcher, peer helpers for adding more CLI agents on the same tmux socket, a canonical 12-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
 
 ## Prerequisites
 
@@ -9,6 +9,10 @@ Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives 
 - `claude`
 - `codex`
 - `gemini` if you want Gemini peer sessions
+
+## Security Notice
+
+`me.sh` launches agents in fully permissive mode (`--dangerously-skip-permissions` for Claude Code, `--yolo` for Codex). This disables all safety prompts and approval gates. Only run it in environments and on codebases where you accept that risk.
 
 ## Quick Start
 
