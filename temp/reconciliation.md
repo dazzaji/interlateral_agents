@@ -893,7 +893,7 @@ The Hilltop's draft event schema is the right starting point. It needs two targe
 
 **Add now** (because they are structural and affect every consumer):
 - `correlation_id`: Links all events within a single Skill run or workflow. Without this, you cannot reconstruct the causal chain of a collaboration.
-- `launcher_mode`: Which launcher started this session (`duo`, `trio`, `quad`, `preflight`). Determines which planes are active and what review surfaces are available.
+- `launcher_mode`: Which launcher started this session. Values match the launcher family directly: `me`, `mesh-no-ag`, `mesh`, `preflight-mesh`. Determines which planes are active and what review surfaces are available.
 
 **Defer to implementation** (because the right shape depends on how agents actually emit events):
 - `message_id`, `parent_event_id`, `artifact_id`: These are eventually needed for replay and causality graphs, but designing them now without knowing the actual event emission patterns risks a schema that's internally consistent but doesn't match reality.
@@ -917,10 +917,17 @@ The Hilltop's draft event schema is the right starting point. It needs two targe
 **Minimum event types** (unchanged from Hilltop): `session_started`, `session_stopped`, `agent_started`, `agent_ready`, `agent_idle`, `agent_busy`, `message_sent`, `message_received`, `skill_invoked`, `skill_completed`, `artifact_created`, `artifact_updated`, `warning`, `error`, `eval_started`, `eval_completed`.
 
 **Added event types** for live operational state:
-- `agent_blocked` (waiting for permission, stuck on input, human intervention needed)
+- `agent_blocked` (stuck on input, unresponsive peer, general blockage)
 - `agent_degraded` (fallback mode, courier instead of direct, missing peer)
 - `skill_timeout` (Skill run exceeded time limit)
 - `skill_failed` (Skill run terminated with error)
+
+**Added event types** for approval workflow:
+- `approval_requested` (agent needs permission from human or peer to proceed)
+- `approval_granted` (permission given — by human or peer agent)
+- `approval_denied` (permission refused — includes reason in payload)
+
+These are separate from `agent_blocked` because approval is a deliberate workflow state, not an error condition. An agent can be blocked without requesting approval (e.g., stuck on input), and an agent can request approval without being blocked (e.g., pre-checking before a destructive operation). Keeping them distinct lets the review plane show approval chains cleanly and lets the dashboard distinguish "waiting for permission" from "stuck."
 
 **Rule** (unchanged): Human-readable logs and dashboards should derive from this stream whenever possible.
 
@@ -928,21 +935,23 @@ The Hilltop's draft event schema is the right starting point. It needs two targe
 
 The Hilltop's artifact model is directionally correct but needs three decisions made explicit before implementation.
 
-**Session package structure** (unchanged from Hilltop):
+**Session package structure** (revised from Hilltop — canonical location consolidated under `.observability/`):
 
 ```
-artifacts/<session-id>/
+.observability/sessions/<session-id>/
 ├── manifest.json
 ├── session-report.md
 ├── decisions.md
 └── links.json
 ```
 
+All session review packages live under `.observability/sessions/`. This is the one canonical location. There is no separate top-level `artifacts/` directory.
+
 **Three decisions that must be made in Phase 0**:
 
 1. **Copy vs. link**: Session packages should *link* to artifacts (via paths in `links.json`), not copy them. Artifacts live where agents create them (typically in `projects/` or the repo working tree). The session package is an index, not an archive. This keeps disk usage bounded and avoids duplication.
 
-2. **Retention**: Session packages are retained indefinitely in `.observability/artifacts/`. Raw telemetry logs (`.observability/casts/`, `.observability/logs/`) follow the existing `rotate-logs.sh` archival policy. Event streams (`.observability/events.jsonl`) are append-only within a session and archived on rotation.
+2. **Retention**: Session packages under `.observability/sessions/` are retained indefinitely. Raw telemetry logs (`.observability/casts/`, `.observability/logs/`) follow the existing `rotate-logs.sh` archival policy. Event streams (`.observability/events.jsonl`) are append-only within a session and archived on rotation.
 
 3. **Self-containment for export**: When a session needs to be shared or archived externally, a `scripts/export-session.sh` should bundle the manifest, report, linked artifacts, and relevant event stream slice into a portable archive. This is a Phase 4 concern, not Phase 0.
 
@@ -1029,7 +1038,7 @@ Three options:
 2. Make `comms.md` a derived/synchronized view
 3. Create `watch-session.sh` (simple polling wrapper for duo mode)
 4. Adapt `interlateral_comms_monitor/` for mesh mode, reading from event stream
-5. Create session report generator (`artifacts/<session-id>/session-report.md`)
+5. Create session report generator (`.observability/sessions/<session-id>/session-report.md`)
 6. Create artifact manifest generator
 
 **Deliverable**: One source of truth for events, plus live and retrospective human review.
@@ -1064,3 +1073,6 @@ Three options:
 | **Skills instrumentation** | Not addressed | Identified as the hardest unsolved problem. Three options evaluated. Recommends agent self-reporting (option 1) for Phase 2, evolving to router-mediated or wrapper-based in Phase 4. | Both agents independently converged on this as the critical gap. The Hilltop described the desired end state but not how to get there. |
 | **Phase 0 scope** | 6 items | Same 6 items, but each now has specific decisions locked (link-not-copy, `ia-` prefix, registry at `.agent/skills/registry.json`) | Phase 0 should *decide*, not just *list topics to decide*. |
 | **Implementation phases** | 4 phases with deliverables | Same 4 phases, refined: Phase 2 adds Skill event emission; Phase 3 adds operational state events; Phase 4 adds export and evolved instrumentation | Each phase now includes the specific additions identified in this changelog. |
+| **Session package path** *(post-Hilltop, Mountaintop revision)* | Mixed: `artifacts/<session-id>/` in structure, `.observability/artifacts/` in retention | Consolidated to `.observability/sessions/<session-id>/` everywhere | Dazza's feedback: consistency matters more than the exact choice. All session review packages now live under `.observability/` alongside other session data. |
+| **`launcher_mode` values** *(post-Hilltop, Mountaintop revision)* | `duo`, `trio`, `quad`, `preflight` | `me`, `mesh-no-ag`, `mesh`, `preflight-mesh` | Dazza's feedback: align field values with actual launcher names to eliminate an avoidable crosswalk between concepts and scripts. |
+| **Approval-state events** *(post-Hilltop, Mountaintop revision)* | Approval/permission states folded into `agent_blocked` | Explicit `approval_requested`, `approval_granted`, `approval_denied` event types, separate from `agent_blocked` | Dazza's feedback + design reasoning: approval is a deliberate workflow state, not an error condition. Separating them lets the review plane show approval chains cleanly. |
