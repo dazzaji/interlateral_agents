@@ -1,62 +1,45 @@
 {
   "version": "1.0",
-  "description": "Flexible leadership configuration for quad-agent mesh (CC, AG, Codex, Gemini)",
-
+  "description": "Leadership configuration for the Interlateral Agents v0.1 CLI trio",
   "lead": "cc",
-
   "agents": {
     "cc": {
       "name": "Claude Code",
-      "session": "interlateral-claude",
+      "session": "ia-claude",
       "control_script": "cc.js"
-    },
-    "ag": {
-      "name": "Antigravity",
-      "session": null,
-      "control_script": "ag.js",
-      "note": "AG uses CDP on port 9222, not tmux"
     },
     "codex": {
       "name": "Codex",
-      "session": "interlateral-codex",
+      "session": "ia-codex",
       "control_script": "codex.js"
     },
     "gemini": {
       "name": "Gemini CLI",
-      "session": "interlateral-gemini",
+      "session": "ia-gemini",
       "control_script": "gemini.js"
     }
   },
-
-  "ack_timeout_seconds": 30,
-
+  "ack_timeout_seconds": 45,
   "fallback": "proceed",
-
   "team_configurations": {
-    "hierarchical_cc_lead": {
-      "description": "CC leads, AG, Codex, and Gemini follow",
+    "hierarchical_claude_lead": {
+      "description": "Claude leads, Codex and Gemini follow",
       "lead": "cc",
-      "followers": ["ag", "codex", "gemini"]
-    },
-    "hierarchical_ag_lead": {
-      "description": "AG leads, CC, Codex, and Gemini follow",
-      "lead": "ag",
-      "followers": ["cc", "codex", "gemini"]
+      "followers": ["codex", "gemini"]
     },
     "hierarchical_codex_lead": {
-      "description": "Codex leads, CC, AG, and Gemini follow",
+      "description": "Codex leads, Claude and Gemini follow",
       "lead": "codex",
-      "followers": ["cc", "ag", "gemini"]
+      "followers": ["cc", "gemini"]
     },
     "hierarchical_gemini_lead": {
-      "description": "Gemini leads, CC, AG, and Codex follow",
+      "description": "Gemini leads, Claude and Codex follow",
       "lead": "gemini",
-      "followers": ["cc", "ag", "codex"]
+      "followers": ["cc", "codex"]
     },
     "collaborative": {
-      "description": "All agents coordinate as peers, no explicit lead",
-      "lead": null,
-      "note": "Each agent checks comms.md on wake-up and coordinates"
+      "description": "All agents coordinate as peers with direct-first comms",
+      "lead": null
     }
   }
 }

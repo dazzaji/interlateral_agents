@@ -1,27 +1,23 @@
 {
   "name": "interlateral-dna",
-  "version": "1.2.0",
-  "description": "Claude Code control scripts for Antigravity - Interlateral pattern",
-  "main": "ag.js",
+  "version": "0.1.0",
+  "description": "Direct tmux comms control scripts for Interlateral Agents v0.1",
+  "main": "cc.js",
   "scripts": {
-    "status": "node ag.js status",
-    "send": "node ag.js send",
-    "read": "node ag.js read",
-    "screenshot": "node ag.js screenshot",
-    "test": "node ag.js status"
+    "cc:status": "node cc.js status",
+    "codex:status": "node codex.js status",
+    "gemini:status": "node gemini.js status",
+    "gemini:read": "node gemini.js read"
   },
   "keywords": [
     "claude-code",
-    "antigravity",
     "multi-agent",
     "interlateral",
+    "tmux",
     "automation"
   ],
   "author": "Dazza Greenwood",
   "license": "MIT",
-  "dependencies": {
-    "puppeteer-core": "^22.15.0"
-  },
   "engines": {
     "node": ">=20.0.0"
   }

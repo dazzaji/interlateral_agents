@@ -3,8 +3,9 @@ const os = require('os');
 
 function getIdentity() {
   return {
-    team: process.env.INTERLATERAL_TEAM_ID || 'platform',
+    team: process.env.INTERLATERAL_TEAM_ID || 'agents',
     sender: process.env.INTERLATERAL_SENDER || 'relay',
+    agent_type: process.env.INTERLATERAL_AGENT_TYPE || '',
     host: os.hostname(),
     sid: process.env.INTERLATERAL_SESSION_ID || `session_${Date.now()}`,
   };
@@ -12,7 +13,14 @@ function getIdentity() {
 
 function identityStamp() {
   const id = getIdentity();
-  return `[ID team=${id.team} sender=${id.sender} host=${id.host} sid=${id.sid}]`;
+  const parts = [
+    `team=${id.team}`,
+    `sender=${id.sender}`,
+    id.agent_type ? `agent_type=${id.agent_type}` : null,
+    `host=${id.host}`,
+    `sid=${id.sid}`,
+  ].filter(Boolean);
+  return `[ID ${parts.join(' ')}]`;
 }
 
 function stampMessage(message) {

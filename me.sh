@@ -4,22 +4,20 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT_DIR="$REPO_ROOT/scripts"
 DNA_DIR="$REPO_ROOT/interlateral_dna"
-RUNTIME_DIR="$REPO_ROOT/.runtime/agent_boot"
 
 source "$SCRIPT_DIR/tmux-config.sh"
 unset TMUX
 
-CLAUDE_SESSION="${CC_TMUX_SESSION:-ipa-claude}"
-CODEX_SESSION="${CODEX_TMUX_SESSION:-ipa-codex}"
+CLAUDE_SESSION="${CC_TMUX_SESSION:-$CC_SESSION}"
+CODEX_SESSION="${CODEX_TMUX_SESSION:-$CODEX_SESSION}"
 CLAUDE_ARGS="${CLAUDE_ARGS:---dangerously-skip-permissions}"
 CODEX_ARGS="${CODEX_ARGS:--m gpt-5.4 --yolo}"
-INTERLATERAL_TEAM_ID="${INTERLATERAL_TEAM_ID:-platform}"
+INTERLATERAL_TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
+LAUNCH_SESSION_ID="${INTERLATERAL_SESSION_ID:-session_$(date +%s)}"
 export TMUX_SOCKET INTERLATERAL_TEAM_ID
 
 CLAUDE_LOG="$DNA_DIR/claude_telemetry.log"
 CODEX_LOG="$DNA_DIR/codex_telemetry.log"
-CLAUDE_PROMPT="$RUNTIME_DIR/claude_boot_prompt.md"
-CODEX_PROMPT="$RUNTIME_DIR/codex_boot_prompt.md"
 
 need_cmd() {
     if ! command -v "$1" >/dev/null 2>&1; then
@@ -72,22 +70,9 @@ wait_for_phrase() {
     return 1
 }
 
-send_file_to_session() {
-    local session="$1"
-    local file="$2"
-    local content
-    content="$(tr '\n' ' ' < "$file")"
-    run_tmux send-keys -t "$session" -l "$content"
-    sleep 0.3
-    run_tmux send-keys -t "$session" Escape
-    sleep 0.1
-    run_tmux send-keys -t "$session" Enter
-}
-
 quote_file_content() {
-    local file="$1"
     local quoted
-    printf -v quoted '%q' "$(<"$file")"
+    printf -v quoted '%q' "$1"
     printf '%s' "$quoted"
 }
 
@@ -96,30 +81,20 @@ need_cmd node
 need_cmd codex
 need_cmd claude
 
-mkdir -p "$DNA_DIR/codex_outbox" "$RUNTIME_DIR"
-
-cat > "$CLAUDE_PROMPT" <<EOF
-IMPORTANT: This project has billable GCP resources (~\$2/day when running, ~\$0.24/day idle after proper shutdown). Before ending any session involving GCP, you MUST follow shutdown procedures in docs/ops/gcp-cost-guard.md. Never leave Cloud SQL, GCE MIG instances, or the forwarding rule running unless Dazza explicitly says to.
-
-Do not explore yet. First send Codex exactly "ACK from Claude. Can you hear me?" using node interlateral_dna/codex.js send "ACK from Claude. Can you hear me?", then wait for Codex ACK, then print exactly Ready to Rock!, then stop and wait for Dazza's assignment.
-EOF
-
-cat > "$CODEX_PROMPT" <<EOF
-IMPORTANT: This project has billable GCP resources (~\$2/day when running, ~\$0.24/day idle after proper shutdown). Before ending any session involving GCP, you MUST follow shutdown procedures in docs/ops/gcp-cost-guard.md. Never leave Cloud SQL, GCE MIG instances, or the forwarding rule running unless Dazza explicitly says to.
-
-Do not explore yet. Watch Claude's terminal for "ACK from Claude. Can you hear me?". When you see it, reply exactly using node interlateral_dna/cc.js send "ACK from Codex. I can hear you.", then print exactly Ready to Rock!, then stop and wait for Dazza's assignment.
-EOF
+CLAUDE_PROMPT="Read CLAUDE.md in this repo for your operating instructions. Do not explore yet. First send Codex exactly \"ACK from Claude. Can you hear me?\" using node interlateral_dna/codex.js send \"ACK from Claude. Can you hear me?\", then wait for Codex ACK, then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
+CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do not explore yet. Watch Claude's terminal for \"ACK from Claude. Can you hear me?\". When you see it, reply exactly using node interlateral_dna/cc.js send \"ACK from Codex. I can hear you.\", then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
 
 CODEX_BOOT_QUOTED="$(quote_file_content "$CODEX_PROMPT")"
 
 cat > "$DNA_DIR/comms.md" <<EOF
-# Dual-Agent Comms Log
+# Comms Log
 
 Session started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 Team: $INTERLATERAL_TEAM_ID
 Socket: $TMUX_SOCKET
 Claude session: $CLAUDE_SESSION
 Codex session: $CODEX_SESSION
+Launch session id: $LAUNCH_SESSION_ID
 EOF
 
 kill_if_exists "$CLAUDE_SESSION"
@@ -133,12 +108,8 @@ run_tmux new-session -d -s "$CODEX_SESSION" -c "$REPO_ROOT"
 run_tmux pipe-pane -t "$CLAUDE_SESSION" "cat >> '$CLAUDE_LOG'"
 run_tmux pipe-pane -t "$CODEX_SESSION" "cat >> '$CODEX_LOG'"
 
-run_tmux send-keys -t "$CODEX_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && codex $CODEX_ARGS $CODEX_BOOT_QUOTED" Enter
-# WARNING: C-c is safe for Claude, but kills Codex CLI.
-run_tmux send-keys -t "$CLAUDE_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && claude $CLAUDE_ARGS" Enter
-
-"$SCRIPT_DIR/open-tmux-window.sh" "$CLAUDE_SESSION" "Interlateral Claude" >/dev/null 2>&1 || true
-"$SCRIPT_DIR/open-tmux-window.sh" "$CODEX_SESSION" "Interlateral Codex" >/dev/null 2>&1 || true
+run_tmux send-keys -t "$CODEX_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' INTERLATERAL_SENDER='codex' INTERLATERAL_AGENT_TYPE='codex' INTERLATERAL_SESSION_ID='${LAUNCH_SESSION_ID}_codex' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && codex $CODEX_ARGS $CODEX_BOOT_QUOTED" Enter
+run_tmux send-keys -t "$CLAUDE_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' INTERLATERAL_SENDER='claude' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID='${LAUNCH_SESSION_ID}_claude' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && claude $CLAUDE_ARGS" Enter
 
 echo "Waiting for agent CLIs to attach..."
 wait_for_ready "$CLAUDE_SESSION" 45 || echo "Warning: Claude session did not report ready before prompt injection"
@@ -146,10 +117,10 @@ wait_for_ready "$CODEX_SESSION" 45 || echo "Warning: Codex session did not repor
 echo "Waiting for Claude idle prompt..."
 if wait_for_idle "$CLAUDE_SESSION" 30; then
     echo "Claude prompt detected, injecting boot context..."
-    send_file_to_session "$CLAUDE_SESSION" "$CLAUDE_PROMPT"
+    agent_send_long "$CLAUDE_SESSION" "$CLAUDE_PROMPT" "claude_boot_${LAUNCH_SESSION_ID}"
 else
     echo "Warning: Claude prompt not detected, attempting injection anyway..."
-    send_file_to_session "$CLAUDE_SESSION" "$CLAUDE_PROMPT"
+    agent_send_long "$CLAUDE_SESSION" "$CLAUDE_PROMPT" "claude_boot_${LAUNCH_SESSION_ID}"
 fi
 
 echo
