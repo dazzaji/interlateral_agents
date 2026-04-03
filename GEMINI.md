@@ -34,6 +34,10 @@ Gemini needs a 1-second delay between prompt injection and `Enter`. Use the prov
 
 Do not use raw `tmux send-keys` for Gemini prompts unless you recreate that delay.
 
+## Model Pinning
+
+If you need deterministic Gemini behavior across sessions, pin the model explicitly in your Gemini CLI configuration or environment. v0.1 does not hardcode a model in the launcher, but a current Gemini Pro-class model is the intended default.
+
 ## Skills
 
 - Canonical source: `.agent/skills/`
