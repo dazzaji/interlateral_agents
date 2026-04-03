@@ -1834,3 +1834,569 @@ Next target: **0.2**
 ```
 
 You can now create the repo, drop in the files listed under **# HAS**, and start building immediately. The ROADMAP.md above is ready to copy-paste into the root. Let me know when you want the exact file list + copy commands for the 0.1 skeleton!
+
+_______________
+
+# BEST AND FINAL 0.1 VERSION FOLLOWS
+
+**Project:** Interlateral Agents
+**Repo:** `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents`
+**Version:** 0.1 (Starter Scope)
+**Date:** 2026-04-02
+
+## Top-Line Scope Summary
+
+v0.1 is a bite-sized, working multi-agent starter. It has exactly five things: a fast duo launcher (`me.sh`), peer launch helpers to spin up more CLI agents on demand, the full 17-skill collaboration catalog, direct live comms via tmux injection, and basic `comms.md` session logging. Everything else is deferred to `ROADMAP.md` — nothing is dropped, nothing is forgotten.
+
+An agent reading this section should be able to build the entire v0.1 repo from the file structure, donor map, and build plan below.
+
+---
+
+# HAS
+
+## 1. The duo launcher
+
+`/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/me.sh`
+
+One command. Boots Claude Code + Codex in tmux sessions on a shared socket. Mutual ACK handshake. Done in seconds. This is the daily driver.
+
+## 2. Peer launch helpers
+
+```
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/launch-codex-peer.sh
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/send-codex-peer.sh
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/launch-cc-peer.sh
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/launch-gemini-peer.sh
+```
+
+Spin up additional Codex, Claude Code, or Gemini CLI agents on demand. All reuse the same tmux socket from `tmux-config.sh`. All join the same `comms.md` conversation.
+
+## 3. Full Skills catalog
+
+```
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/          # canonical source (all 17 skills)
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.claude/skills/          # deployed copy for Claude Code
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.codex/skills/           # deployed copy for Codex
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/SKILLS.md               # human-readable index
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/deploy-skills.sh # push canonical -> deployed
+```
+
+Skills included: peer-collaboration, negotiation, hierarchical, democratic, competition, constitutional, dev-collaboration, dev-competition, publication-pipeline, add-comments, adherence-check, hyperdomo, test-4-series, evals, search-synth, create-skin, and any additional skill present in the `interlateral_alpha` canonical set.
+
+Human invokes a Skill by naming it in a prompt: "Use the dev-collaboration skill. CC is Drafter, Codex is Reviewer+Breaker."
+
+## 4. Live Comms DNA
+
+```
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/cc.js          # inject into Claude Code tmux pane
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/codex.js       # inject into Codex tmux pane
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/gemini.js      # inject into Gemini CLI tmux pane
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/identity.js    # message stamping (26 lines, zero deps)
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/leadership.json # who leads, collaborative mode config
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/LIVE_COMMS.md  # canonical comms reference
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/comms.md       # fresh each session, running ledger
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/package.json   # metadata only (no runtime deps in 0.1)
+```
+
+All comms are direct-first. No courier in v0.1. Identity stamping is on by default so messages from multiple peers are distinguishable.
+
+## 5. Basic logging and records
+
+`comms.md` is the human-readable session record. tmux pane capture via `tmux-config.sh` helpers provides visibility into each agent's terminal. That's the paper trail for v0.1.
+
+## 6. Minimal supporting files
+
+```
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/tmux-config.sh   # shared socket, session names, send/capture helpers
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/shutdown.sh       # kill tmux sessions cleanly
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/README.md                # how to use me.sh, peers, Skills
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/CLAUDE.md                # CC boot protocol + Skills awareness
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/AGENTS.md                # Codex instructions
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/GEMINI.md                # Gemini CLI instructions
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/TROUBLESHOOTING.md       # common issues and fixes
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/ROADMAP.md               # everything deferred from 0.1
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.gitignore
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.env.example
+```
+
+---
+
+# DOES NOT HAVE
+
+Everything below is intentionally excluded from v0.1 and captured in ROADMAP.md. Nothing is dropped.
+
+- **Antigravity / browser agents:** `ag.js`, `ANTIGRAVITY.md`, CDP, puppeteer-core. AG is the most complex transport and not needed for CLI-first workflow.
+- **Mesh launchers:** `mesh.sh`, `mesh-no-ag.sh`, `preflight-mesh.sh`, `bootstrap-full.sh`, `bootstrap-cli.sh`. Peer helpers cover manual expansion for now.
+- **Architectural abstractions:** `router.js`, `session.js`, `docs/ARCHITECTURE.md`, `docs/EVENT_SCHEMA.md`, `docs/ARTIFACT_MODEL.md`. Valuable but premature — add when you feel the pain.
+- **Comms Monitor dashboard:** `interlateral_comms_monitor/` (Express, WebSocket, React, skins). Not needed when tmux panes and comms.md suffice.
+- **Structured event stream:** `.observability/events.jsonl`, event schema implementation, operational state events, approval workflow events.
+- **Artifact/session packages:** `.observability/sessions/<id>/`, manifests, session reports, link-not-copy model, export tooling.
+- **Lake Merritt evals:** `evals/`, eval packs, `run-skill-eval.sh`, `export-skill-run.sh`, `EVALS_GUIDE.md`.
+- **OTEL and telemetry pipeline:** Traces, asciinema casts, `discover-cc-logs.sh`, `rotate-logs.sh`, `harvest-native-logs.sh`, advanced log rotation.
+- **HyperDomo / advanced orchestration:** Manager-worker patterns, formal pool supervision, Skill lifecycle instrumentation.
+- **Courier fallback:** `courier.js`, `codex_outbox/`. Direct comms is sufficient in v0.1.
+- **Heavy docs/conformance/tests:** `INTERNALS_CONFORMANCE.md`, `conformance-check.sh`, `INTERNALS_GUIDE.md`, Python pytest suite, `SKILLS_DEV_GUIDE.md`.
+- **Advanced protocols:** Permission Granting Protocol, Shared House Rule enforcement, Fresh Session markers.
+- **Machine-readable Skills registry:** `.agent/skills/registry.json`, generator script, `/skills` command UX.
+- **Product/platform code:** API server, database, auth, GCP, admin UI, event modules, simulation runners — all stay in `interlateral_platform_alpha`.
+
+---
+
+# PROPOSED FILE STRUCTURE
+
+```
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/
+├── me.sh                                    # duo launcher (CC + Codex)
+├── CLAUDE.md                                # CC instructions (simplified)
+├── AGENTS.md                                # Codex instructions
+├── GEMINI.md                                # Gemini CLI instructions
+├── SKILLS.md                                # human-readable Skills index
+├── README.md                                # getting started guide
+├── TROUBLESHOOTING.md                       # common issues
+├── ROADMAP.md                               # everything deferred from 0.1
+├── .env.example                             # environment template
+├── .gitignore                               # standard exclusions
+│
+├── interlateral_dna/                        # core comms layer
+│   ├── cc.js                                # Claude Code tmux injection
+│   ├── codex.js                             # Codex tmux injection
+│   ├── gemini.js                            # Gemini CLI tmux injection
+│   ├── identity.js                          # message stamping
+│   ├── leadership.json                      # lead agent + collaborative mode
+│   ├── LIVE_COMMS.md                        # canonical comms reference
+│   ├── comms.md                             # session ledger (fresh each run)
+│   └── package.json                         # metadata
+│
+├── .agent/skills/                           # canonical Skills (17 skills)
+│   ├── peer-collaboration/SKILL.md
+│   ├── negotiation/SKILL.md
+│   ├── hierarchical/SKILL.md
+│   ├── democratic/SKILL.md
+│   ├── competition/SKILL.md
+│   ├── constitutional/SKILL.md
+│   ├── dev-collaboration/SKILL.md
+│   ├── dev-competition/SKILL.md
+│   ├── publication-pipeline/SKILL.md
+│   ├── add-comments/SKILL.md
+│   ├── adherence-check/SKILL.md
+│   ├── hyperdomo/SKILL.md
+│   ├── test-4-series/SKILL.md
+│   ├── evals/SKILL.md
+│   ├── search-synth/SKILL.md
+│   └── create-skin/SKILL.md
+│
+├── .claude/skills/                          # deployed copy for CC
+├── .codex/skills/                           # deployed copy for Codex
+│
+├── scripts/
+│   ├── tmux-config.sh                       # shared socket, names, helpers
+│   ├── deploy-skills.sh                     # canonical -> deployed copies
+│   ├── shutdown.sh                          # kill tmux sessions
+│   ├── launch-codex-peer.sh                 # spin up extra Codex
+│   ├── send-codex-peer.sh                   # send to a Codex peer
+│   ├── launch-cc-peer.sh                    # spin up extra Claude Code
+│   └── launch-gemini-peer.sh                # spin up extra Gemini CLI
+│
+├── dev_plan/                                # task assignments (human-editable)
+│   └── dev_plan.md
+│
+└── temp/                                    # scratch workspace
+```
+
+---
+
+# BUILD PLAN
+
+## Step 1: Create directory structure
+
+Create all directories listed in the file structure above inside `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/`.
+
+## Step 2: Copy DNA layer from interlateral_alpha
+
+Copy control scripts from the most mature source:
+
+```
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/cc.js      /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/codex.js   /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/gemini.js  /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/leadership.json /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/LIVE_COMMS.md   /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/package.json    /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+```
+
+**Adaptation needed for cc.js, codex.js, gemini.js:** Update session names and socket path to match `tmux-config.sh` conventions (see Step 5). Add `identity.js` stamping to the send functions.
+
+## Step 3: Import identity.js from platform_alpha
+
+```
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/interlateral_dna/identity.js /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/
+```
+
+**Adaptation needed:** Extend `getIdentity()` to include `agent_type` field. Add `INTERLATERAL_AGENT_TYPE` environment variable support. Keep backward compatibility with existing `stampMessage()` API.
+
+## Step 4: Create comms.md
+
+Create a fresh `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/interlateral_dna/comms.md` with a minimal header:
+
+```markdown
+# Comms Log
+```
+
+This file is regenerated fresh each session by `me.sh`.
+
+## Step 5: Create tmux-config.sh
+
+Build `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/tmux-config.sh` by merging:
+
+**From platform_alpha** (`/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/scripts/tmux-config.sh`):
+- `agent_send` helper function
+- `codex_send_clean` helper function
+- Long-prompt paste support
+- Pane capture helpers
+- Idle detection
+
+**From interlateral_alpha** (`/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/scripts/tmux-config.sh`):
+- Explicit shared socket path discipline
+
+**Set these values:**
+```bash
+export INTERLATERAL_TMUX_SOCKET="/tmp/interlateral-agents-tmux.sock"
+export CC_SESSION="ia-claude"
+export CODEX_SESSION="ia-codex"
+export GEMINI_SESSION="ia-gemini"
+```
+
+## Step 6: Adapt me.sh from platform_alpha
+
+Start from `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/me.sh`.
+
+**Adaptations needed:**
+- Source `scripts/tmux-config.sh` for socket path and session names
+- Use session names from tmux-config.sh (`ia-claude`, `ia-codex`), not platform_alpha's names
+- Set identity stamping environment variables per session
+- Reference this repo's `CLAUDE.md` and `AGENTS.md` in boot prompts
+- Keep the mutual ACK handshake and "Ready to Rock!" behavior
+- Add pipe-pane telemetry capture to `interlateral_dna/` log files
+- Refresh `comms.md` at session start
+
+## Step 7: Create peer launch helpers
+
+**launch-codex-peer.sh and send-codex-peer.sh:**
+Start from `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/scripts/launch-codex-peer.sh` and `send-codex-peer.sh`. Adapt to source `tmux-config.sh` and use the shared socket.
+
+**launch-cc-peer.sh:**
+New file. Simple script that creates a new tmux session (`ia-claude-peer-NN`) on the shared socket and starts Claude Code in it. Pattern it after `launch-codex-peer.sh`.
+
+**launch-gemini-peer.sh:**
+New file. Same pattern but for Gemini CLI. Creates `ia-gemini-peer-NN` sessions. Must use the 1-second input buffer delay documented in `gemini.js`.
+
+## Step 8: Copy Skills from interlateral_alpha
+
+```
+cp -r /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/ /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/
+```
+
+Then create `deploy-skills.sh` based on `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/scripts/deploy-skills.sh`. It should copy `.agent/skills/` contents to `.claude/skills/` and `.codex/skills/`.
+
+Run it once to populate the deployed copies.
+
+## Step 9: Copy SKILLS.md
+
+```
+cp /Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/SKILLS.md /Users/dazzagreenwood/Documents/GitHub/interlateral_agents/SKILLS.md
+```
+
+**Adaptation needed:** Update any internal paths that reference old repo locations.
+
+## Step 10: Create agent instruction docs
+
+**CLAUDE.md:** Write new, simplified. Include: boot protocol (verify tmux, ACK with Codex), Skills awareness (how to read and follow `.agent/skills/` or `.claude/skills/`), comms rules (direct injection + comms.md ledger), identity stamping. Do NOT include: GCP cost guard, mesh-specific sections, AG-related protocols. Reference files exist at `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/CLAUDE.md` (19.5KB, full mesh version) and `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/CLAUDE.md` (24 lines, cost guard only). The v0.1 version should be ~2-4KB.
+
+**AGENTS.md:** Start from `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/AGENTS.md` (16.7KB). Simplify: keep Codex boot protocol, Skills awareness, direct comms instructions, idle-after-ACK. Remove: mesh-specific sections, courier instructions, quad-agent references. Target ~2-4KB.
+
+**GEMINI.md:** Start from `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/GEMINI.md` (7.2KB). Simplify: keep model pinning, input buffer delay warning, ACK protocol, comms rules. Remove: mesh-specific sections. Target ~1-2KB.
+
+**README.md:** Write new. Sections: What this is (one paragraph), Prerequisites (Node.js 20+, tmux), Quick Start (`./me.sh`), Adding More Agents (peer helpers), Using Skills (name it in your prompt), Troubleshooting (link to TROUBLESHOOTING.md), Roadmap (link to ROADMAP.md).
+
+**TROUBLESHOOTING.md:** Copy from `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/TROUBLESHOOTING.md`. Remove any mesh-specific or AG-specific entries.
+
+## Step 11: Create shutdown.sh
+
+New file at `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/scripts/shutdown.sh`. Should:
+- Source `tmux-config.sh` for socket path
+- Kill all sessions on the shared socket
+- Print what was stopped
+
+## Step 12: Create .gitignore and .env.example
+
+**.gitignore:** Standard Node.js ignores plus:
+```
+node_modules/
+.env
+.env.local
+interlateral_dna/comms.md
+interlateral_dna/*.log
+.observability/
+.DS_Store
+```
+
+**.env.example:** Minimal template with identity stamping variables:
+```
+INTERLATERAL_TEAM_ID=agents
+INTERLATERAL_SENDER=relay
+INTERLATERAL_AGENT_TYPE=
+INTERLATERAL_SESSION_ID=
+```
+
+## Step 13: Create ROADMAP.md
+
+Use the content from the ROADMAP section below.
+
+## Step 14: Test
+
+1. Run `./me.sh` — verify two agents boot, ACK, print "Ready to Rock!"
+2. Run `scripts/launch-codex-peer.sh` — verify a peer Codex session starts
+3. Verify `comms.md` shows messages from both agents
+4. Verify Skills are readable: agent should be able to read `.claude/skills/dev-collaboration/SKILL.md`
+5. Run `scripts/shutdown.sh` — verify all sessions are killed
+
+---
+
+# ROADMAP.md
+
+```markdown
+# ROADMAP — Interlateral Agents
+
+Current: **v0.1** (duo launcher + peer helpers + Skills + live comms + basic logs)
+
+Everything below is intentionally excluded from v0.1. Nothing has been dropped.
+
+---
+
+## 1. Architecture Normalization
+
+### 1.1 session.js — Centralized Session Config
+- Single source of truth for socket path, session names, team ID, ACK timeouts, launcher mode
+- Replaces hardcoded values across control scripts and launchers
+- Why deferred: hardcoded values work in v0.1 with one launcher
+
+### 1.2 router.js — Centralized Command Dispatch
+- Unified send/status/read for all agents
+- Target registry, fallback order, unified logging
+- Why deferred: individual control scripts work when called directly
+
+### 1.3 docs/ARCHITECTURE.md
+- Canonical architecture document (five-plane model: control, comms, skills, artifacts, review)
+- Why deferred: you understand the system; this matters when others need to
+
+### 1.4 docs/EVENT_SCHEMA.md
+- Canonical event format for structured logging
+- Fields: ts, session_id, correlation_id, launcher_mode, team_id, event_type, source, target, agent_type, session_name, status, skill_name, artifact_path, payload
+- Event types: session/agent lifecycle, message sent/received, skill lifecycle, operational state (blocked, degraded, timeout, failed), approval workflow (requested, granted, denied)
+- Why deferred: comms.md is the v0.1 log
+
+### 1.5 docs/ARTIFACT_MODEL.md
+- First-class artifact model: typed, indexed, attributable outputs
+- Session packages at .observability/sessions/<session-id>/
+- Link-not-copy, retention policy, export-to-archive
+- Why deferred: add when you want structured reviewability
+
+---
+
+## 2. Mesh Expansion
+
+### 2.1 Mesh Launchers
+- mesh-no-ag.sh (CC + Codex + Gemini CLI)
+- mesh.sh (full quad with AG)
+- preflight-mesh.sh (formal mode with eval hooks)
+- bootstrap-full.sh and bootstrap-cli.sh
+- Why deferred: peer helpers cover manual expansion for now
+
+### 2.2 Worker-Pool Normalization
+- Standardize peer-pool conventions across Codex and Gemini
+- Consistent naming, status reporting, pool health
+- Why deferred: basic peer helpers are sufficient at small scale
+
+---
+
+## 3. Skills Infrastructure
+
+### 3.1 Machine-Readable Skills Registry
+- .agent/skills/registry.json generated from SKILL.md files
+- Fields: name, description, roles, expected outputs, launcher compatibility
+- Why deferred: SKILLS.md is the v0.1 index
+
+### 3.2 Skills Cleanup Pass
+- Remove stale path references in existing Skills
+- Standardize role names and termination conventions
+- Why deferred: Skills work as-is
+
+### 3.3 Skill Composability and Lifecycle
+- Chain Skills in sequence
+- Skill invocations as first-class events with metadata
+- Instrumentation: agent self-reporting -> router-mediated -> wrapper-based
+- /skills command UX
+- Why deferred: depends on event stream and registry
+
+### 3.4 SKILLS_DEV_GUIDE.md
+- How to author new Skills
+- Promotion workflow: draft -> test -> canonical
+- Why deferred: using existing Skills first, not writing new ones
+
+### 3.5 Advanced Skills Validation
+- scripts/validate-skills.sh (lint SKILL.md files)
+- Why deferred: Skills work as-is
+
+---
+
+## 4. Observability and Review
+
+### 4.1 Structured Event Stream
+- .observability/events.jsonl as append-only canonical substrate
+- comms.md becomes a derived view
+- Depends on: EVENT_SCHEMA.md
+
+### 4.2 Lightweight Duo-Mode Live View
+- scripts/watch-session.sh (polling wrapper: comms.md tail, agent status, new files)
+- Why deferred: tmux panes + comms.md suffice for now
+
+### 4.3 Comms Monitor Dashboard
+- interlateral_comms_monitor/ (Express + WebSocket + React)
+- Hot-swappable skins, real-time streaming, direct injection, export
+- Why deferred: not needed until running 3+ agents regularly
+
+### 4.4 OTEL Traces and Telemetry Pipeline
+- OpenTelemetry, trace extraction, log rotation, asciinema recordings
+- discover-cc-logs.sh, rotate-logs.sh, harvest-native-logs.sh
+- Why deferred: basic comms.md logging is enough for v0.1
+
+### 4.5 Session Artifact Packages
+- .observability/sessions/<session-id>/ with manifest, report, decisions, links
+- Session report generation at session end
+- scripts/export-session.sh for portable archives
+- Depends on: ARTIFACT_MODEL.md, event stream
+
+---
+
+## 5. Evals and Quality
+
+### 5.1 Lake Merritt Eval System
+- evals/ directory with LLM-as-judge, 7 eval packs
+- run-skill-eval.sh, export-skill-run.sh, run-test4.sh
+- EVALS_GUIDE.md, preflight-wakeup.sh
+- Why deferred: a whole subsystem unto itself
+
+### 5.2 Conformance System
+- INTERNALS_CONFORMANCE.md (~150KB spec)
+- conformance-check.sh, INTERNALS_GUIDE.md
+- Why deferred: heavy documentation infrastructure
+
+### 5.3 Automated Test Suite
+- Python pytest: wake-up, capture, cleanup, wrapper tests
+- CI integration
+- Why deferred: manual testing is sufficient at v0.1 scale
+
+---
+
+## 6. Orchestration and Pools
+
+### 6.1 HyperDomo Manager-Agent Orchestration
+- Manager agent loads Skills, wakes workers, checkpoints, reports
+- Depends on: router.js, session.js, Skills registry
+
+### 6.2 Permission Granting Protocol
+- Peer agents approve stuck prompts
+- Permission state events in event stream
+- Depends on: event stream, approval events
+
+### 6.3 Shared House Rule and Governance
+- File access governance across agents
+- Enforcement and logging
+
+### 6.4 Fresh Session Markers
+- # === NEW SESSION === markers in comms.md
+- Automatic archiving of prior sessions
+- Session naming conventions
+
+---
+
+## 7. AG and Browser-Based Agents
+
+### 7.1 AG CDP Transport
+- interlateral_dna/ag.js (puppeteer-core, port 9222, iframe injection)
+- ANTIGRAVITY.md
+- Why deferred: most complex transport, not needed for CLI-first workflow
+
+### 7.2 AG Telemetry and Observation
+- AG-specific telemetry watcher, screenshots, log integration
+
+### 7.3 Full Quad-Agent Bootstrap
+- AG in bootstrap-full.sh, health checks, graceful degradation
+
+---
+
+## 8. Explicitly Out-of-Scope Product/Platform Features
+
+These are NOT part of this repo unless strategy changes:
+
+- REST API server (api-server.js)
+- Database (LowDB, PostgreSQL)
+- Auth / registration / onboarding
+- GCP infrastructure (Cloud SQL, MIG, LB)
+- Admin console UI
+- Event modules (debate, voting, rounds)
+- Simulation runners
+- GCP cost guard and ops runbooks
+
+These stay in interlateral_platform_alpha.
+
+---
+
+## Provenance
+
+Capabilities consolidated from five source repos:
+
+| Source Repo | Role |
+|---|---|
+| interlateral_platform_alpha | Duo launcher kernel, identity.js, peer helpers, tmux ergonomics |
+| interlateral_prototype_alphasa_uiax | Historical AG/CDP reference, dashboard lineage |
+| interlateral_design_pattern_factory | Skills workshop, conformance spec source |
+| interlateral_alpha-upstream | Quad-agent distribution template, evals, Skills catalog |
+| interlateral_alpha | Most mature reference implementation — primary base |
+
+Novel additions from reconciliation: router.js, session.js, event schema, artifact model, five-plane framework, registry.json, watch-session.sh, launch-gemini-peer.sh, approval workflow events.
+
+Nothing from any source or reconciliation has been dropped.
+```
+
+---
+
+# SOURCE-OF-TRUTH DONOR MAP
+
+| v0.1 File | Source Repo | Source Path | Adaptation |
+|---|---|---|---|
+| `me.sh` | interlateral_platform_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/me.sh` | Adapt session names, socket path, boot prompts, identity stamping. Keep ACK handshake behavior. |
+| `interlateral_dna/cc.js` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/cc.js` | Update session name to `ia-claude`, socket to match tmux-config.sh, add identity stamping |
+| `interlateral_dna/codex.js` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/codex.js` | Update session name to `ia-codex`, socket to match, add identity stamping |
+| `interlateral_dna/gemini.js` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/gemini.js` | Update session name to `ia-gemini`, socket to match, add identity stamping |
+| `interlateral_dna/identity.js` | interlateral_platform_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/interlateral_dna/identity.js` | Add `agent_type` field, add `INTERLATERAL_AGENT_TYPE` env var |
+| `interlateral_dna/leadership.json` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/leadership.json` | No changes needed |
+| `interlateral_dna/LIVE_COMMS.md` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/LIVE_COMMS.md` | No changes needed |
+| `interlateral_dna/package.json` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/interlateral_dna/package.json` | Remove puppeteer-core dep (not needed without ag.js) |
+| `.agent/skills/*` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/` | Copy entire directory. Update any stale internal paths. |
+| `SKILLS.md` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/SKILLS.md` | Update internal path references |
+| `scripts/deploy-skills.sh` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/scripts/deploy-skills.sh` | Verify paths match new repo structure |
+| `scripts/tmux-config.sh` | MERGE | platform_alpha: `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/scripts/tmux-config.sh` + alpha: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/scripts/tmux-config.sh` | Merge: platform_alpha helpers (agent_send, codex_send_clean, paste, capture, idle) + alpha socket discipline. Set new session names. |
+| `scripts/launch-codex-peer.sh` | interlateral_platform_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/scripts/launch-codex-peer.sh` | Adapt to source tmux-config.sh, use shared socket |
+| `scripts/send-codex-peer.sh` | interlateral_platform_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/scripts/send-codex-peer.sh` | Adapt to source tmux-config.sh |
+| `scripts/launch-cc-peer.sh` | NEW | — | New file. Pattern after launch-codex-peer.sh but for Claude Code sessions. |
+| `scripts/launch-gemini-peer.sh` | NEW | — | New file. Pattern after launch-codex-peer.sh but for Gemini CLI. Must use 1s input delay. |
+| `scripts/shutdown.sh` | NEW | — | New file. Source tmux-config.sh, kill all sessions on shared socket. |
+| `CLAUDE.md` | NEW (merge) | Reference: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/CLAUDE.md` + `/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/CLAUDE.md` | Write new ~2-4KB simplified version. Boot protocol + Skills + comms rules + identity. |
+| `AGENTS.md` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/AGENTS.md` | Simplify to ~2-4KB. Keep boot, Skills, direct comms. Remove mesh/courier/quad. |
+| `GEMINI.md` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/GEMINI.md` | Simplify to ~1-2KB. Keep model pin, delay, ACK. Remove mesh. |
+| `README.md` | NEW | — | Write new. Quick start, peers, Skills, troubleshooting, roadmap links. |
+| `TROUBLESHOOTING.md` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/TROUBLESHOOTING.md` | Remove AG-specific and mesh-specific entries. |
+| `ROADMAP.md` | NEW | — | Use content from ROADMAP section above. |
+| `.gitignore` | interlateral_alpha | `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.gitignore` | Simplify for v0.1 scope. |
+| `.env.example` | NEW | — | Minimal: identity stamping vars only. |
