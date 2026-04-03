@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "description": "Flexible leadership configuration for quad-agent mesh (CC, AG, Codex, Gemini)",
+
+  "lead": "cc",
+
+  "agents": {
+    "cc": {
+      "name": "Claude Code",
+      "session": "interlateral-claude",
+      "control_script": "cc.js"
+    },
+    "ag": {
+      "name": "Antigravity",
+      "session": null,
+      "control_script": "ag.js",
+      "note": "AG uses CDP on port 9222, not tmux"
+    },
+    "codex": {
+      "name": "Codex",
+      "session": "interlateral-codex",
+      "control_script": "codex.js"
+    },
+    "gemini": {
+      "name": "Gemini CLI",
+      "session": "interlateral-gemini",
+      "control_script": "gemini.js"
+    }
+  },
+
+  "ack_timeout_seconds": 30,
+
+  "fallback": "proceed",
+
+  "team_configurations": {
+    "hierarchical_cc_lead": {
+      "description": "CC leads, AG, Codex, and Gemini follow",
+      "lead": "cc",
+      "followers": ["ag", "codex", "gemini"]
+    },
+    "hierarchical_ag_lead": {
+      "description": "AG leads, CC, Codex, and Gemini follow",
+      "lead": "ag",
+      "followers": ["cc", "codex", "gemini"]
+    },
+    "hierarchical_codex_lead": {
+      "description": "Codex leads, CC, AG, and Gemini follow",
+      "lead": "codex",
+      "followers": ["cc", "ag", "gemini"]
+    },
+    "hierarchical_gemini_lead": {
+      "description": "Gemini leads, CC, AG, and Codex follow",
+      "lead": "gemini",
+      "followers": ["cc", "ag", "codex"]
+    },
+    "collaborative": {
+      "description": "All agents coordinate as peers, no explicit lead",
+      "lead": null,
+      "note": "Each agent checks comms.md on wake-up and coordinates"
+    }
+  }
+}

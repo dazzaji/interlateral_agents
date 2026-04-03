@@ -1,0 +1,28 @@
+{
+  "name": "interlateral-dna",
+  "version": "1.2.0",
+  "description": "Claude Code control scripts for Antigravity - Interlateral pattern",
+  "main": "ag.js",
+  "scripts": {
+    "status": "node ag.js status",
+    "send": "node ag.js send",
+    "read": "node ag.js read",
+    "screenshot": "node ag.js screenshot",
+    "test": "node ag.js status"
+  },
+  "keywords": [
+    "claude-code",
+    "antigravity",
+    "multi-agent",
+    "interlateral",
+    "automation"
+  ],
+  "author": "Dazza Greenwood",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer-core": "^22.15.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
