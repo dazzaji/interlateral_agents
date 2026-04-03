@@ -191,6 +191,9 @@ run_tmux pipe-pane -t "$CODEX_SESSION" "cat >> '$CODEX_LOG'"
 run_tmux send-keys -t "$CODEX_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' INTERLATERAL_SENDER='codex' INTERLATERAL_AGENT_TYPE='codex' INTERLATERAL_SESSION_ID='${LAUNCH_SESSION_ID}_codex' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && codex $CODEX_ARGS $CODEX_BOOT_QUOTED" Enter
 run_tmux send-keys -t "$CLAUDE_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' INTERLATERAL_SENDER='claude' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID='${LAUNCH_SESSION_ID}_claude' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && claude $CLAUDE_ARGS" Enter
 
+"$SCRIPT_DIR/open-tmux-window.sh" "$CLAUDE_SESSION" "Interlateral Claude" >/dev/null 2>&1 || true
+"$SCRIPT_DIR/open-tmux-window.sh" "$CODEX_SESSION" "Interlateral Codex" >/dev/null 2>&1 || true
+
 echo "Waiting for agent CLIs to attach..."
 wait_for_ready "$CLAUDE_SESSION" 45 || echo "Warning: Claude session did not report ready before prompt injection"
 wait_for_ready "$CODEX_SESSION" 45 || echo "Warning: Codex session did not report ready before prompt injection"
