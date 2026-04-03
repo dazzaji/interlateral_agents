@@ -1076,3 +1076,761 @@ Three options:
 | **Session package path** *(post-Hilltop, Mountaintop revision)* | Mixed: `artifacts/<session-id>/` in structure, `.observability/artifacts/` in retention | Consolidated to `.observability/sessions/<session-id>/` everywhere | Dazza's feedback: consistency matters more than the exact choice. All session review packages now live under `.observability/` alongside other session data. |
 | **`launcher_mode` values** *(post-Hilltop, Mountaintop revision)* | `duo`, `trio`, `quad`, `preflight` | `me`, `mesh-no-ag`, `mesh`, `preflight-mesh` | Dazza's feedback: align field values with actual launcher names to eliminate an avoidable crosswalk between concepts and scripts. |
 | **Approval-state events** *(post-Hilltop, Mountaintop revision)* | Approval/permission states folded into `agent_blocked` | Explicit `approval_requested`, `approval_granted`, `approval_denied` event types, separate from `agent_blocked` | Dazza's feedback + design reasoning: approval is a deliberate workflow state, not an error condition. Separating them lets the review plane show approval chains cleanly. |
+
+
+_______________
+
+# Streamlined and Simplified Starter Scope
+
+I am Dazza and I need to start building this now but it has become sprawling.  So I need a bite-sized starter initial 0.1 state project that
+
+A) HAS:
+
+has 1) the 2-agent clean simple thing and 2) has a easy way to spin up more agents including more codex, more claude code, and more gemini cli agents, and 3) an easy way to start to use the SKILLS files so I can use them to get the agents organized in lots of ways (so we keep the SKILLS stuff) and 4) of course the Live Comms and 5) some logging/records such as the comms.md file but 
+
+B) DOES NOT HAVE
+
+All the other stuff that seems like complexity or bloat for right now.  Instead add ALL THAT TO a new "ROADMAP.md" file that I will add to root dir.  BE SURE YOU DO NOT MISS ANYTHING and that it is all in section A (HAS) or B (DOES NOT HAVE).  
+
+Give me your response in body of text reply and use markdown headers for "# HAS" and for "# DOES NOT HAVE" and for "# ROADMAP.md"
+
+____
+
+# RESPONSE 01_CL
+
+OK Dazza, here's the clean split. I went through every capability across all five repos and the full reconciliation proposal to make sure nothing falls through the cracks.
+
+## HAS (v0.1 Starter Scope)
+
+**The duo launcher.** `me.sh` at the repo root. One command, boots Claude Code + Codex in tmux sessions on a shared socket, mutual ACK handshake, done in under 5 seconds. Adapted from `platform_alpha`'s `me.sh` behavior, using `interlateral_alpha`'s socket discipline (`/tmp/interlateral-tmux.sock`). This is your daily driver.
+
+**The DNA layer for direct comms.** `interlateral_dna/` containing: `cc.js` (inject into Claude Code's tmux pane), `codex.js` (inject into Codex's tmux pane), `gemini.js` (inject into Gemini CLI's tmux pane), `LIVE_COMMS.md` (the canonical reference for who-talks-to-whom-how), `comms.md` (fresh each session, the running ledger of what agents said), and `leadership.json` (simple config for who leads, collaborative mode). All comms are direct-first. No courier in v0.1 — if Codex can run `--full-auto` or equivalent, it talks directly.
+
+**Peer launch helpers for spinning up more agents.** `scripts/launch-codex-peer.sh` and `scripts/send-codex-peer.sh` from `platform_alpha` — lets you spin up additional Codex instances and message them. `scripts/launch-gemini-peer.sh` (new, simple, based on the Gemini bootstrap logic from `interlateral_alpha`) — same thing for Gemini CLI instances. A simple `scripts/launch-cc-peer.sh` for additional Claude Code sessions. This is how you scale from duo to as many CLI agents as you want without needing the full mesh launcher infrastructure.
+
+**The full Skills catalog.** `.agent/skills/` as the canonical location, containing all 16–17 skills from `interlateral_alpha`: peer-collaboration, negotiation, hierarchical, democratic, competition, constitutional, dev-collaboration, dev-competition, publication-pipeline, add-comments, adherence-check, hyperdomo, test-4-series, evals, search-synth, create-skin. Deploy copies go to `.claude/skills/` and `.codex/skills/` so each agent can read them. `SKILLS.md` at the root as the human-readable index. `scripts/deploy-skills.sh` to push canonical copies to agent directories.
+
+**Basic tmux config.** `scripts/tmux-config.sh` — shared socket path, session names, and the essential helpers from `platform_alpha`: `agent_send`, `codex_send_clean`, long-prompt paste support, and pane capture. This is the glue that makes the launcher and peer scripts work consistently.
+
+**Logging and records.** `comms.md` refreshed each session as the human-readable record of agent conversation. `ag_log.md` placeholder for when AG is added. Standard tmux pane capture so you can always see what each agent's terminal shows. That's your paper trail for v0.1 — simple, readable, sufficient.
+
+**Minimal agent instruction docs.** `CLAUDE.md` (simplified — boot protocol, Skills awareness, comms rules, no GCP cost guard or mesh-specific sections). `AGENTS.md` (Codex instructions — how to read Skills, direct comms, idle-after-ACK, repo boundaries). `GEMINI.md` (Gemini CLI instructions — model pinning, input buffer delay, session conventions). `README.md` (getting started: how to run `me.sh`, how to launch peers, how to invoke Skills). `TROUBLESHOOTING.md` (common issues, from `interlateral_alpha`).
+
+**A basic shutdown script.** `scripts/shutdown.sh` — kills tmux sessions cleanly so you don't accumulate zombie agents.
+
+**`ROADMAP.md`** at root (see below) — everything else lives here as a named, organized, prioritized list so nothing is forgotten.
+
+## DOES NOT HAVE (Deferred to Roadmap)
+
+Everything below is cut from v0.1 and captured in the ROADMAP. I've organized this into groups so you can see what you're deferring and why.
+
+**Architectural abstractions:** `router.js` (centralized send/status/read dispatch), `session.js` (centralized config for sockets/names/modes), `docs/ARCHITECTURE.md`, `docs/EVENT_SCHEMA.md`, `docs/ARTIFACT_MODEL.md`, the five-plane conceptual framework as formalized code structure. These are valuable but they're unifying abstractions — you can add them once you feel the pain of not having them, which makes the design better anyway.
+
+**The mesh launcher family:** `mesh.sh`, `mesh-no-ag.sh`, `preflight-mesh.sh`, `scripts/bootstrap-full.sh`, `scripts/bootstrap-cli.sh`. You don't need named launchers for larger configurations yet — the peer launch scripts let you manually spin up whatever combination you want. The formal launchers make sense once the patterns stabilize.
+
+**Antigravity (browser-based Gemini IDE agent):** `ag.js` (CDP/Puppeteer injection), `ANTIGRAVITY.md`, all AG-related bootstrap logic, AG telemetry watcher. AG is the most complex transport and requires Chrome DevTools Protocol, puppeteer-core, and a running Antigravity instance. Not needed for your CLI-first workflow.
+
+**Identity stamping:** `identity.js` from `platform_alpha`, extending it to all 4 agents, adding `[ID team=... sender=... agent=...]` metadata to every message. Nice for forensics but not essential when you're the only operator with a handful of agents.
+
+**Courier fallback:** `courier.js`, `codex_outbox/` directory, file-watcher sidecar for sandboxed Codex. Only needed if Codex can't do direct comms. Deferred.
+
+**The Comms Monitor dashboard:** `interlateral_comms_monitor/` — the full Express+WebSocket+React dashboard with hot-swappable skins, real-time streaming, direct injection UI, and export. This is the mesh-mode observation tool. Deferred until you're running enough agents to need it.
+
+**Lightweight duo-mode live view:** `scripts/watch-session.sh` (the polling wrapper for duo mode that shows agent status and recent messages). Even this simpler observation tool can wait — tmux panes and `comms.md` are enough for now.
+
+**Structured event stream:** `.observability/events.jsonl` as the single canonical append-only event substrate. The full event schema with 16+ event types, `correlation_id`, `launcher_mode`, operational state events (`agent_blocked`, `agent_degraded`, `skill_timeout`), and approval workflow events (`approval_requested`/`granted`/`denied`). This is the foundation of the mature observability model but is premature for v0.1.
+
+**OTEL traces and telemetry pipeline:** OpenTelemetry integration, trace extraction, telemetry discovery (`discover-cc-logs.sh`), log rotation (`rotate-logs.sh`), asciinema terminal recordings, `scripts/harvest-native-logs.sh`. All the structured observability infrastructure beyond basic comms.md logging.
+
+**Lake Merritt eval system:** The full LLM-as-judge evaluation framework, 7 eval packs, `evals/` directory (renamed from `corpbot_agent_evals/`), `run-skill-eval.sh`, `export-skill-run.sh`, `run-test4.sh`, `EVALS_GUIDE.md`, `scripts/preflight-wakeup.sh`. Powerful but a whole subsystem unto itself.
+
+**Session artifact packages:** `.observability/sessions/<session-id>/` with `manifest.json`, `session-report.md`, `decisions.md`, `links.json`. Typed artifact model (code patch, document, decision record, eval result, screenshot, transcript, prompt artifact, research note). Link-not-copy policy. Export-to-archive tooling (`scripts/export-session.sh`). The entire first-class artifact plane.
+
+**Machine-readable Skills registry:** `skills/registry.json` generated index with skill name, description, roles, expected outputs, launcher compatibility. The `/skills` command UX. Skill composability. Skill lifecycle event emission and outcome logging per run.
+
+**HyperDomo manager-agent orchestration:** The manager agent pattern where a supervisor loads project skills, wakes workers, sends prompts, checkpoints state, and generates reports. This is the deepest Skills usage pattern and depends on the simpler Skills working well first.
+
+**Conformance and quality checking:** `INTERNALS_CONFORMANCE.md` (~150KB architecture conformance spec), `conformance-check.sh`, `validate-skills.sh` (advanced validation), the adherence-check skill as an automated validation tool (the skill file itself stays in v0.1 since all skills are kept, but the tooling around running it programmatically is deferred).
+
+**Advanced protocols:** Permission Granting Protocol (agents granting permissions to peers for stuck prompts), Shared House Rule (file access governance), Fresh Session Rule with `# === NEW SESSION ===` markers, graceful degradation logic (formal handling of missing agents).
+
+**Test suite:** Python pytest suite (wake-up tests, capture tests, cleanup tests, wrapper tests). Automated CI validation.
+
+**Project template:** `projects/mesh-hello-world/` example project. Project directory conventions.
+
+**`SKILLS_DEV_GUIDE.md`:** The guide for authoring new Skills. Deferred because you're using existing Skills first, not writing new ones yet.
+
+**`ROADMAP_additions.md`:** The extended 17.8KB roadmap from `interlateral_alpha`. Folded into the new consolidated ROADMAP.md below.
+
+**`.tmux.conf`:** Root-level tmux configuration from `interlateral_alpha`.
+
+---
+
+## ROADMAP.md
+
+Here's the file content:Here's your ROADMAP.md. To recap the split:
+
+**v0.1 HAS** — the stuff you use every day: `me.sh` duo launcher, peer launch helpers to spin up more Codex/CC/Gemini CLI agents on demand, the full 17-skill catalog in `.agent/skills/`, LIVE_COMMS.md, comms.md session logging, basic tmux-config, agent instruction docs (CLAUDE.md, AGENTS.md, GEMINI.md), SKILLS.md, TROUBLESHOOTING.md, and a shutdown script. That's a working multi-agent system you can use right now.
+
+**ROADMAP has everything else**, organized into five tiers: (1) near-term friction fixes like identity stamping and courier fallback, (2) architectural unification like router.js/session.js and the mesh launcher family, (3) full observability including the dashboard, event stream, OTEL, evals, and session reports, (4) Antigravity/browser-agent support, and (5) long-term hardening like HyperDomo orchestration, conformance checking, test suites, and skill composability.
+
+Every single capability from all five source repos and every novel addition from the reconciliation is accounted for — either in v0.1 or in the roadmap. Nothing dropped.
+
+---
+
+## ROADMAP — interlateral_agents
+
+**Current state:** v0.1 (Starter Scope)
+**What v0.1 has:** `me.sh` duo launcher, peer launch helpers for scaling agents (Codex, CC, Gemini CLI), full Skills catalog, LIVE_COMMS.md, comms.md logging, basic tmux config, agent instruction docs, shutdown script.
+
+Everything below is deferred from v0.1, organized by priority tier. Nothing has been dropped — it is all here, waiting for the right moment.
+
+---
+
+## Tier 1: Add When You Feel the Pain (Near-Term)
+
+These are things you'll likely want within weeks of using v0.1 daily. They address friction you'll hit quickly.
+
+### 1.1 Identity Stamping
+- Import `identity.js` from `interlateral_platform_alpha`
+- Extend to support all agent types (cc, codex, gemini, ag, relay, human)
+- Add `[ID team=... sender=... agent=... sid=...]` metadata to every injected message
+- Add `INTERLATERAL_AGENT_TYPE` environment variable per agent session
+- **Why deferred:** Not essential with a small number of agents where you can see who's who. Becomes important when running multiple peers or reviewing logs after the fact.
+
+### 1.2 Courier Fallback for Sandboxed Codex
+- Bring in `courier.js` from `interlateral_alpha`
+- Set up `codex_outbox/` message queue directory
+- File-watcher sidecar that relays Codex messages when direct tmux injection isn't available
+- **Why deferred:** v0.1 assumes Codex can do direct comms. If you hit a sandboxing situation where Codex can't inject directly, add courier.
+
+### 1.3 Lightweight Duo-Mode Live View
+- Create `scripts/watch-session.sh`
+- Simple `watch`-style polling wrapper: last 10 lines of comms.md, agent status via tmux, newest project files
+- Explicitly not a TUI — if insufficient, jump to the full dashboard instead
+- **Why deferred:** tmux panes + comms.md are enough for early use. This fills the gap between "raw terminal" and "full web dashboard."
+
+### 1.4 Fresh Session Markers and Conventions
+- `# === NEW SESSION ===` markers in comms.md at session start
+- Automatic clearing or archiving of prior session's comms.md
+- Session naming convention (`ia-` prefix recommended)
+- **Why deferred:** Manageable manually at first. Becomes important when you're running multiple sessions per day and reviewing logs.
+
+### 1.5 Advanced Skills Validation
+- `scripts/validate-skills.sh` — lint all SKILL.md files for required fields, role definitions, and consistent formatting
+- **Why deferred:** Skills work as-is. Validation tooling matters when you start editing or authoring new Skills.
+
+---
+
+## Tier 2: Architectural Unification (Medium-Term)
+
+These create the structural backbone that makes the system coherent at scale. Add them once the ad-hoc v0.1 patterns start feeling fragile.
+
+### 2.1 `session.js` — Centralized Session Config
+- Single source of truth for: socket path, session names, team ID, ACK timeout values, launcher mode
+- Replaces hardcoded values scattered across control scripts and launch helpers
+- All control scripts and launchers source their config from this file
+- **Why deferred:** Hardcoded values work fine in v0.1 with one launcher. Becomes essential when you have multiple launch modes and peer pools sharing the same conventions.
+
+### 2.2 `router.js` — Centralized Command Dispatch
+- Unified send/status/read dispatch for all agents
+- Target registry (cc, codex, gemini, ag)
+- Fallback order per agent (direct-first, courier if available)
+- Unified logging format and identity stamping integration
+- Replaces duplicated logic across cc.js, codex.js, gemini.js, ag.js
+- **Why deferred:** Individual control scripts work fine when you're calling them directly. Router pays off when you want uniform logging, consistent fallback, and a single interface for Skills and orchestration to target.
+
+### 2.3 `docs/ARCHITECTURE.md`
+- Single canonical architecture document explaining: launch modes, DNA layer, Skills layer, observability layer, worker-pool model
+- Organized around the five-plane framework: control, comms, skills, artifacts, review
+- Replaces the current pattern of layered README drift
+- **Why deferred:** You understand the system. This matters when other people need to understand it, or when you return to it after a break.
+
+### 2.4 `docs/EVENT_SCHEMA.md`
+- Defines the canonical event format for `.observability/events.jsonl`
+- Fields: `ts`, `session_id`, `team_id`, `event_type`, `source`, `target`, `agent_type`, `session_name`, `status`, `skill_name`, `artifact_path`, `correlation_id`, `launcher_mode`, `payload`
+- Event types: `session_started`, `session_stopped`, `agent_started`, `agent_ready`, `agent_idle`, `agent_busy`, `agent_blocked`, `agent_degraded`, `message_sent`, `message_received`, `skill_invoked`, `skill_completed`, `skill_timeout`, `skill_failed`, `artifact_created`, `artifact_updated`, `approval_requested`, `approval_granted`, `approval_denied`, `warning`, `error`, `eval_started`, `eval_completed`
+- Rule: all human-readable logs and dashboards derive from this stream
+- **Why deferred:** comms.md is the v0.1 log. This schema is the foundation of the mature observability model — design it when you're ready to build on it.
+
+### 2.5 `docs/ARTIFACT_MODEL.md`
+- Makes agent outputs first-class: typed, indexed, attributable
+- Session packages at `.observability/sessions/<session-id>/` containing: `manifest.json`, `session-report.md`, `decisions.md`, `links.json`
+- Artifact classes: code patch, document, decision record, eval result, screenshot, transcript, prompt artifact, research note
+- Manifest fields: `session_id`, `started_at`, `ended_at`, `agents`, `skills_invoked`, `artifacts`, `errors`, `summary`
+- Link-not-copy policy (artifacts stay where agents create them; session packages are indexes, not archives)
+- Retention policy: session packages retained indefinitely; raw telemetry follows rotation; event streams archived per session
+- Export-to-archive deferred to Tier 3
+- **Why deferred:** Agent outputs currently live wherever agents put them. This formalizes the model — add it when you want structured reviewability.
+
+### 2.6 Machine-Readable Skills Registry
+- Generate `.agent/skills/registry.json` from SKILL.md files
+- Fields per skill: name, one-line description, roles, expected outputs, launcher compatibility (me, mesh-no-ag, mesh, preflight)
+- Generator script that re-indexes on demand
+- Foundation for future `/skills` command UX and skill composability
+- **Why deferred:** You can read SKILLS.md. The registry matters for tooling that needs to programmatically discover and route to Skills.
+
+### 2.7 Mesh Launcher Family
+- `mesh.sh`: full quad-agent mesh (CC + Codex + Gemini CLI + AG) with dashboard
+- `mesh-no-ag.sh`: CLI-only trio/quad (CC + Codex + Gemini CLI, no AG)
+- `preflight-mesh.sh`: formal mode with eval hooks and stronger review surfaces
+- `scripts/bootstrap-full.sh` and `scripts/bootstrap-cli.sh` supporting the above
+- Clear semantic distinction: `me` = duo fast path, `mesh` = multi-agent system
+- **Why deferred:** v0.1 uses `me.sh` + manual peer launches. Named mesh launchers formalize the common configurations once you know which ones you actually use.
+
+---
+
+## Tier 3: Full Observability and Review (Medium-to-Long-Term)
+
+These make the system observable, reviewable, and auditable. They turn raw logs into understanding.
+
+### 3.1 Structured Event Stream
+- `.observability/events.jsonl` as the one append-only canonical substrate
+- All control scripts emit events when they send, receive, start, stop, fail
+- `comms.md` becomes a derived/synchronized human view, not the source of truth
+- Skill invocations emit `skill_invoked` and `skill_completed` events with `correlation_id`
+- Operational state events: `agent_blocked`, `agent_degraded`, `skill_timeout`, `skill_failed`
+- Approval workflow events: `approval_requested`, `approval_granted`, `approval_denied`
+- **Depends on:** EVENT_SCHEMA.md (2.4), router.js (2.2) recommended but not required
+
+### 3.2 Comms Monitor Dashboard
+- Import `interlateral_comms_monitor/` from `interlateral_alpha`
+- Express + WebSocket backend, React + Vite frontend
+- Hot-swappable skins (Cockpit, Timeline, Focus, and others)
+- Real-time streaming of agent messages
+- Direct injection from dashboard UI
+- Export (JSON/TXT/CSV)
+- Adapt to read from event stream (3.1) when available
+- **Depends on:** More valuable once you're running 3+ agents regularly
+
+### 3.3 OTEL Traces and Telemetry Pipeline
+- OpenTelemetry integration for structured traces
+- Trace extraction tooling
+- `scripts/discover-cc-logs.sh` — find Claude Code's native log paths
+- `scripts/rotate-logs.sh` — log rotation and archival
+- `scripts/harvest-native-logs.sh` — collect native agent logs
+- Asciinema terminal recordings (`logged-claude.sh`, `logged-ag.sh`)
+- `.observability/` directory structure: traces/, casts/, logs/
+- **Depends on:** EVENT_SCHEMA.md (2.4)
+
+### 3.4 Session Artifact Packages
+- Generate `.observability/sessions/<session-id>/session-report.md` at session end
+- Include: which agents participated, which Skills were invoked, key decisions, artifacts produced, errors/timeouts, links to traces
+- Generate `manifest.json` and `links.json` per session
+- Artifact indexing so you can find what agents produced
+- `scripts/export-session.sh` for portable session archives
+- **Depends on:** ARTIFACT_MODEL.md (2.5), event stream (3.1) recommended
+
+### 3.5 Lake Merritt Evaluation System
+- `evals/` directory (renamed from `corpbot_agent_evals/`)
+- LLM-as-judge quality evaluation with 7 eval packs
+- OTEL trace scoring
+- `scripts/run-skill-eval.sh` — run eval on a completed skill run
+- `scripts/export-skill-run.sh` — package a skill run for evaluation
+- `scripts/run-test4.sh` — automated test framework
+- `EVALS_GUIDE.md` — how to use the eval system
+- `scripts/preflight-wakeup.sh` — launch with eval hooks active
+- **Depends on:** OTEL traces (3.3), event stream (3.1) for full power; can run in limited mode against comms.md earlier
+
+---
+
+## Tier 4: Antigravity and Browser-Based Agents (When Needed)
+
+AG is the most complex transport. Add it when you specifically need a browser-based Gemini IDE agent.
+
+### 4.1 AG CDP Transport
+- `interlateral_dna/ag.js` — Chrome DevTools Protocol injection via puppeteer-core into Antigravity's Electron app
+- Port 9222 connection, iframe navigation, contenteditable injection
+- Read, screenshot, and watch capabilities
+- puppeteer-core dependency (^22.15)
+- `ANTIGRAVITY.md` — agent instruction file for AG
+
+### 4.2 AG Telemetry and Observation
+- AG-specific telemetry watcher
+- AG pane capture and screenshot tooling
+- AG log integration into the event stream
+
+### 4.3 Full Quad-Agent Bootstrap
+- Integration of AG into `bootstrap-full.sh`
+- AG health checks and readiness reporting
+- Graceful degradation when AG is unavailable
+
+---
+
+## Tier 5: Advanced Orchestration and Hardening (Long-Term)
+
+These turn the system from a tool for one operator into a robust platform.
+
+### 5.1 HyperDomo Manager-Agent Orchestration
+- Manager agent loads project skills, wakes workers, sends prompts, checkpoints state, generates reports
+- Deepest form of Skills usage — Skills become addressable workflow primitives, not just instruction files
+- Worker orchestration across agent pools
+- **Depends on:** router.js (2.2), session.js (2.1), Skills registry (2.6)
+
+### 5.2 Skill Composability and Lifecycle
+- Chain Skills: "First use negotiation to decide the approach, then use dev-collaboration to build it"
+- Skill invocations as first-class events with metadata: who invoked, which agents, which roles, expected artifacts, actual outputs, completion status
+- Three instrumentation options: (1) agent self-reporting in Phase 2, (2) router-mediated in Phase 4, (3) wrapper-based in Phase 4
+- `/skills` command UX for humans to see available Skills with one-line descriptions
+- **Depends on:** Skills registry (2.6), event stream (3.1)
+
+### 5.3 Permission Granting Protocol
+- Formal protocol where a peer agent can observe another agent's terminal and approve stuck prompts
+- Explicit doctrine in agent instruction files
+- Permission state events in the event stream
+- Review surface for approval chains
+- **Depends on:** event stream (3.1), approval events in EVENT_SCHEMA
+
+### 5.4 Shared House Rule and Governance
+- Explicit file access governance across agents
+- Which agents can read/write which directories
+- Enforcement and logging of access patterns
+
+### 5.5 Conformance and Quality System
+- `INTERNALS_CONFORMANCE.md` (~150KB architecture conformance spec) from `interlateral_alpha`/`design_pattern_factory`
+- `scripts/conformance-check.sh` — automated conformance validation
+- `adherence-check` skill as a tooling-backed validation (the SKILL.md is already in v0.1; the automated tooling around it is here)
+- `INTERNALS_GUIDE.md`
+
+### 5.6 Worker Pool Normalization
+- Standardize peer-pool conventions across Codex and Gemini CLI
+- Consistent naming, session management, and status reporting for pools
+- Connect pools to router/session model
+- Pool health monitoring and auto-recovery
+
+### 5.7 Automated Test Suite
+- Python pytest suite: wake-up tests, capture tests, cleanup tests, wrapper tests
+- CI integration
+- Regression testing for control scripts and launch modes
+
+### 5.8 Skills Development Guide and Authoring Tooling
+- `SKILLS_DEV_GUIDE.md` — how to author new Skills
+- Skills development workspace conventions (from `design_pattern_factory`)
+- Promotion workflow: draft → test → canonical
+
+### 5.9 Project Template and Conventions
+- `projects/mesh-hello-world/` example project
+- Convention for where deliverables go (`projects/<project-name>/`)
+- Skill-specific output location conventions
+
+### 5.10 Root-Level tmux Configuration
+- `.tmux.conf` at repo root from `interlateral_alpha`
+- Standardized tmux settings for agent sessions
+
+---
+
+## Provenance Notes
+
+This roadmap consolidates capabilities from five source repos:
+
+| Source Repo | Role |
+|---|---|
+| `interlateral_platform_alpha` | Duo launcher kernel, identity.js, peer helpers, tmux ergonomics |
+| `interlateral_prototype_alphasa_uiax` | Historical AG/CDP reference, dashboard lineage |
+| `interlateral_design_pattern_factory` | Skills workshop, conformance spec source, minimal pattern reference |
+| `interlateral_alpha-upstream` | Quad-agent distribution template, evals, Skills catalog |
+| `interlateral_alpha` | Most mature reference implementation — primary base for final repo |
+
+Novel additions proposed during reconciliation (not from any existing repo):
+- `router.js` and `session.js` (architectural unification)
+- Machine-readable Skills registry (`registry.json`)
+- Structured event stream as single source of truth
+- Session artifact packages with manifests and reports
+- `docs/ARCHITECTURE.md`, `docs/EVENT_SCHEMA.md`, `docs/ARTIFACT_MODEL.md`
+- Five-plane conceptual framework (control, comms, skills, artifacts, review)
+- `watch-session.sh` lightweight duo-mode live view
+- `launch-gemini-peer.sh` for Gemini CLI worker-pool symmetry
+- Formal event types for operational state and approval workflows
+
+Nothing from the original five repos or the reconciliation proposal has been dropped. Everything is either in v0.1 (HAS) or in this roadmap.
+
+_____
+
+# RESPONSE 02_CH
+
+# HAS
+
+The 0.1 starter should be a **small, runnable control repo** built for immediate use, not the full final architecture. Its job is to give you a clean duo mode, a clean path to add more agents, retained Skills, live comms, and basic records — nothing more. That aligns with the final synthesis’s “very easy starting mode” and “progressive ladder” approach, but stops before the broader architecture and review stack.  
+
+## 1) Clean simple 2-agent mode
+
+Keep `me.sh` as the obvious default entrypoint: Claude Code + Codex, minimal friction, fast startup, tmux-based, direct comms, ACK discipline, and the strongest human ergonomics from `interlateral_platform_alpha`. This is the right “start here now” mode.   
+
+## 2) Easy way to spin up more agents
+
+Include a **small launcher family**, but keep it minimal:
+
+* `me.sh` for Claude + Codex
+* `mesh-no-ag.sh` for Claude + Codex + Gemini CLI
+* `mesh.sh` for full mesh including Antigravity
+* `scripts/launch-codex-peer.sh`
+* `scripts/send-codex-peer.sh`
+* `scripts/launch-gemini-peer.sh`
+
+That gives you the easy expansion path you asked for: more Codex agents, more Claude/Claude Code sessions via the same tmux/session model, and Gemini CLI peers, without dragging in the rest of the platform. The final proposal explicitly preserves Codex worker helpers and adds Gemini peer symmetry.   
+
+## 3) Keep Skills and make them usable now
+
+Keep `.agent/skills` as the canonical Skills source, with deployed copies for the active agents and a simple `SKILLS.md` humans can actually use. For 0.1, the important thing is not the full registry/index system; it is that you can start agents and invoke Skills in prompts right away. The final synthesis is very clear that `.agent/skills` stays canonical and Skills remain first-class.   
+
+## 4) Live Comms
+
+Keep `LIVE_COMMS.md` and keep the runtime direct-first:
+
+* direct tmux injection is primary
+* courier is fallback only
+* explicit session naming and socket discipline stay in place
+* message identity stamping should stay, because it is one of the most useful low-cost pieces from `platform_alpha`
+
+This preserves the operational core without requiring the larger monitor/replay system.  
+
+## 5) Basic logging and records
+
+Keep:
+
+* `comms.md`
+* basic session logs
+* enough pane capture / send helpers from `tmux-config.sh` to support review and debugging
+* fresh per-session records
+
+For 0.1, `comms.md` can remain a primary human-readable record. You do not need the full structured event substrate yet. The existing repos all rely on comms logs heavily, and the final proposal only moves beyond that in the larger architecture.  
+
+## 6) Small supporting core only
+
+Keep only the smallest necessary core files:
+
+* `cc.js`
+* `codex.js`
+* `gemini.js`
+* `ag.js`
+* `courier.js`
+* `interlateral_dna/identity.js`
+* one merged `scripts/tmux-config.sh`
+* `leadership.json`
+* `CLAUDE.md`
+* `AGENTS.md` or `CODEX.md`
+* `GEMINI.md`
+* `ANTIGRAVITY.md`
+* `SKILLS.md`
+* `LIVE_COMMS.md`
+
+That is enough to run the system, organize agent behavior, and keep operations understandable.  
+
+# DOES NOT HAVE
+
+The 0.1 starter should **not** include the broader “final architecture” items that make the system sprawl. Those should be deferred, even if they were recommended for the eventual repo. The right rule is: if it is not needed to run the duo mode, expand to more agents, use Skills, maintain live comms, or keep basic records, it stays out of 0.1.  
+
+## 1) No full dashboard / monitor stack
+
+Do not include:
+
+* `interlateral_comms_monitor`
+* WebSocket streaming UI
+* skins/themes
+* live web dashboard
+* replay UI
+* export UI
+
+Those are valuable later, but they are not required for your immediate starter. They belong in roadmap, not in the initial repo.  
+
+## 2) No evals / Lake Merritt / formal review system
+
+Do not include:
+
+* eval packs
+* LLM-as-judge
+* OTEL trace scoring
+* `run-skill-eval.sh`
+* `export-skill-run.sh`
+* `corpbot_agent_evals/`
+* formal preflight / review orchestration
+
+Those are real capabilities in `interlateral_alpha`, but they are exactly the kind of “good later, not now” complexity you want to avoid in 0.1.  
+
+## 3) No structured event / artifact architecture yet
+
+Do not include, yet:
+
+* append-only structured event stream as source of truth
+* `artifacts/<session-id>/manifest.json`
+* session artifact packaging
+* `session-report.md`
+* explicit artifact model
+* explicit event schema
+
+Those were additions in the synthesized final proposal beyond the existing repos, but they are not required for your starter build. For now, basic logs and `comms.md` are enough.  
+
+## 4) No `router.js` and no `session.js` in 0.1
+
+These were smart architectural additions for the fuller repo, but for your bite-sized start they are optional complexity. You can keep launch/session logic simpler at first and add these when you are ready to normalize the control and comms planes.  
+
+## 5) No product-app/platform features
+
+Do not include anything from `platform_alpha` that belongs to the product/application layer:
+
+* REST API server
+* debate/event modules
+* database
+* auth / registration / onboarding
+* GCP infrastructure
+* billing / ops guardrails
+* admin console
+* simulation runners
+
+Those were explicitly identified as product-repo concerns, not control-repo concerns.  
+
+## 6) No historical/debug baggage
+
+Do not include:
+
+* AG auxiliary debug scripts from `prototype_alphasa_uiax`
+* older historical dashboard/debug plumbing
+* docs or files kept only for lineage/reference
+* mixed old courier-first patterns
+
+Those are reference material, not starter-state necessities. 
+
+## 7) No full conformance/documentation suite
+
+Do not include in 0.1:
+
+* full `INTERNALS_CONFORMANCE.md`
+* `INTERNALS_GUIDE.md`
+* conformance checking scripts
+* broad documentation tree
+* historical docs archive
+* full project/examples/test suite carried over wholesale
+
+Keep docs minimal and operational for now.  
+
+## 8) No HyperDomo or broader observability stack
+
+Do not include:
+
+* HyperDomo path
+* OTEL extraction / trace conventions
+* traces / casts / richer observability directories
+* session recordings / archival system beyond simple logs
+
+These are useful later, but not necessary for the small starter you described.  
+
+# ROADMAP.md
+
+Your `ROADMAP.md` should contain **everything intentionally excluded from 0.1**, organized so you do not lose any capability. The main sections should be these.
+
+## 1) Architecture normalization
+
+Add later:
+
+* `interlateral_dna/router.js`
+* `interlateral_dna/session.js`
+* stronger unified routing/session model
+* clearer control/comms/skills/artifacts/review separation
+* explicit session and naming invariants
+
+This is the first major “grow up” step after 0.1.  
+
+## 2) Better Skills infrastructure
+
+Add later:
+
+* `skills/registry.json`
+* machine-readable Skills catalog
+* Skills cleanup pass
+* stale-path cleanup
+* standardized role names / termination conventions
+* richer Skills discoverability and UX
+
+0.1 keeps Skills working; roadmap makes Skills systematic.  
+
+## 3) Rich observability and dashboard
+
+Add later:
+
+* `interlateral_comms_monitor`
+* lightweight duo watcher such as `scripts/watch-session.sh`
+* richer mesh dashboard
+* live status surfaces
+* replay surfaces
+* exports
+* WebSocket streaming
+* session recordings / archival
+
+These were part of the mature mesh repos and the synthesized future direction, but not needed to start.  
+
+## 4) Event, artifact, and review model
+
+Add later:
+
+* append-only structured event stream
+* `docs/EVENT_SCHEMA.md`
+* `docs/ARTIFACT_MODEL.md`
+* artifact manifests
+* session packaging
+* session report generation
+* stronger after-action review flow
+
+This is one of the biggest “beyond existing repos” additions and should be preserved in roadmap explicitly.  
+
+## 5) Formal evals and quality/conformance
+
+Add later:
+
+* Lake Merritt eval system
+* skill eval scripts
+* eval packs
+* OTEL scoring
+* conformance docs
+* conformance checks
+* adherence-check integration
+* stronger test suite
+
+This keeps the 0.1 repo light while preserving the quality path.  
+
+## 6) Deeper launcher and pool evolution
+
+Add later:
+
+* `preflight-mesh.sh`
+* richer supervision and readiness reporting
+* manager-worker orchestration
+* larger Codex/Gemini pools
+* more formal launcher ladder behavior
+* stronger shutdown/cleanup lifecycle
+
+Your 0.1 already has the minimal launcher family; roadmap is where you grow it into a more formal orchestration system. 
+
+## 7) Product/platform capabilities explicitly out of scope
+
+Add a roadmap section that says these are **not part of this repo unless strategy changes**:
+
+* API server
+* debate/event systems
+* DB/auth/onboarding
+* GCP infra
+* admin UI
+* simulation runners
+
+This is important so the repo does not drift back into product-app scope.  
+
+## 8) Historical/reference material
+
+Add later only as reference imports if truly needed:
+
+* prototype AG debug helpers
+* older lineage docs
+* design-pattern examples as reference only
+* historical notes and migration docs
+
+These should be treated as reference sources, not starter-state code.  
+
+## Recommended 0.1 framing for you
+
+In one line: **build the repo as “duo-first, mesh-capable, Skills-kept, comms-live, logs-basic.”** Everything else goes into `ROADMAP.md`. That gives you something you can actually start coding now without losing the larger plan.  
+
+_____
+
+# RESPONSE 03_GK
+
+**# HAS**
+
+The 0.1 starter repo (`interlateral_agents`) is deliberately minimal and focused **only** on these five things you asked for:
+
+1. **Clean simple 2-agent thing**  
+   - `./me.sh` — the exact fast duo launcher (Claude Code + Codex) you are already using.  
+   - Boots two tmux sessions, does mutual ACK handshake, prints “Ready to Rock!”, and is ready in <5 seconds.  
+   - Uses `interlateral_dna/cc.js` and `codex.js` for direct tmux injection (Ledger + Whip pattern).
+
+2. **Easy way to spin up more agents**  
+   - `scripts/launch-codex-peer.sh` and `scripts/send-codex-peer.sh` (imported from platform_alpha) so you can instantly add as many extra Codex instances as you want.  
+   - Simple equivalent helpers for extra Claude Code instances and Gemini CLI agents (basic launch scripts that reuse the same tmux socket).  
+   - All extra agents join the **same shared comms.md** automatically.
+
+3. **Easy way to start using SKILLS files**  
+   - `.agent/skills/` directory with all 16–17 Skills copied from `interlateral_alpha` (canonical location).  
+   - Top-level `SKILLS.md` index so you can see what’s available.  
+   - Agents are instructed (via merged CLAUDE.md / AGENTS.md) to read and follow any Skill you name in your prompt, e.g. “Use the dev-collaboration skill…”.
+
+4. **Live Comms**  
+   - Full Ledger + Whip: every message is both injected live into the target agent **and** appended to the shared `comms.md` ledger.
+
+5. **Basic logging/records**  
+   - `comms.md` (fresh each session) as the single human-readable record of everything said.  
+   - Simple tmux pane capture and console output for visibility.
+
+**That’s it.** The entire 0.1 repo is built around these five capabilities and nothing more. You can start using it **today** exactly like your current `me.sh` workflow, but now with Skills and the ability to spin up extra agents on demand.
+
+**# DOES NOT HAVE**
+
+Everything else is **explicitly excluded** from 0.1 (no bloat, no complexity):
+
+- No full-mesh launchers (`mesh.sh`, `mesh-no-ag.sh`, `preflight-mesh.sh`, etc.)
+- No Antigravity / Gemini IDE / CDP support (`ag.js` is not present)
+- No Comms Monitor dashboard or WebSocket UI
+- No `router.js` or `session.js` (the new DNA abstractions)
+- No structured event stream (`.observability/events.jsonl`)
+- No Lake Merritt evals or any evaluation system
+- No OTEL traces, asciinema casts, log rotation, or advanced observability
+- No artifact/session packages or `session-report.md`
+- No HyperDomo / manager-worker orchestration
+- No permission-granting protocol or Shared House Rule enforcement
+- No leadership.json (beyond the simple duo)
+- No `.claude/skills/` or `.codex/skills/` deployed copies or `deploy-skills.sh`
+- No `watch-session.sh`, preflight checks, or shutdown scripts
+- No docs/ARCHITECTURE.md, EVENT_SCHEMA.md, ARTIFACT_MODEL.md, or any phase-0 design docs
+- No five-plane architecture implementation
+- No worker-pool symmetry beyond the basic Codex helpers already listed in HAS
+
+All of the above (and every other capability mentioned in the original reports) is deliberately deferred.
+
+**# ROADMAP.md**
+
+```markdown
+# Interlateral Agents — ROADMAP
+
+This file contains **everything** that is intentionally excluded from the 0.1 starter but will be added in future versions.
+
+## v0.2 – Mesh Foundations (next)
+- Add `mesh-no-ag.sh` (CLI trio: CC + Codex + Gemini CLI)
+- Add `mesh.sh` (full quad mesh with Antigravity)
+- Introduce `interlateral_dna/session.js` and `router.js`
+- Merge full tmux-config.sh helpers (agent_send, codex_send_clean, etc.)
+- Deploy Skills copies to `.claude/skills/` and `.codex/skills/`
+- Add `launch-gemini-peer.sh` for symmetric Gemini worker pools
+
+## v0.3 – Observability & Review
+- Single structured `.observability/events.jsonl` event stream
+- Lightweight `watch-session.sh` for duo mode
+- Full Comms Monitor dashboard (interlateral_comms_monitor/)
+- Basic session packages under `.observability/sessions/<id>/` (manifest + session-report.md)
+
+## v0.4 – Polish & Production Readiness
+- Full Lake Merritt LLM-as-judge eval system
+- OTEL traces, asciinema casts, log rotation
+- Permission Granting Protocol + Shared House Rule
+- HyperDomo / manager-worker orchestration
+- `preflight-mesh.sh` with evals and traces
+- Export-session.sh for portable archives
+
+## v1.0 – Mature Multi-Agent Platform
+- Five-plane architecture fully implemented (control, comms, skills, artifacts, review)
+- Machine-readable `registry.json` for Skills
+- Approval/permission state events
+- Advanced Skill instrumentation and correlation IDs
+- Comprehensive docs/ARCHITECTURE.md, EVENT_SCHEMA.md, ARTIFACT_MODEL.md
+- Community contribution guidelines and Skills expansion pipeline
+
+## Long-term (post v1.0)
+- Dynamic worker pools under manager control
+- Mixed human + agent teams
+- Integration hooks with the platform product (interlateral_platform_alpha)
+- Public Skills marketplace / community library
+
+**Rule for all future work:**  
+Never add anything to the 0.1 core unless it directly serves the five HAS items above. Everything else belongs in this ROADMAP and will be implemented as separate, incremental releases.
+
+Current version: **0.1** (simple duo + Skills + peer spawning)
+Next target: **0.2**
+```
+
+You can now create the repo, drop in the files listed under **# HAS**, and start building immediately. The ROADMAP.md above is ready to copy-paste into the root. Let me know when you want the exact file list + copy commands for the 0.1 skeleton!
