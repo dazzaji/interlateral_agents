@@ -27,4 +27,4 @@
 
 - Confirm the session exists on the shared socket.
 - Increase patience and inspect the terminal buffer.
-- Review `scripts/tmux-config.sh` and the launcher timeouts in `me.sh` if you are intentionally changing timeout behavior. `interlateral_dna/leadership.json` is reference-only and does not drive runtime logic.
+- Review `scripts/tmux-config.sh` and the launcher timeouts in `me.sh` if you are intentionally changing timeout behavior.

@@ -2403,30 +2403,26 @@ Nothing from any source or reconciliation has been dropped.
 
 # CLAUDE CHECK
 
-**Verdict:** PASS WITH RISKS
+**Verdict:** PASS
 
 **Findings:**
 
-1. **LOW — ROADMAP.md deferred-skill restoration target paths are aspirational, not live.** The three restoration target paths (e.g., `.agent/skills/create-skin/SKILL.md`) do not currently exist on disk — they describe where skills will be placed when restored. This is now clearly labeled "Restoration target path" vs "Donor source path," so intent is unambiguous. The donor paths in `interlateral_alpha` are confirmed live. No fix needed — flagging for awareness only.
-
-2. **LOW — TROUBLESHOOTING.md leadership.json wording is improved but still references the file.** Line 30 now says leadership.json "is reference-only and does not drive runtime logic," which is accurate and no longer misleading. No fix needed.
-
-3. **INFO — me.sh comms.md refresh now occurs after abort confirmation (line 107), which is correct.** The abort path (`exit 1` at line 103) exits before the ledger is touched. Verified non-regressing.
+1. **INFO — me.sh comms.md refresh now occurs after abort confirmation (line 107), which is correct.** The abort path (`exit 1` at line 103) exits before the ledger is touched. Verified non-regressing.
 
 **What was verified clean:**
 
 - **Skill command paths:** All occurrences of `node cc.js`, `node codex.js`, `node gemini.js`, and `<target_agent_script>.js` are gone from all three skill locations (`.agent/`, `.claude/`, `.codex/`). Replaced with `node interlateral_dna/cc.js send` etc. Deployed copies match canonical (diff confirmed).
 - **me.sh abort path:** `comms.md` refresh moved to after the attached-session confirmation gate. User answering "N" now preserves both sessions and the prior ledger.
-- **ROADMAP.md deferred skills:** Now shows both restoration target paths (in `interlateral_agents`) and donor source paths (in `interlateral_alpha`). All three donor paths verified live on disk.
+- **ROADMAP.md deferred skills:** Now shows both restoration target paths and donor source paths, and explicitly labels the restoration targets as future in-repo locations that do not exist until restored. All three donor paths were verified live on disk.
 - **CLAUDE.md skill count:** Line 55 now says "12 skills" (was "16"). Consistent with README.md, SKILLS.md, and the on-disk 12/12/12 catalog.
-- **TROUBLESHOOTING.md:** No longer implies leadership.json controls runtime behavior.
+- **TROUBLESHOOTING.md:** No longer references `leadership.json` in timeout guidance.
 - **No regressions:** Syntax checks pass, skill counts remain 12/12/12, no dead references in skills, no tracked runtime artifacts.
 
-**Reasoning:** All five findings from `temp/revisions-plan-REVIEW.md` have been addressed. The HIGH (broken skill command paths) is fully resolved. The three MEDIUMs (me.sh abort path, ROADMAP dead paths, CLAUDE.md skill count) are fully resolved. The LOW (TROUBLESHOOTING.md) is resolved. Remaining risks are cosmetic/awareness-level only.
+**Reasoning:** All five findings from `temp/revisions-plan-REVIEW.md` have been addressed. The HIGH (broken skill command paths) is fully resolved. The three MEDIUMs (me.sh abort path, ROADMAP dead paths, CLAUDE.md skill count) are fully resolved. The LOW (TROUBLESHOOTING.md) is fully resolved. No remaining issues were identified in the implemented fix set.
 
 # CODEX CHECK
 
-**Verdict:** PASS WITH RISKS
+**Verdict:** PASS
 
 **Findings:** None at blocking or regression level.
 
@@ -2445,4 +2441,4 @@ Nothing from any source or reconciliation has been dropped.
 - Deployed skill copies were resynced and matched the canonical rewritten skills.
 - Searches for stale `node cc.js`, `node codex.js`, `node gemini.js`, and `<target_agent_script>.js` patterns in the rewritten skill scope came back clean.
 
-**Residual risk level:** Low. The remaining concerns are documentation/awareness-level only, not functional breakage in the implemented fix set.
+**Residual risk level:** None identified in the implemented fix set.

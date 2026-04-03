@@ -56,20 +56,22 @@ Everything below is intentionally excluded from v0.1. Nothing has been dropped.
 
 ### 3.0 Deferred Skills (removed from v0.1 catalog)
 
-The following reusable skills were removed from the v0.1 catalog and are deferred until their supporting infrastructure ships. Source absolute paths are included so future agents can find the donor material directly when it is time to restore them:
+The following reusable skills were removed from the v0.1 catalog and are deferred until their supporting infrastructure ships. Each entry lists:
+- a **restoration target path** for where the skill will live in this repo when restored
+- a **donor source path** for where the source material exists today
 
 - **create-skin** — dashboard skin generation (depends on comms monitor / skins system, see 4.3)
-  - Restoration target path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/create-skin/SKILL.md`
+  - Restoration target path (future in-repo location, not present until restored): `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/create-skin/SKILL.md`
   - Donor source path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/create-skin/SKILL.md`
   - Restored only when dashboard / skin infrastructure is back in scope
 
 - **evals** — eval and trace tooling (depends on Lake Merritt eval system, see 5.1)
-  - Restoration target path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/evals/SKILL.md`
+  - Restoration target path (future in-repo location, not present until restored): `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/evals/SKILL.md`
   - Donor source path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/evals/SKILL.md`
   - Restored only when traces, eval packs, and supporting scripts are back in scope
 
 - **hyperdomo** — advanced manager-agent orchestration (depends on router.js, session.js, skills registry, see 6.1)
-  - Restoration target path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/hyperdomo/SKILL.md`
+  - Restoration target path (future in-repo location, not present until restored): `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/hyperdomo/SKILL.md`
   - Donor source path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/hyperdomo/SKILL.md`
   - Restored only when manager/worker orchestration infrastructure is back in scope
 
