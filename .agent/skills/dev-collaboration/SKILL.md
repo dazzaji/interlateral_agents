@@ -11,7 +11,10 @@ compatibility: Requires at least two agents from {claude, codex, gemini} and acc
 
 ## Prerequisites
 
-- **Notification Scripts:** Use the agent-specific scripts (e.g., `cc.js`, `codex.js`, `gemini.js`) to send direct notifications.
+- **Notification Scripts:** Use the repo's agent-specific scripts under `interlateral_dna/` to send direct notifications.
+  - Claude Code: `node interlateral_dna/cc.js send "message"`
+  - Codex: `node interlateral_dna/codex.js send "message"`
+  - Gemini: `node interlateral_dna/gemini.js send "message"`
 - **Ledger:** Use `comms.md` as the shared communications ledger.
 
 ## Roles
@@ -62,9 +65,9 @@ The dual-hatted agent must complete each role as a separate phase and deliver se
 1. Create the artifact at `artifact_path`.
 2. When done, perform the **Ledger + Notify** step:
    - **Post to comms.md:** `[YOUR_AGENT] @REVIEWER @BREAKER -- Draft ready at [artifact_path].`
-   - **Send direct notification** to each agent:
+   - **Send direct notification** to each agent using the matching script in `interlateral_dna/`:
      ```bash
-     node <target_agent_script>.js send "[YOUR_AGENT] Draft ready at [ABSOLUTE_PATH]. Please review."
+     node interlateral_dna/cc.js send "[YOUR_AGENT] Draft ready at [ABSOLUTE_PATH]. Please review."
      ```
 3. Wait for both roles to complete (or for the 10-minute timeout).
 4. Read their feedback and produce a revised version.

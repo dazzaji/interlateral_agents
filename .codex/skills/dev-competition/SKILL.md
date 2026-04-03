@@ -87,9 +87,9 @@ The requirement spec lives at `requirement_path` (which may be inside or outside
 Posting to `comms.md` alone does NOT wake agents. You must:
 1. Log to `comms.md` (for the record)
 2. Send via injection (to actually deliver):
-   - To CC: `node cc.js send "message"`
-   - To Codex: `node codex.js send "message"`
-   - To Gemini: `node gemini.js send "message"`
+   - To CC: `node interlateral_dna/cc.js send "message"`
+   - To Codex: `node interlateral_dna/codex.js send "message"`
+   - To Gemini: `node interlateral_dna/gemini.js send "message"`
 
 During the parallel implementation phase:
 - Implementers must NOT post detailed progress to `comms.md`
@@ -274,7 +274,7 @@ Assign roles:
 Start Phase 1 setup, then dispatch to implementers.
 ```
 
-**Lead sends to Implementer A (CC) via `node cc.js send`:**
+**Lead sends to Implementer A (CC) via `node interlateral_dna/cc.js send`:**
 ```
 You are Implementer A in a dev-competition.
 Read: projects/specs/auth-middleware-spec.md
@@ -284,7 +284,7 @@ Do NOT post implementation details to comms.md.
 Signal when complete via injection.
 ```
 
-**Lead sends to Implementer B (Gemini) via `node gemini.js send`:**
+**Lead sends to Implementer B (Gemini) via `node interlateral_dna/gemini.js send`:**
 ```
 You are Implementer B in a dev-competition.
 Read: projects/specs/auth-middleware-spec.md
@@ -294,7 +294,7 @@ Do NOT post implementation details to comms.md.
 Signal when complete via injection.
 ```
 
-**After both complete, Lead sends to Judge (Codex) via `node codex.js send`:**
+**After both complete, Lead sends to Judge (Codex) via `node interlateral_dna/codex.js send`:**
 ```
 You are the Judge in a dev-competition.
 Requirement: projects/specs/auth-middleware-spec.md

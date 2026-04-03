@@ -52,7 +52,7 @@ v0.1 includes:
 - `./me.sh`
 - peer launch helpers
 - direct tmux comms
-- 16 skills
+- 12 skills
 - minimal docs and logs
 
 v0.1 does not include:

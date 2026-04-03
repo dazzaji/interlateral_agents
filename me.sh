@@ -86,17 +86,6 @@ CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do no
 
 CODEX_BOOT_QUOTED="$(quote_file_content "$CODEX_PROMPT")"
 
-cat > "$DNA_DIR/comms.md" <<EOF
-# Comms Log
-
-Session started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
-Team: $INTERLATERAL_TEAM_ID
-Socket: $TMUX_SOCKET
-Claude session: $CLAUDE_SESSION
-Codex session: $CODEX_SESSION
-Launch session id: $LAUNCH_SESSION_ID
-EOF
-
 if [[ "${1:-}" != "--force" ]]; then
     ATTACHED=""
     if run_tmux has-session -t "$CLAUDE_SESSION" 2>/dev/null; then
@@ -114,6 +103,17 @@ if [[ "${1:-}" != "--force" ]]; then
         [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 1; }
     fi
 fi
+
+cat > "$DNA_DIR/comms.md" <<EOF
+# Comms Log
+
+Session started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+Team: $INTERLATERAL_TEAM_ID
+Socket: $TMUX_SOCKET
+Claude session: $CLAUDE_SESSION
+Codex session: $CODEX_SESSION
+Launch session id: $LAUNCH_SESSION_ID
+EOF
 
 kill_if_exists "$CLAUDE_SESSION"
 kill_if_exists "$CODEX_SESSION"

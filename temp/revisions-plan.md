@@ -154,7 +154,7 @@ grep -r 'interlateral_comms_monitor\|ag\.js\|courier\.js\|corpbot_agent_evals\|p
 # ^ should return nothing
 
 # 7. DNA scripts have Escape hardening
-grep -A2 "send-keys.*Enter" interlateral_dna/cc.js interlateral_dna/codex.js interlateral_dna/gemini.js
+grep -B2 "send-keys.*Enter" interlateral_dna/cc.js interlateral_dna/codex.js interlateral_dna/gemini.js
 # ^ each should show Escape before Enter
 
 # 8. Session name validation exists
