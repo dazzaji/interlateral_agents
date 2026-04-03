@@ -70,6 +70,68 @@ wait_for_phrase() {
     return 1
 }
 
+pane_contains() {
+    local session="$1"
+    local needle="$2"
+    run_tmux capture-pane -t "$session" -p | grep -Fq "$needle"
+}
+
+wait_for_exact_line() {
+    local session="$1"
+    local line="$2"
+    local tries="${3:-60}"
+    local i
+    for i in $(seq 1 "$tries"); do
+        if run_tmux capture-pane -t "$session" -p | grep -Fxq "$line"; then
+            return 0
+        fi
+        sleep 2
+    done
+    return 1
+}
+
+wait_for_ready_signal() {
+    local session="$1"
+    local tries="${2:-60}"
+    local i
+    for i in $(seq 1 "$tries"); do
+        if run_tmux capture-pane -t "$session" -p | grep -Eq '^[[:space:]•-]*Ready to Rock!$'; then
+            return 0
+        fi
+        sleep 2
+    done
+    return 1
+}
+
+claude_needs_workspace_trust() {
+    local session="$1"
+    pane_contains "$session" "Quick safety check:"
+}
+
+confirm_claude_workspace_trust() {
+    local session="$1"
+    run_tmux send-keys -t "$session" Enter
+}
+
+prepare_claude_for_boot() {
+    local session="$1"
+    local tries="${2:-45}"
+    local i
+    for i in $(seq 1 "$tries"); do
+        if claude_needs_workspace_trust "$session"; then
+            echo "Claude workspace trust prompt detected, confirming..."
+            confirm_claude_workspace_trust "$session"
+            sleep 2
+            continue
+        fi
+        if wait_for_idle "$session" 1; then
+            return 0
+        fi
+        sleep 2
+    done
+    return 1
+}
+
 quote_file_content() {
     local quoted
     printf -v quoted '%q' "$1"
@@ -133,12 +195,12 @@ echo "Waiting for agent CLIs to attach..."
 wait_for_ready "$CLAUDE_SESSION" 45 || echo "Warning: Claude session did not report ready before prompt injection"
 wait_for_ready "$CODEX_SESSION" 45 || echo "Warning: Codex session did not report ready before prompt injection"
 echo "Waiting for Claude idle prompt..."
-if wait_for_idle "$CLAUDE_SESSION" 30; then
+if prepare_claude_for_boot "$CLAUDE_SESSION" 30; then
     echo "Claude prompt detected, injecting boot context..."
-    agent_send_long "$CLAUDE_SESSION" "$CLAUDE_PROMPT" "claude_boot_${LAUNCH_SESSION_ID}"
+    agent_send "$CLAUDE_SESSION" "$CLAUDE_PROMPT"
 else
     echo "Warning: Claude prompt not detected, attempting injection anyway..."
-    agent_send_long "$CLAUDE_SESSION" "$CLAUDE_PROMPT" "claude_boot_${LAUNCH_SESSION_ID}"
+    agent_send "$CLAUDE_SESSION" "$CLAUDE_PROMPT"
 fi
 
 echo
@@ -151,10 +213,10 @@ echo "Waiting for Ready to Rock! confirmations..."
 
 CLAUDE_READY=0
 CODEX_READY=0
-if wait_for_phrase "$CLAUDE_SESSION" "Ready to Rock!" 45; then
+if wait_for_ready_signal "$CLAUDE_SESSION" 45; then
     CLAUDE_READY=1
 fi
-if wait_for_phrase "$CODEX_SESSION" "Ready to Rock!" 45; then
+if wait_for_ready_signal "$CODEX_SESSION" 45; then
     CODEX_READY=1
 fi
 

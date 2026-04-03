@@ -11,7 +11,10 @@ if ! run_tmux list-sessions -F '#S' >/tmp/interlateral_agents_shutdown.$$ 2>/dev
     exit 0
 fi
 
-mapfile -t SESSIONS < /tmp/interlateral_agents_shutdown.$$
+SESSIONS=()
+while IFS= read -r session; do
+    SESSIONS+=("$session")
+done < /tmp/interlateral_agents_shutdown.$$
 rm -f /tmp/interlateral_agents_shutdown.$$
 
 if [[ "${#SESSIONS[@]}" -eq 0 ]]; then

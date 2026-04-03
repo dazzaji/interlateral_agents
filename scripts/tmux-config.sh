@@ -81,7 +81,7 @@ agent_capture_deep() {
 pane_idle() {
     local session="${1:?session name required}"
     local output
-    output="$(agent_capture_recent "$session" 8 2>/dev/null || true)"
+    output="$(agent_capture_recent "$session" 30 2>/dev/null || true)"
     echo "$output" | grep -Eq "❯|›|> $"
 }
 
