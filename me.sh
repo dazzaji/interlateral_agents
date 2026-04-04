@@ -95,7 +95,7 @@ wait_for_ready_signal() {
     local tries="${2:-60}"
     local i
     for i in $(seq 1 "$tries"); do
-        if run_tmux capture-pane -t "$session" -p | grep -Eq '^[[:space:]•-]*Ready to Rock!$'; then
+        if run_tmux capture-pane -t "$session" -p | grep -q 'Ready to Rock!'; then
             return 0
         fi
         sleep 2
