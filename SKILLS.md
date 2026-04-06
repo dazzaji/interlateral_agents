@@ -9,7 +9,7 @@ Deployed copies:
 
 Use `scripts/deploy-skills.sh` after editing the canonical copy.
 
-v0.1 ships a 12-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
+v0.1 now ships a 13-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
 
 `projects/` is reserved for downstream user work. Do not put system skills there.
 
@@ -28,6 +28,7 @@ v0.1 ships a 12-skill canonical set. Three reusable skills (`create-skin`, `eval
 | `negotiation` | `.agent/skills/negotiation/SKILL.md` | Structured trade-off process |
 | `peer-collaboration` | `.agent/skills/peer-collaboration/SKILL.md` | Two-peer collaboration loop |
 | `publication-pipeline` | `.agent/skills/publication-pipeline/SKILL.md` | Editorial multi-round pipeline |
+| `ready-rock-quartet` | `.agent/skills/ready-rock-quartet/SKILL.md` | Four-agent visible-terminal launch and role-lock workflow |
 | `search-synth` | `.agent/skills/search-synth/SKILL.md` | Search and synthesis workflow |
 
 ## Typical Usage
