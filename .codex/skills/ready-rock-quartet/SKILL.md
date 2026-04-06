@@ -50,10 +50,15 @@ Preferred roster:
 - Claude as `VERIFIER`
 
 Recommended session naming:
-- `ia-codex-peer-02` -> `LEAD`
-- `ia-claude-peer-02` -> `REVIEWER`
-- `ia-codex-peer-03` -> `BREAKER`
-- `ia-claude-peer-03` -> `VERIFIER`
+- `13-codex-lead` -> `LEAD`
+- `13-claude-reviewer` -> `REVIEWER`
+- `13-codex-breaker` -> `BREAKER`
+- `13-claude-verifier` -> `VERIFIER`
+
+Why this naming is better:
+- it avoids collisions with already-running `ia-*` house sessions
+- the role is obvious from the session name
+- the `13-` prefix ties the team to Skill 13 and makes the quartet easy to spot in tmux
 
 If different session names are used, lock them explicitly in the sprint prompt.
 
@@ -62,19 +67,19 @@ If different session names are used, lock them explicitly in the sprint prompt.
 In this repo, the practical launch path is:
 
 ```bash
-./scripts/launch-codex-peer.sh ia-codex-peer-02 "Read AGENTS.md first, then wait for instructions."
-./scripts/launch-codex-peer.sh ia-codex-peer-03 "Read AGENTS.md first, then wait for instructions."
-./scripts/launch-cc-peer.sh ia-claude-peer-02 "Read CLAUDE.md first, then wait for instructions."
-./scripts/launch-cc-peer.sh ia-claude-peer-03 "Read CLAUDE.md first, then wait for instructions."
+./scripts/launch-codex-peer.sh 13-codex-lead "Read AGENTS.md first, then wait for instructions."
+./scripts/launch-codex-peer.sh 13-codex-breaker "Read AGENTS.md first, then wait for instructions."
+./scripts/launch-cc-peer.sh 13-claude-reviewer "Read CLAUDE.md first, then wait for instructions."
+./scripts/launch-cc-peer.sh 13-claude-verifier "Read CLAUDE.md first, then wait for instructions."
 ```
 
 To expose each session in a visible Terminal.app window:
 
 ```bash
-TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh ia-codex-peer-02 "Interlateral Codex Peer 02"
-TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh ia-codex-peer-03 "Interlateral Codex Peer 03"
-TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh ia-claude-peer-02 "Interlateral Claude Peer 02"
-TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh ia-claude-peer-03 "Interlateral Claude Peer 03"
+TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh 13-codex-lead "Skill 13 Codex Lead"
+TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh 13-codex-breaker "Skill 13 Codex Breaker"
+TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh 13-claude-reviewer "Skill 13 Claude Reviewer"
+TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh 13-claude-verifier "Skill 13 Claude Verifier"
 ```
 
 ### Important Launcher Caveat
@@ -82,8 +87,8 @@ TMUX_SOCKET=/tmp/interlateral-agents-tmux.sock ./scripts/open-tmux-window.sh ia-
 Fresh peer launchers create sessions, but they do **not** automatically establish pair-specific cross-peer wake-up behavior.
 
 Do not assume:
-- `ia-codex-peer-02` will automatically watch `ia-claude-peer-02`
-- `ia-claude-peer-03` will automatically target `ia-codex-peer-03`
+- `13-codex-lead` will automatically watch `13-claude-reviewer`
+- `13-claude-verifier` will automatically target `13-codex-breaker`
 
 You must explicitly pair them in the wake-up prompt.
 
@@ -94,18 +99,18 @@ You must explicitly pair them in the wake-up prompt.
 Use unique visible sessions. Avoid ambiguous names.
 
 Preferred names:
-- `ia-codex-peer-02`
-- `ia-codex-peer-03`
-- `ia-claude-peer-02`
-- `ia-claude-peer-03`
+- `13-codex-lead`
+- `13-codex-breaker`
+- `13-claude-reviewer`
+- `13-claude-verifier`
 
 ### 2. Pair The Wake-Up Handshake
 
 Do not leave comms implicit.
 
 Pair them:
-- `ia-codex-peer-02` <-> `ia-claude-peer-02`
-- `ia-codex-peer-03` <-> `ia-claude-peer-03`
+- `13-codex-lead` <-> `13-claude-reviewer`
+- `13-codex-breaker` <-> `13-claude-verifier`
 
 Each pair must complete the local wake-up handshake and visibly print:
 
@@ -132,10 +137,10 @@ Before sending the sprint prompt, publish a live roster block:
 
 ```text
 Live team roster for this sprint:
-- Lead / Orchestrator / Integrator: ia-codex-peer-02
-- Reviewer: ia-claude-peer-02
-- Breaker: ia-codex-peer-03
-- Verifier: ia-claude-peer-03
+- Lead / Orchestrator / Integrator: 13-codex-lead
+- Reviewer: 13-claude-reviewer
+- Breaker: 13-codex-breaker
+- Verifier: 13-claude-verifier
 - Use these exact session names for direct comms and role ownership.
 - Do not reassign roles unless the human explicitly says to.
 ```
@@ -293,10 +298,10 @@ Goal:
 Launch a four-agent execution team for the Jot subdomain sprint.
 
 Live roster:
-- Lead / Orchestrator / Integrator: ia-codex-peer-02
-- Reviewer: ia-claude-peer-02
-- Breaker: ia-codex-peer-03
-- Verifier: ia-claude-peer-03
+- Lead / Orchestrator / Integrator: 13-codex-lead
+- Reviewer: 13-claude-reviewer
+- Breaker: 13-codex-breaker
+- Verifier: 13-claude-verifier
 
 Artifact:
 /abs/path/to/execution_log.md
@@ -317,10 +322,10 @@ Reviewer / Breaker / Verifier:
 SKILL: ready-rock-quartet
 STATUS: DONE
 TEAM:
-- LEAD: ia-codex-peer-02
-- REVIEWER: ia-claude-peer-02
-- BREAKER: ia-codex-peer-03
-- VERIFIER: ia-claude-peer-03
+- LEAD: 13-codex-lead
+- REVIEWER: 13-claude-reviewer
+- BREAKER: 13-codex-breaker
+- VERIFIER: 13-claude-verifier
 READY_CHECK: 4/4 terminals showed "Ready to Rock!"
 ARTIFACT: /abs/path/to/execution_log.md
 ROLE_LOCK: CONFIRMED
