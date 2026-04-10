@@ -154,7 +154,7 @@ Overseer stop marker: $STOP_MARKER
 
 Execute the post-team completion process:
 1. Review the sprint evidence file and the latest live state now.
-2. Verify health for gateway, pilot, and forum.
+2. Verify all declared health checks and regression surfaces.
 3. Inspect the team terminals only as needed to confirm the final gate state.
 4. Coordinate with your peer overseer for Joint ACK.
 5. Append a checkpoint entry to $OVERSEER_LOG.
@@ -186,6 +186,16 @@ Execute the periodic check-in process:
 4. Inspect evidence in $SPRINT_DIR/evidence/.
 5. Classify on-track, off-track, or idle/stalled.
 6. Append a checkpoint entry to $OVERSEER_LOG.
+
+OVERRIDE AUTHORITY:
+If you independently judge the sprint substantively complete according to the declared
+health checks, regression surfaces, and Joint Overseer ACK criteria — even if the team
+has not yet written $DONE_MARKER — you are explicitly authorized to:
+- write the team's done marker yourself into $CLOSEOUT_FILE with a note:
+  OVERRIDE-BY-OVERSEERS: <one-line reason>
+- immediately switch to Joint ACK + overseer closeout work
+
+Use this only after both overseers independently verify the sprint is complete.
 
 This is not a reminder to think about polling later.
 Do the poll now. Do not just acknowledge.
