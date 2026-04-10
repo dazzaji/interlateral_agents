@@ -191,11 +191,14 @@ OVERRIDE AUTHORITY:
 If you independently judge the sprint substantively complete according to the declared
 health checks, regression surfaces, and Joint Overseer ACK criteria — even if the team
 has not yet written $DONE_MARKER — you are explicitly authorized to:
-- write the team's done marker yourself into $CLOSEOUT_FILE with a note:
+- Write the team's done marker yourself into $CLOSEOUT_FILE with a note:
   OVERRIDE-BY-OVERSEERS: <one-line reason>
-- immediately switch to Joint ACK + overseer closeout work
+- Immediately switch to Joint ACK + overseer closeout work
 
-Use this only after both overseers independently verify the sprint is complete.
+Use this authority only after you have verified the sprint is complete.
+If your peer overseer is also active, coordinate first.
+If you are the only active overseer, proceed only after two consecutive check-ins
+with no team progress and a complete live verification.
 
 This is not a reminder to think about polling later.
 Do the poll now. Do not just acknowledge.
