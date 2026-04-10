@@ -1,6 +1,6 @@
 # Interlateral Agents
 
-Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives you a fast Claude Code + Codex duo launcher, peer helpers for adding more CLI agents on the same tmux socket, a canonical 12-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
+Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives you a fast Claude Code + Codex duo launcher, peer helpers for adding more CLI agents on the same tmux socket, a canonical 14-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
 
 ## Prerequisites
 
@@ -80,6 +80,29 @@ Use the dev-collaboration skill at .agent/skills/dev-collaboration/SKILL.md.
 CC is Drafter. Codex is Reviewer+Breaker.
 Artifact: dev_plan/dev_plan.md
 ```
+
+### Sprint Overseer Recipe
+
+To oversee a sprint in any working repo, point the skill at the absolute sprint file path:
+
+```text
+Use the sprint-overseer skill.
+Sprint file: /abs/path/to/other-repo/docs/sprint.md
+Manager session: ia-claude
+Sprint team pattern: s3-*
+Poll interval: every 5 minutes
+```
+
+Optional mechanical wake-up loop:
+
+```bash
+scripts/sprint_overseer.sh /abs/path/to/other-repo/docs/sprint.md \
+  --manager ia-claude \
+  --overseer ia-codex \
+  --interval 300
+```
+
+The skill derives all sprint-local paths from `sprint_file`, writes `sprint-overseer-log.md` beside that sprint, and stops when `evidence/sprint_closeout.md` contains the done marker.
 
 ## Troubleshooting
 
