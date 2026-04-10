@@ -99,10 +99,18 @@ Optional mechanical wake-up loop:
 scripts/sprint_overseer.sh /abs/path/to/other-repo/docs/sprint.md \
   --manager ia-claude \
   --overseer ia-codex \
+  --closeout-file /abs/path/to/other-repo/docs/evidence/sprint3_proof.md \
+  --done-marker "STATUS: DONE" \
+  --stop-file /abs/path/to/other-repo/docs/evidence/sprint3_overseer_closeout.md \
+  --stop-marker "STATUS: OVERSEER-DONE" \
   --interval 300
 ```
 
-The skill derives all sprint-local paths from `sprint_file`, writes `sprint-overseer-log.md` beside that sprint, and stops when `evidence/sprint_closeout.md` contains the done marker.
+The skill derives sprint-local paths from `sprint_file`, writes `sprint-overseer-log.md` beside that sprint, and should usually be pointed at:
+- a sprint-specific team evidence file via `--closeout-file`
+- a separate sprint-specific overseer closeout via `--stop-file`
+
+That separation lets the timer keep running after the team finishes so the overseers can still perform Joint ACK and final closeout.
 
 ## Troubleshooting
 

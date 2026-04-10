@@ -54,5 +54,10 @@ Sprint team pattern: s3-*
 ```
 
 ```bash
-scripts/sprint_overseer.sh /abs/path/to/project/docs/sprint.md --interval 300
+scripts/sprint_overseer.sh /abs/path/to/project/docs/sprint.md \
+  --closeout-file /abs/path/to/project/docs/evidence/sprint3_proof.md \
+  --done-marker "STATUS: DONE" \
+  --stop-file /abs/path/to/project/docs/evidence/sprint3_overseer_closeout.md \
+  --stop-marker "STATUS: OVERSEER-DONE" \
+  --interval 300
 ```

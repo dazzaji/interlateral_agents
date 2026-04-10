@@ -26,8 +26,11 @@ Required:
 Optional:
 - `manager_session`: tmux session name for the sprint lead. Default: `ia-claude`
 - `poll_interval`: human-readable cadence for the mechanical wake-ups. Default: every 5 minutes
-- `done_marker`: text that signals sprint completion in the closeout file. Default: `STATUS: WORKSHOP-READY`
+- `done_marker`: text that signals team completion in the team evidence file. Default: `STATUS: WORKSHOP-READY`
 - `sprint_team_pattern`: tmux session glob for sprint workers. Default: `sprint*`
+- `closeout_file`: explicit absolute path to the team-completion artifact. Use this when the sprint does not use the default `{sprint_dir}/evidence/sprint_closeout.md`.
+- `stop_file`: explicit absolute path to the overseer-completion artifact. Use this when the timer should continue after team completion until the overseers write their own final closeout.
+- `stop_marker`: text that signals overseer completion in `stop_file`. Default: same as `done_marker`
 
 ## Derived Paths
 
@@ -35,7 +38,8 @@ Derive these from `sprint_file` every time:
 - sprint directory: parent of `sprint_file`
 - overseer log: `{sprint_dir}/sprint-overseer-log.md`
 - evidence directory: `{sprint_dir}/evidence/`
-- closeout file: `{sprint_dir}/evidence/sprint_closeout.md`
+- team evidence file: `{closeout_file}` if provided, otherwise `{sprint_dir}/evidence/sprint_closeout.md`
+- overseer stop file: `{stop_file}` if provided, otherwise the same path as the team evidence file
 
 Do not hardcode repo-specific paths.
 
@@ -50,7 +54,8 @@ Do not hardcode repo-specific paths.
 Sprint file: {sprint_file}
 Manager session: {manager_session}
 Started: {timestamp}
-Done marker: {done_marker}
+Team done marker: {done_marker}
+Overseer stop marker: {stop_marker}
 ```
 
 3. Append the first checkpoint entry.
@@ -67,10 +72,12 @@ On every wake-up, perform these steps:
    - `on-track`: active work or clear progress
    - `off-track`: active work, but on the wrong thing or looping
    - `idle/stalled`: no material progress for 15+ minutes across manager, workers, and evidence
+   - `team-complete / overseer-open`: the sprint team appears done, but the overseers still owe final health/evidence review, peer coordination, or final closeout
 6. Act:
    - `on-track`: log only
    - `off-track`: log and send a specific nudge to the manager
    - `idle/stalled`: log and send a wake-up nudge to the manager
+   - `team-complete / overseer-open`: stop nudging the team, coordinate Joint ACK with the peer overseer, and write the overseer closeout if the final review is green
 
 ## Nudge Rules
 
@@ -91,8 +98,10 @@ node interlateral_dna/gemini.js send "message"
 ## Stop Condition
 
 Stop when either:
-- `{sprint_dir}/evidence/sprint_closeout.md` exists and contains `done_marker`
+- the configured overseer stop file exists and contains `stop_marker`
 - the human explicitly redirects or pauses the overseer
+
+When the team evidence file reaches `done_marker` but the overseer stop file does not yet contain `stop_marker`, continue running. At that point your job changes from team progress monitoring to final overseer closeout and Joint ACK coordination.
 
 When the stop condition is met, append a final checkpoint entry.
 
@@ -107,7 +116,7 @@ Append every check-in to `{sprint_dir}/sprint-overseer-log.md`:
 **Manager ({manager_session}):** {active / waiting / idle}
 **Worker sessions:** {sessions and status}
 **Evidence progress:** {latest artifacts and markers}
-**Classification:** {on-track / off-track / idle-stalled}
+**Classification:** {on-track / off-track / idle-stalled / team-complete-overseer-open}
 **Action taken:** {none / nudge sent / escalation noted}
 ```
 
@@ -121,6 +130,10 @@ Use the reusable timer in this repo:
 scripts/sprint_overseer.sh /abs/path/to/sprint.md \
   --manager ia-claude \
   --overseer ia-codex \
+  --closeout-file /abs/path/to/project/docs/evidence/sprint3_proof.md \
+  --done-marker "STATUS: DONE" \
+  --stop-file /abs/path/to/project/docs/evidence/sprint3_overseer_closeout.md \
+  --stop-marker "STATUS: OVERSEER-DONE" \
   --interval 300
 ```
 
@@ -134,14 +147,18 @@ Sprint file: /Users/dazza/repos/project/docs/sprint.md
 Manager session: ia-claude
 Sprint team pattern: s3-*
 Poll interval: every 5 minutes
+Closeout file: /Users/dazza/repos/project/docs/evidence/sprint3_proof.md
+Done marker: STATUS: DONE
+Stop file: /Users/dazza/repos/project/docs/evidence/sprint3_overseer_closeout.md
+Stop marker: STATUS: OVERSEER-DONE
 ```
 
 ## Safety
 
 - Do not execute sprint work yourself.
 - Do not edit the sprint spec.
-- Do not edit sprint evidence files.
-- Only write the overseer log.
+- Do not edit team evidence files except when the sprint explicitly designates an overseer closeout artifact as yours to write.
+- Only write the overseer log and the designated overseer closeout artifact.
 - If you cannot determine status confidently, say so in the log.
 
 ## Final Status Format
