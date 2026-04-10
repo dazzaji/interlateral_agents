@@ -71,13 +71,13 @@ On every wake-up, perform these steps:
 5. Classify the sprint state:
    - `on-track`: active work or clear progress
    - `off-track`: active work, but on the wrong thing or looping
-- `idle/stalled`: no material progress for 15+ minutes across manager, workers, and evidence
-- `team-complete-overseer-open`: the sprint team appears done, but the overseers still owe final health/evidence review, peer coordination, or final closeout
+   - `idle/stalled`: no material progress for 15+ minutes across manager, workers, and evidence
+   - `team-complete-overseer-open`: the sprint team appears done, but the overseers still owe final health/evidence review, peer coordination, or final closeout
 6. Act:
    - `on-track`: log only
    - `off-track`: log and send a specific nudge to the manager
    - `idle/stalled`: log and send a wake-up nudge to the manager
-- `team-complete-overseer-open`: stop nudging the team, coordinate Joint ACK with the peer overseer, and write the overseer closeout if the final review is green
+   - `team-complete-overseer-open`: stop nudging the team, coordinate Joint ACK with the peer overseer, and write the overseer closeout if the final review is green
 
 When the team appears substantively complete but has not marked `done_marker`, the overseers may use the Override Authority below to break deadlock.
 
@@ -105,7 +105,7 @@ Stop when either:
 
 When the team evidence file reaches `done_marker` but the overseer stop file does not yet contain `stop_marker`, continue running. At that point your job changes from team progress monitoring to final overseer closeout and Joint ACK coordination.
 
-When the team evidence file has not reached `done_marker`, but the overseers collectively invoke Override Authority, treat that as functionally equivalent to team completion for the purpose of final Joint ACK and overseer closeout.
+When the team evidence file has not reached `done_marker`, but the overseers invoke Override Authority, treat that as functionally equivalent to team completion for the purpose of final Joint ACK and overseer closeout. This may happen either through coordinated use by both overseers or through the lone-overseer fallback described below.
 
 When the stop condition is met, append a final checkpoint entry.
 

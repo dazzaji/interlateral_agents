@@ -72,12 +72,14 @@ On every wake-up, perform these steps:
    - `on-track`: active work or clear progress
    - `off-track`: active work, but on the wrong thing or looping
    - `idle/stalled`: no material progress for 15+ minutes across manager, workers, and evidence
-   - `team-complete / overseer-open`: the sprint team appears done, but the overseers still owe final health/evidence review, peer coordination, or final closeout
+   - `team-complete-overseer-open`: the sprint team appears done, but the overseers still owe final health/evidence review, peer coordination, or final closeout
 6. Act:
    - `on-track`: log only
    - `off-track`: log and send a specific nudge to the manager
    - `idle/stalled`: log and send a wake-up nudge to the manager
-   - `team-complete / overseer-open`: stop nudging the team, coordinate Joint ACK with the peer overseer, and write the overseer closeout if the final review is green
+   - `team-complete-overseer-open`: stop nudging the team, coordinate Joint ACK with the peer overseer, and write the overseer closeout if the final review is green
+
+When the team appears substantively complete but has not marked `done_marker`, the overseers may use the Override Authority below to break deadlock.
 
 ## Nudge Rules
 
@@ -103,7 +105,20 @@ Stop when either:
 
 When the team evidence file reaches `done_marker` but the overseer stop file does not yet contain `stop_marker`, continue running. At that point your job changes from team progress monitoring to final overseer closeout and Joint ACK coordination.
 
+When the team evidence file has not reached `done_marker`, but the overseers invoke Override Authority, treat that as functionally equivalent to team completion for the purpose of final Joint ACK and overseer closeout. This may happen either through coordinated use by both overseers or through the lone-overseer fallback described below.
+
 When the stop condition is met, append a final checkpoint entry.
+
+## Overseer Override Authority
+
+If the team has not marked `done_marker` in the team evidence file but the overseers judge the sprint objectives met — based on the declared health checks, acceptance criteria, regression surfaces, and live endpoint verification — the overseers are authorized to:
+
+1. Write the team's `done_marker` into the team evidence file themselves, with a note: `OVERRIDE-BY-OVERSEERS: <reason>`.
+2. Immediately switch to Joint Overseer ACK and closeout.
+
+This authority exists to prevent a single stuck or pedantic team agent from silently blocking the entire overseer completion path. The overseers have final say on whether a sprint is done, not the team.
+
+**When to use:** Prefer coordinated use by both overseers after they independently verify that the sprint's acceptance criteria are met via live checks. If only one overseer is active, that overseer may invoke the authority only after two consecutive check-ins with no team progress and a complete live verification. Never use to skip genuinely incomplete work.
 
 ## Checkpoint Format
 
@@ -157,8 +172,10 @@ Stop marker: STATUS: OVERSEER-DONE
 
 - Do not execute sprint work yourself.
 - Do not edit the sprint spec.
-- Do not edit team evidence files except when the sprint explicitly designates an overseer closeout artifact as yours to write.
-- Only write the overseer log and the designated overseer closeout artifact.
+- Do not edit team evidence files except:
+  1. when the sprint explicitly designates an overseer closeout artifact as yours to write, or
+  2. when both overseers invoke Override Authority and write the team's `done_marker` with an `OVERRIDE-BY-OVERSEERS:` note.
+- Only write the overseer log, the designated overseer closeout artifact, and the narrow override note described above.
 - If you cannot determine status confidently, say so in the log.
 
 ## Final Status Format
