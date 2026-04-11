@@ -78,9 +78,24 @@ agent_capture_deep() {
     run_tmux capture-pane -t "$session" -p -S "-$lines"
 }
 
+pane_current_command() {
+    local session="${1:?session name required}"
+    run_tmux display-message -p -F '#{pane_current_command}' -t "$session" 2>/dev/null || true
+}
+
+pane_seems_cli() {
+    local session="${1:?session name required}"
+    local cmd
+    cmd="$(pane_current_command "$session")"
+    [[ "$cmd" =~ ^(claude|codex|gemini)$ ]]
+}
+
 pane_idle() {
     local session="${1:?session name required}"
     local output
+    if ! pane_seems_cli "$session"; then
+        return 1
+    fi
     output="$(agent_capture_recent "$session" 30 2>/dev/null || true)"
     echo "$output" | grep -Eq "❯|›|> $"
 }
@@ -118,6 +133,8 @@ export -f agent_send_long 2>/dev/null || true
 export -f agent_send_long_delayed 2>/dev/null || true
 export -f agent_capture_recent 2>/dev/null || true
 export -f agent_capture_deep 2>/dev/null || true
+export -f pane_current_command 2>/dev/null || true
+export -f pane_seems_cli 2>/dev/null || true
 export -f pane_idle 2>/dev/null || true
 export -f wait_for_idle 2>/dev/null || true
 export -f next_peer_session_name 2>/dev/null || true

@@ -28,6 +28,8 @@ Options:
   --stop-marker TEXT    Overseer stop marker (default: done-marker)
   --team-pattern GLOB   Worker session glob for overseer context (default: sprint*)
   --idle-timeout SEC    Max seconds to wait for overseer prompt to go idle before skipping this cycle (default: 120)
+  --ack-timeout SEC     Max seconds to wait for HEARTBEAT_ID acknowledgment in overseer log (default: 60)
+  --validation-mode     Send a narrow validation prompt instead of a full sprint-overseer prompt
 EOF
 }
 
@@ -57,6 +59,8 @@ CLOSEOUT_FILE=""
 STOP_FILE=""
 IDLE_TIMEOUT_SEC=120
 STOP_MARKER=""
+ACK_TIMEOUT_SEC=60
+VALIDATION_MODE=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -84,6 +88,10 @@ while [[ $# -gt 0 ]]; do
       IDLE_TIMEOUT_SEC="$2"
       shift 2
       ;;
+    --ack-timeout)
+      ACK_TIMEOUT_SEC="$2"
+      shift 2
+      ;;
     --done-marker)
       DONE_MARKER="$2"
       shift 2
@@ -95,6 +103,10 @@ while [[ $# -gt 0 ]]; do
     --team-pattern)
       TEAM_PATTERN="$2"
       shift 2
+      ;;
+    --validation-mode)
+      VALIDATION_MODE=1
+      shift
       ;;
     -h|--help)
       usage
@@ -135,10 +147,108 @@ overseer_done_ready() {
   [[ -f "$STOP_FILE" ]] && grep -q "$STOP_MARKER" "$STOP_FILE" 2>/dev/null
 }
 
+# --- Launch Preflight ---
+# Verify the timer can actually do its job before entering the main loop.
+# This catches the Sprint 5.5 failure mode: timer "started" but target is wrong.
+preflight_check() {
+  local ok=true
+
+  if [[ ! -f "$SPRINT_FILE" ]]; then
+    log "PREFLIGHT FAIL: Sprint file not found: $SPRINT_FILE"
+    ok=false
+  fi
+
+  if ! run_tmux has-session -t "$OVERSEER_SESSION" 2>/dev/null; then
+    log "PREFLIGHT FAIL: Overseer session $OVERSEER_SESSION not found on shared socket"
+    ok=false
+  else
+    # Check pane is running a CLI, not a bare shell
+    local pane_cmd
+    pane_cmd="$(pane_current_command "$OVERSEER_SESSION")"
+    if ! pane_seems_cli "$OVERSEER_SESSION"; then
+      log "PREFLIGHT FAIL: Overseer pane $OVERSEER_SESSION is running '$pane_cmd' (expected claude, codex, or gemini CLI)"
+      ok=false
+    else
+      log "PREFLIGHT OK: Overseer pane running '$pane_cmd'"
+    fi
+  fi
+
+  if ! run_tmux has-session -t "$MANAGER_SESSION" 2>/dev/null; then
+    log "PREFLIGHT FAIL: Manager session $MANAGER_SESSION not found on shared socket"
+    ok=false
+  else
+    local manager_cmd
+    manager_cmd="$(pane_current_command "$MANAGER_SESSION")"
+    if ! pane_seems_cli "$MANAGER_SESSION"; then
+      log "PREFLIGHT FAIL: Manager pane $MANAGER_SESSION is running '$manager_cmd' (expected claude, codex, or gemini CLI)"
+      ok=false
+    else
+      log "PREFLIGHT OK: Manager pane running '$manager_cmd'"
+    fi
+  fi
+
+  if [[ -f "$STOP_FILE" ]] && grep -q "$STOP_MARKER" "$STOP_FILE" 2>/dev/null; then
+    log "PREFLIGHT FAIL: Stop file already contains '$STOP_MARKER' — timer would exit immediately"
+    ok=false
+  fi
+
+  if [[ "$ok" == "false" ]]; then
+    log "PREFLIGHT FAILED — timer will not start. Fix the issues above and retry."
+    exit 1
+  fi
+
+  log "PREFLIGHT PASSED — all checks green"
+}
+
+# --- Heartbeat Acknowledgment ---
+# Generate a unique heartbeat ID per cycle. The overseer must echo this ID
+# in the overseer log for the cycle to count as acknowledged.
+generate_heartbeat_id() {
+  printf 'HB-%s-%04d-%d' "$(date -u '+%Y%m%dT%H%M%SZ')" "$CHECKPOINT" "$$"
+}
+
+check_heartbeat_ack() {
+  local hb_id="$1"
+  local max_wait="${2:-60}"
+  local elapsed=0
+  while (( elapsed < max_wait )); do
+    if [[ -f "$OVERSEER_LOG" ]] && grep -Fq "HEARTBEAT_ID: $hb_id" "$OVERSEER_LOG" 2>/dev/null; then
+      return 0
+    fi
+    sleep 2
+    elapsed=$((elapsed + 2))
+  done
+  return 1
+}
+
+build_validation_prompt() {
+  local hb_id="$1"
+  cat <<EOF
+HEARTBEAT VALIDATION [$hb_id]
+
+This is a heartbeat transport/wake-up validation, not a sprint poll.
+
+Do exactly this now:
+1. Create $OVERSEER_LOG if it does not exist.
+2. Append this exact block:
+
+## $(date '+%Y-%m-%d %H:%M:%S %Z') — Validation heartbeat
+HEARTBEAT_ID: $hb_id
+STATUS: TIMER-ACK
+
+3. End your reply with exactly: TIMER-ACK-$hb_id
+
+No other analysis. No sprint work.
+EOF
+}
+
 wake_overseer() {
+  local hb_id="$1"
   local prompt
-  if team_done_ready; then
-    prompt="HEARTBEAT WAKE-UP: TEAM COMPLETED — Perform Joint ACK now.
+  if (( VALIDATION_MODE == 1 )); then
+    prompt="$(build_validation_prompt "$hb_id")"
+  elif team_done_ready; then
+    prompt="HEARTBEAT WAKE-UP [$hb_id]: TEAM COMPLETED — Perform Joint ACK now.
 
 Current time: $(date '+%Y-%m-%d %H:%M:%S %Z')
 
@@ -157,15 +267,18 @@ Execute the post-team completion process:
 2. Verify all declared health checks and regression surfaces.
 3. Inspect the team terminals only as needed to confirm the final gate state.
 4. Coordinate with your peer overseer for Joint ACK.
-5. Append a checkpoint entry to $OVERSEER_LOG.
+5. Append a checkpoint entry to $OVERSEER_LOG that includes this heartbeat ID: $hb_id
 6. If the sprint is truly complete from the overseer perspective, write the overseer closeout with $STOP_MARKER.
+
+IMPORTANT: Your checkpoint entry in $OVERSEER_LOG MUST include the exact line:
+HEARTBEAT_ID: $hb_id
 
 This is not a reminder to think about it later.
 Do the Joint ACK / overseer closeout work now.
 Do not just acknowledge.
 End with exactly: Check-in complete and log updated."
   else
-    prompt="HEARTBEAT WAKE-UP: Perform one overseer poll NOW.
+    prompt="HEARTBEAT WAKE-UP [$hb_id]: Perform one overseer poll NOW.
 
 Current time: $(date '+%Y-%m-%d %H:%M:%S %Z')
 
@@ -185,7 +298,10 @@ Execute the periodic check-in process:
 3. Inspect worker sessions matching $TEAM_PATTERN.
 4. Inspect evidence in $SPRINT_DIR/evidence/.
 5. Classify on-track, off-track, or idle/stalled.
-6. Append a checkpoint entry to $OVERSEER_LOG.
+6. Append a checkpoint entry to $OVERSEER_LOG that includes this heartbeat ID: $hb_id
+
+IMPORTANT: Your checkpoint entry in $OVERSEER_LOG MUST include the exact line:
+HEARTBEAT_ID: $hb_id
 
 OVERRIDE AUTHORITY:
 If you independently judge the sprint substantively complete according to the declared
@@ -227,18 +343,68 @@ log "  Stop file:        $STOP_FILE"
 log "  Overseer log:     $OVERSEER_LOG"
 log "  Timer log:        $TIMER_LOG"
 
+# --- Launch Preflight ---
+# MANDATORY: The timer MUST pass preflight before entering the main loop.
+# The overseer timer is mandatory for every sprint. An agent cannot decide
+# to skip it. Only Dazza (the human owner) can waive this requirement.
+# WHO STARTS THE TIMER: The human operator or the overseer boot script
+# starts the timer BEFORE the team boot sequence. The timer must show at
+# least one "Timer alive" entry before the first team prompt is injected.
+preflight_check
+
 CHECKPOINT=0
+CONSECUTIVE_NO_ACK=0
 while true; do
   if overseer_done_ready; then
     log "Overseer stop file contains '$STOP_MARKER'; stopping timer"
     exit 0
   fi
 
+  log "Timer alive — next wake-up in ${INTERVAL_SEC}s (checkpoint $((CHECKPOINT + 1)) pending)"
+
   if run_tmux has-session -t "$OVERSEER_SESSION" 2>/dev/null; then
     CHECKPOINT=$((CHECKPOINT + 1))
+    HB_ID="$(generate_heartbeat_id)"
+
     if wait_for_idle "$OVERSEER_SESSION" "$IDLE_TIMEOUT_SEC"; then
-      wake_overseer
-      log "Checkpoint $CHECKPOINT: heartbeat prompt sent to $OVERSEER_SESSION"
+      wake_overseer "$HB_ID"
+      log "Checkpoint $CHECKPOINT [$HB_ID]: heartbeat prompt sent to $OVERSEER_SESSION"
+
+      # Wait for acknowledgment in overseer log
+      ACK_WAIT="$ACK_TIMEOUT_SEC"
+      if check_heartbeat_ack "$HB_ID" "$ACK_WAIT"; then
+        log "Checkpoint $CHECKPOINT [$HB_ID]: ACK confirmed — overseer processed heartbeat"
+        CONSECUTIVE_NO_ACK=0
+      else
+        log "Checkpoint $CHECKPOINT [$HB_ID]: NO ACK after ${ACK_WAIT}s — retrying once"
+
+        if wait_for_idle "$OVERSEER_SESSION" "$IDLE_TIMEOUT_SEC"; then
+          wake_overseer "$HB_ID"
+          log "Checkpoint $CHECKPOINT [$HB_ID]: retry heartbeat prompt sent to $OVERSEER_SESSION"
+          if check_heartbeat_ack "$HB_ID" "$ACK_WAIT"; then
+            log "Checkpoint $CHECKPOINT [$HB_ID]: ACK confirmed after retry"
+            CONSECUTIVE_NO_ACK=0
+          else
+            CONSECUTIVE_NO_ACK=$((CONSECUTIVE_NO_ACK + 1))
+            log "Checkpoint $CHECKPOINT [$HB_ID]: NO ACK after retry and ${ACK_WAIT}s wait (consecutive no-ack: $CONSECUTIVE_NO_ACK)"
+
+            pane_tail="$(run_tmux capture-pane -t "$OVERSEER_SESSION" -p 2>/dev/null | tail -5 || true)"
+            log "Checkpoint $CHECKPOINT [$HB_ID]: overseer pane tail: $pane_tail"
+
+            if (( CONSECUTIVE_NO_ACK >= 3 )); then
+              log "WARNING: $CONSECUTIVE_NO_ACK consecutive heartbeats with no ACK — overseer may be unresponsive. Consider escalation."
+              if [[ -f "$IA_ROOT/interlateral_dna/comms.md" ]]; then
+                printf '%s [TIMER WARNING] %s consecutive heartbeats with no ACK from %s. Sprint: %s\n' \
+                  "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" "$CONSECUTIVE_NO_ACK" "$OVERSEER_SESSION" "$SPRINT_FILE" \
+                  >> "$IA_ROOT/interlateral_dna/comms.md"
+              fi
+            fi
+          fi
+        else
+          CONSECUTIVE_NO_ACK=$((CONSECUTIVE_NO_ACK + 1))
+          log "Checkpoint $CHECKPOINT [$HB_ID]: retry skipped because $OVERSEER_SESSION did not become idle"
+        fi
+      fi
     else
       log "Checkpoint $CHECKPOINT: $OVERSEER_SESSION stayed busy for ${IDLE_TIMEOUT_SEC}s; skipped this cycle to avoid corrupting input"
     fi

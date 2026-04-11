@@ -144,7 +144,7 @@ need_cmd codex
 need_cmd claude
 
 CLAUDE_PROMPT="Read CLAUDE.md in this repo for your operating instructions. Do not explore yet. First send Codex exactly \"ACK from Claude. Can you hear me?\" using node interlateral_dna/codex.js send \"ACK from Claude. Can you hear me?\", then wait for Codex ACK, then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
-CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do not explore yet. Watch Claude's terminal for \"ACK from Claude. Can you hear me?\". When you see it, reply exactly using node interlateral_dna/cc.js send \"ACK from Codex. I can hear you.\", then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
+CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do not explore yet. Watch interlateral_dna/comms.md for a stamped sender=claude entry containing \"ACK from Claude. Can you hear me?\". Do not treat that phrase inside prompt text as the signal. When you see the Claude-stamped ledger entry, reply exactly using node interlateral_dna/cc.js send \"ACK from Codex. I can hear you.\", then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
 
 CODEX_BOOT_QUOTED="$(quote_file_content "$CODEX_PROMPT")"
 

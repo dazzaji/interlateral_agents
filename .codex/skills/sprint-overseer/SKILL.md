@@ -137,6 +137,24 @@ Append every check-in to `{sprint_dir}/sprint-overseer-log.md`:
 
 Keep entries concise and scannable.
 
+## Who Starts the Timer (MANDATORY)
+
+**The overseer timer is mandatory for every sprint. An agent cannot decide to skip it. Only the human owner (Dazza) can waive this requirement.**
+
+The timer MUST be started by the **human operator or the overseer boot script** BEFORE the team boot sequence begins. The timer must show at least one "Timer alive" entry in its log before the first team prompt is injected.
+
+**Startup order:**
+1. Start the overseer timer(s)
+2. Verify timer log shows "PREFLIGHT PASSED" and "Timer alive"
+3. THEN boot the team sessions
+4. THEN inject the lead prompt
+
+If an agent proposes skipping the timer (e.g., "we'll supervise manually"), that proposal MUST be rejected unless Dazza explicitly approves. Manual supervision without a mechanical wake-up is not viable — agent sessions will go idle and nothing will wake them.
+
+Before any overnight sprint or new overseer topology, run `scripts/heartbeat_validation_harness.sh` first to prove visible injection and HEARTBEAT_ID acknowledgment on the real target CLI session.
+
+**The timer runs the heartbeat acknowledgment protocol:** Each heartbeat carries a unique HEARTBEAT_ID. The overseer must echo that ID in their checkpoint log entry. A cycle counts as successful only when the ID appears in the overseer log. If 3 consecutive heartbeats receive no acknowledgment, the timer logs a WARNING to comms.md for escalation.
+
 ## Recommended Mechanical Wake-Up
 
 Use the reusable timer in this repo:
@@ -152,7 +170,7 @@ scripts/sprint_overseer.sh /abs/path/to/sprint.md \
   --interval 300
 ```
 
-The timer only wakes the overseer. You still do the actual review and logging.
+The timer runs a launch preflight check (verifies session exists, pane is CLI, stop marker absent) before entering the main loop. It logs "Timer alive" each cycle independent of injection success, making stale timers detectable. The timer only wakes the overseer — you still do the actual review and logging.
 
 ## Example Prompt
 

@@ -7,7 +7,9 @@ You are Codex in the Interlateral Agents v0.1 repo.
 1. Read `interlateral_dna/LIVE_COMMS.md`.
 2. Check `dev_plan/dev_plan.md`.
 3. If `./me.sh` launched the session, watch for:
+   a stamped `sender=claude` entry in `interlateral_dna/comms.md` containing:
    `ACK from Claude. Can you hear me?`
+   Do not treat that phrase inside another agent prompt as the signal.
 4. Reply exactly with:
    `node interlateral_dna/cc.js send "ACK from Codex. I can hear you."`
 5. Print exactly `Ready to Rock!`
@@ -20,6 +22,7 @@ Do not keep polling, cleaning, or inventing work after ACK.
 - Direct injection is the live channel.
 - `interlateral_dna/comms.md` is the paper trail.
 - Never treat `comms.md` alone as a wake-up mechanism.
+- Exception: for the `./me.sh` boot ACK only, use the stamped Claude entry in `comms.md` as handshake verification because the literal ACK text can appear in injected prompt text before Claude actually sends it.
 
 Send to Claude:
 
