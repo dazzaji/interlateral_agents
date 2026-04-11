@@ -157,7 +157,9 @@ Before any overnight sprint or new overseer topology, run `scripts/heartbeat_val
 
 ## Recommended Mechanical Wake-Up
 
-Use the reusable timer in this repo:
+The timer supports two delivery paths depending on the overseer's CLI:
+
+### Codex CLI overseers — tmux injection (default)
 
 ```bash
 scripts/sprint_overseer.sh /abs/path/to/sprint.md \
@@ -169,6 +171,41 @@ scripts/sprint_overseer.sh /abs/path/to/sprint.md \
   --stop-marker "STATUS: OVERSEER-DONE" \
   --interval 300
 ```
+
+This uses the existing Escape-then-Enter tmux injection, which is proven reliable for Codex (9/9 ACKs in validation).
+
+### Claude Code CLI overseers — native `/loop` + file polling
+
+Claude Code v2.1.101+ does not reliably process tmux-injected prompts as fresh turns when idle. The validated workaround uses `/loop` inside the TUI with a shared file:
+
+**Timer side** (adds `--native-file`):
+```bash
+scripts/sprint_overseer.sh /abs/path/to/sprint.md \
+  --manager ia-codex \
+  --overseer ia-claude \
+  --native-file /path/to/workdir/sprint_heartbeat_command.txt \
+  --closeout-file /abs/path/to/project/docs/evidence/sprint3_proof.md \
+  --done-marker "STATUS: DONE" \
+  --stop-file /abs/path/to/project/docs/evidence/sprint3_overseer_closeout.md \
+  --stop-marker "STATUS: OVERSEER-DONE" \
+  --interval 300
+```
+
+**Claude side** (type into TUI):
+```
+/loop 60s Read /path/to/workdir/sprint_heartbeat_command.txt — if the file
+exists and has content, treat it as a heartbeat prompt: follow the instructions
+in the file, write HEARTBEAT_ID + ACK to the overseer log, then DELETE the file.
+If the file is missing or empty, output: heartbeat check — no pending command
+```
+
+**Interval guidance:** `/loop` interval should be ≤ half the timer interval. For `--interval 300`, use `/loop 60s` to `/loop 120s`. For validation (`--interval 30`), use `/loop 15s` (rounded to 1m by cron minimum).
+
+**File detection:** Read-and-delete. The loop reads the file, acts on it, deletes it. Next cycle sees no file = no action. No mtime tracking or state between iterations.
+
+**Note:** Claude's TUI injection path (`agent_send_long`) is preserved in `sprint_overseer.sh` for future Channels integration but is not used for heartbeats when `--native-file` is set. `/loop` is session-scoped — if the Claude session crashes, `/loop` must be re-registered as part of overseer startup.
+
+### Common to both paths
 
 The timer runs a launch preflight check (verifies session exists, pane is CLI, stop marker absent) before entering the main loop. It logs "Timer alive" each cycle independent of injection success, making stale timers detectable. The timer only wakes the overseer — you still do the actual review and logging.
 

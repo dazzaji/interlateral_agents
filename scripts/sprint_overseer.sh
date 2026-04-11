@@ -29,6 +29,7 @@ Options:
   --team-pattern GLOB   Worker session glob for overseer context (default: sprint*)
   --idle-timeout SEC    Max seconds to wait for overseer prompt to go idle before skipping this cycle (default: 120)
   --ack-timeout SEC     Max seconds to wait for HEARTBEAT_ID acknowledgment in overseer log (default: 60)
+  --native-file PATH    Write Claude heartbeat payloads to a shared file instead of TUI injection
   --validation-mode     Send a narrow validation prompt instead of a full sprint-overseer prompt
 EOF
 }
@@ -60,6 +61,7 @@ STOP_FILE=""
 IDLE_TIMEOUT_SEC=120
 STOP_MARKER=""
 ACK_TIMEOUT_SEC=60
+NATIVE_FILE=""
 VALIDATION_MODE=0
 
 while [[ $# -gt 0 ]]; do
@@ -90,6 +92,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --ack-timeout)
       ACK_TIMEOUT_SEC="$2"
+      shift 2
+      ;;
+    --native-file)
+      NATIVE_FILE="$2"
       shift 2
       ;;
     --done-marker)
@@ -322,7 +328,11 @@ Nudge only for real stalls or drift.
 End with exactly: Check-in complete and log updated."
   fi
 
-  if [[ "$OVERSEER_SESSION" == *codex* ]]; then
+  if [[ -n "$NATIVE_FILE" && "$OVERSEER_SESSION" == *claude* ]]; then
+    mkdir -p "$(dirname "$NATIVE_FILE")"
+    printf '%s' "$prompt" > "$NATIVE_FILE"
+    log "Checkpoint $CHECKPOINT [$hb_id]: STATE WRITTEN to $NATIVE_FILE"
+  elif [[ "$OVERSEER_SESSION" == *codex* ]]; then
     codex_send_clean "$OVERSEER_SESSION" "$prompt"
   else
     agent_send_long "$OVERSEER_SESSION" "$prompt"
@@ -340,6 +350,9 @@ log "  Team done marker: $DONE_MARKER"
 log "  Team file:        $CLOSEOUT_FILE"
 log "  Stop marker:      $STOP_MARKER"
 log "  Stop file:        $STOP_FILE"
+if [[ -n "$NATIVE_FILE" ]]; then
+  log "  Native file:      $NATIVE_FILE"
+fi
 log "  Overseer log:     $OVERSEER_LOG"
 log "  Timer log:        $TIMER_LOG"
 

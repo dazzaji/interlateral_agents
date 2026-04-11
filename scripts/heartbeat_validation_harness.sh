@@ -18,6 +18,7 @@ Options:
   --interval SEC       Heartbeat interval for validation run (default: 30)
   --idle-timeout SEC   Idle timeout for validation run (default: 15)
   --ack-timeout SEC    Ack timeout for validation run (default: 45)
+  --mode MODE          Validation transport mode: tmux or native (default: tmux)
   --run                Run sprint_overseer.sh immediately in validation mode
   -h, --help           Show this help
 
@@ -33,6 +34,7 @@ MANAGER_SESSION=""
 INTERVAL_SEC=30
 IDLE_TIMEOUT_SEC=15
 ACK_TIMEOUT_SEC=45
+MODE="tmux"
 RUN_TIMER=0
 
 while [[ $# -gt 0 ]]; do
@@ -61,6 +63,10 @@ while [[ $# -gt 0 ]]; do
       ACK_TIMEOUT_SEC="$2"
       shift 2
       ;;
+    --mode)
+      MODE="$2"
+      shift 2
+      ;;
     --run)
       RUN_TIMER=1
       shift
@@ -76,6 +82,16 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+case "$MODE" in
+  tmux|native)
+    ;;
+  *)
+    echo "Unknown mode: $MODE" >&2
+    usage
+    exit 1
+    ;;
+esac
 
 if [[ -z "$MANAGER_SESSION" ]]; then
   if [[ "$OVERSEER_SESSION" == "${CC_SESSION:-ia-claude}" ]]; then
@@ -95,8 +111,10 @@ SPRINT_FILE="$WORKDIR/heartbeat_validation_sprint.md"
 EVIDENCE_DIR="$WORKDIR/evidence"
 EVIDENCE_FILE="$EVIDENCE_DIR/heartbeat_validation_proof.md"
 STOP_FILE="$EVIDENCE_DIR/heartbeat_validation_overseer_closeout.md"
+HEARTBEAT_FILE="$WORKDIR/sprint_heartbeat_command.txt"
 
 mkdir -p "$EVIDENCE_DIR"
+rm -f "$HEARTBEAT_FILE"
 
 cat > "$SPRINT_FILE" <<EOF
 # Heartbeat Validation Sprint
@@ -141,6 +159,9 @@ Evidence file:
 Overseer closeout file:
   $STOP_FILE
 
+Heartbeat file:
+  $HEARTBEAT_FILE
+
 Suggested watch commands:
   source "$IA_ROOT/scripts/tmux-config.sh"
   tmux -S "$TMUX_SOCKET" capture-pane -t "$OVERSEER_SESSION" -p | tail -40
@@ -158,19 +179,25 @@ Validation timer command:
     --interval "$INTERVAL_SEC" \\
     --idle-timeout "$IDLE_TIMEOUT_SEC" \\
     --ack-timeout "$ACK_TIMEOUT_SEC" \\
-    --validation-mode
+$(if [[ "$MODE" == "native" ]]; then printf '    --native-file "%s" \\\\\n' "$HEARTBEAT_FILE"; fi)    --validation-mode
 EOF
 
 if (( RUN_TIMER == 1 )); then
-  exec "$IA_ROOT/scripts/sprint_overseer.sh" "$SPRINT_FILE" \
-    --manager "$MANAGER_SESSION" \
-    --overseer "$OVERSEER_SESSION" \
-    --closeout-file "$EVIDENCE_FILE" \
-    --done-marker "STATUS: DONE" \
-    --stop-file "$STOP_FILE" \
-    --stop-marker "STATUS: OVERSEER-DONE" \
-    --interval "$INTERVAL_SEC" \
-    --idle-timeout "$IDLE_TIMEOUT_SEC" \
-    --ack-timeout "$ACK_TIMEOUT_SEC" \
-    --validation-mode
+  CMD=(
+    "$IA_ROOT/scripts/sprint_overseer.sh" "$SPRINT_FILE"
+    --manager "$MANAGER_SESSION"
+    --overseer "$OVERSEER_SESSION"
+    --closeout-file "$EVIDENCE_FILE"
+    --done-marker "STATUS: DONE"
+    --stop-file "$STOP_FILE"
+    --stop-marker "STATUS: OVERSEER-DONE"
+    --interval "$INTERVAL_SEC"
+    --idle-timeout "$IDLE_TIMEOUT_SEC"
+    --ack-timeout "$ACK_TIMEOUT_SEC"
+  )
+  if [[ "$MODE" == "native" ]]; then
+    CMD+=(--native-file "$HEARTBEAT_FILE")
+  fi
+  CMD+=(--validation-mode)
+  exec "${CMD[@]}"
 fi

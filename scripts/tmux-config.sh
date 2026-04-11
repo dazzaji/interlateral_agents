@@ -87,7 +87,7 @@ pane_seems_cli() {
     local session="${1:?session name required}"
     local cmd
     cmd="$(pane_current_command "$session")"
-    [[ "$cmd" =~ ^(claude|codex|gemini)$ ]]
+    [[ "$cmd" =~ ^(claude|codex|gemini|node|[0-9]+\.[0-9]+\.[0-9]+)$ ]]
 }
 
 pane_idle() {
