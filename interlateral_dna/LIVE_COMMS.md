@@ -32,6 +32,22 @@ These values are defined in `scripts/tmux-config.sh`.
 | Codex | `node interlateral_dna/cc.js send "msg"` | self | `node interlateral_dna/gemini.js send "msg"` |
 | Gemini | `node interlateral_dna/cc.js send "msg"` | `node interlateral_dna/codex.js send "msg"` | self |
 
+## Desktop Peers
+
+Desktop peers now participate as tmux peers too, but with one important difference:
+
+- `claude-desktop` and `codex-desktop` should each own their own inbox session on the shared socket.
+- When possible, ACK desktop peers in **both** places:
+  1. direct to their tmux session
+  2. mirrored to `comms.md`
+- For `codex-desktop`, direct ACKs should target `ia-codex-desktop`.
+- For `claude-desktop`, there is currently no dedicated helper script in `interlateral_dna`; the proven route is direct pane/tty delivery to `ia-claude-desktop` plus a ledger mirror to `@Claude Desktop`.
+- When proving a new desktop peer, use a nonce challenge rather than a generic hello.
+
+Desktop onboarding details live in:
+
+`/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/docs/ops/comms/DESKTOP_FIRST.md`
+
 ## Why The Control Scripts Matter
 
 Do not use raw `tmux send-keys` for agent-to-agent messages. Claude, Codex, and Gemini all need a short delay between text injection and `Enter`, otherwise messages can remain stuck in the input buffer.
