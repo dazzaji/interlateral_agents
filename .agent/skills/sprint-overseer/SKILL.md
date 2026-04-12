@@ -107,6 +107,11 @@ When the team evidence file reaches `done_marker` but the overseer stop file doe
 
 When the team evidence file has not reached `done_marker`, but the overseers invoke Override Authority, treat that as functionally equivalent to team completion for the purpose of final Joint ACK and overseer closeout. This may happen either through coordinated use by both overseers or through the lone-overseer fallback described below.
 
+When no heartbeat file is present (empty-file tick between heartbeats), write a
+short-form tick entry to the log anyway so the log proves the overseer is alive
+between heartbeats. A gap in the log means the overseer was dead — not that
+nothing happened.
+
 When the stop condition is met, append a final checkpoint entry.
 
 ## Overseer Override Authority
@@ -134,6 +139,11 @@ Append every check-in to `{sprint_dir}/sprint-overseer-log.md`:
 **Classification:** {on-track / off-track / idle-stalled / team-complete-overseer-open}
 **Action taken:** {none / nudge sent / escalation noted}
 ```
+
+Every wake-up writes a log entry — including empty-file ticks where no heartbeat
+is pending. Use a one-paragraph short form for those so the log proves the
+overseer is alive between heartbeats. Example: `"Cron tick — no heartbeat pending.
+Team status: on-track, LEAD actively coding. No action."`
 
 Keep entries concise and scannable.
 
