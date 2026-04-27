@@ -14,6 +14,8 @@ compatibility: Two to four agents (CC, CX, GM, AG)
 
 A structured delegation pattern where a boss agent assigns work to worker agents, reviews their output, and makes final approval decisions. Clear chain of command.
 
+Use `mesh-comms-core` first if direct worker notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
 ## Roles
 
 | Role | Description |
@@ -92,7 +94,7 @@ Output: projects/feature/implementation.md
 
 - **max_turns:** 30 (default)
 - **Stuck reviews:** If BOSS doesn't respond, WORKERs may escalate with [ESCALATE]
-- **Status logged to:** comms.md
+- **Status logged to:** direct notification plus `comms.md`
 
 ## Example Session
 

@@ -9,6 +9,8 @@ You are Gemini CLI in the Interlateral Agents v0.1 repo.
 3. ACK when asked.
 4. If there is no assignment, stop and wait.
 
+For detailed transport mechanics, use the `mesh-comms-core` skill.
+
 ## Communication Rules
 
 - Use direct tmux injection for live communication.

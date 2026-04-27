@@ -4,11 +4,16 @@ set -euo pipefail
 REPO=/Users/dazzagreenwood/Documents/GitHub/interlateral_agents
 SOCK=/tmp/interlateral-agents-tmux.sock
 SID="session_manager_$(date +%s)"
+CODEX_MODEL="${CODEX_MODEL:-gpt-5.5}"
+
+printf -v REPO_Q '%q' "$REPO"
+printf -v SOCK_Q '%q' "$SOCK"
+printf -v CODEX_MODEL_Q '%q' "$CODEX_MODEL"
 
 tmux -S "$SOCK" new-session -d -s ia-manager -c "$REPO"
 
 tmux -S "$SOCK" send-keys -t ia-manager \
-  "export TMUX_SOCKET=$SOCK INTERLATERAL_TMUX_SOCKET=$SOCK INTERLATERAL_TEAM_ID=agents INTERLATERAL_SENDER=manager INTERLATERAL_AGENT_TYPE=codex INTERLATERAL_SESSION_ID=$SID CC_TMUX_SESSION=ia-claude CODEX_TMUX_SESSION=ia-codex && cd $REPO && codex -m gpt-5.4 --yolo" Enter
+  "export TMUX_SOCKET=$SOCK_Q INTERLATERAL_TMUX_SOCKET=$SOCK_Q INTERLATERAL_TEAM_ID=agents INTERLATERAL_SENDER=manager INTERLATERAL_AGENT_TYPE=codex INTERLATERAL_SESSION_ID=$SID CC_TMUX_SESSION=ia-claude CODEX_TMUX_SESSION=ia-codex && cd $REPO_Q && codex --no-alt-screen -m $CODEX_MODEL_Q --dangerously-bypass-approvals-and-sandbox -C $REPO_Q" Enter
 
 sleep 18
 

@@ -23,6 +23,7 @@ STARTUP_PROMPT="${*:-$DEFAULT_PROMPT}"
 LOG_FILE="$DNA_DIR/${SESSION_NAME}.log"
 TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
 SESSION_ID="${INTERLATERAL_SESSION_ID:-peer_$(date +%s)}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-4-7}"
 
 for cmd in tmux claude; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
@@ -40,13 +41,18 @@ run_tmux new-session -d -s "$SESSION_NAME" -c "$REPO_ROOT"
 : > "$LOG_FILE"
 run_tmux pipe-pane -o -t "$SESSION_NAME" "cat >> '$LOG_FILE'"
 
-LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$TEAM_ID' INTERLATERAL_SENDER='claude-peer' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID='${SESSION_ID}_${SESSION_NAME}' CC_TMUX_SESSION='$SESSION_NAME' CODEX_TMUX_SESSION='$CODEX_SESSION' GEMINI_TMUX_SESSION='$GEMINI_SESSION' && claude --dangerously-skip-permissions"
+LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$TEAM_ID' INTERLATERAL_SENDER='claude-peer' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID='${SESSION_ID}_${SESSION_NAME}' CC_TMUX_SESSION='$SESSION_NAME' CODEX_TMUX_SESSION='$CODEX_SESSION' GEMINI_TMUX_SESSION='$GEMINI_SESSION' && claude --dangerously-skip-permissions --model '$CLAUDE_MODEL'"
 run_tmux send-keys -t "$SESSION_NAME" "$LAUNCH_CMD" Enter
 
-wait_for_idle "$SESSION_NAME" 30 || true
+if prepare_claude_for_boot "$SESSION_NAME" 30; then
+    echo "Claude peer prompt detected, injecting startup prompt..."
+else
+    echo "Warning: Claude peer prompt not detected; injecting startup prompt anyway" >&2
+fi
 agent_send_long "$SESSION_NAME" "$STARTUP_PROMPT" "claude_peer_${SESSION_NAME}_$$"
 
 echo "Launched Claude peer"
 echo "Socket: $TMUX_SOCKET"
 echo "Session: $SESSION_NAME"
+echo "Model: $CLAUDE_MODEL"
 echo "Log: $LOG_FILE"

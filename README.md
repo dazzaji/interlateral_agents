@@ -1,6 +1,6 @@
 # Interlateral Agents
 
-Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives you a fast Claude Code + Codex duo launcher, peer helpers for adding more CLI agents on the same tmux socket, a canonical 14-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
+Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives you a fast Claude Code + Codex duo launcher, peer helpers for adding more CLI agents on the same tmux socket, a canonical 17-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
 
 ## Prerequisites
 
@@ -12,20 +12,36 @@ Interlateral Agents v0.1 is a small, working multi-agent starter repo. It gives 
 
 ## Security Notice
 
-`me.sh` launches agents in fully permissive mode (`--dangerously-skip-permissions` for Claude Code, `--yolo` for Codex). This disables all safety prompts and approval gates. Only run it in environments and on codebases where you accept that risk.
+`me.sh` launches agents in fully permissive mode (`--dangerously-skip-permissions` for Claude Code, `--dangerously-bypass-approvals-and-sandbox` for Codex). This disables all safety prompts and approval gates. Only run it in environments and on codebases where you accept that risk.
 
 ## Quick Start
+
+Recommended bootstrap prompt for a fresh agent:
+
+```text
+Use the init skill in this repo.
+```
+
+That skill runs the standard initializer:
 
 ```bash
 ./me.sh
 ```
 
 This boots:
-- Claude Code in `ia-claude`
-- Codex in `ia-codex`
+- Claude Code in `ia-claude` using `claude-opus-4-7` by default
+- Codex in `ia-codex` using `gpt-5.5` by default
 - shared socket at `/tmp/interlateral-agents-tmux.sock`
 
-The duo launcher performs the ACK handshake and waits for both agents to print `Ready to Rock!`.
+The bootstrap agent that runs `init` or `me.sh` is not part of the mesh. The launcher prints CLI versions and the exact Claude/Codex commands before launch, performs the ACK handshake, and waits for both agents to print `Reporting for Duty!`.
+
+Override defaults when needed:
+
+```bash
+CLAUDE_MODEL=claude-opus-4-7 CODEX_MODEL=gpt-5.5 ./me.sh
+CLAUDE_ARGS="--dangerously-skip-permissions --model claude-opus-4-7" ./me.sh
+CODEX_ARGS="--no-alt-screen -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox -C /path/to/repo" ./me.sh
+```
 
 If you want to run `me.sh` from anywhere as `me.sh` instead of `./me.sh`, add this repo to your shell `PATH` in `~/.zshrc` or the equivalent startup file for your shell:
 
@@ -80,6 +96,18 @@ Use the dev-collaboration skill at .agent/skills/dev-collaboration/SKILL.md.
 CC is Drafter. Codex is Reviewer+Breaker.
 Artifact: dev_plan/dev_plan.md
 ```
+
+### Comms And Init Skills
+
+The comms setup is now split into focused skills:
+
+- `init` launches only the standard two-agent CLI mesh with `me.sh`.
+- `mesh-comms-core` documents the transport substrate: tmux socket, direct-send helpers, `comms.md` ledger, identity stamping, safe TUI submission, idle checks, and ACK proof.
+- `desktop-mesh-peer` joins Claude Desktop or Codex Desktop separately with its own inbox session and nonce ACK proof.
+
+Collaboration-pattern skills now treat `comms.md` as the ledger rather than the wake-up path. Use direct helper scripts such as `node interlateral_dna/cc.js send "message"` and let the helpers mirror stamped entries into `interlateral_dna/comms.md`.
+
+This keeps the foundation simple for new users: start one bootstrap agent, tell it to use `init`, and it should bring up the standard Claude/Codex duo without requiring local edits to `me.sh`. More complex collaboration remains opt-in through separate skills, so the basic boot path does not also carry desktop onboarding, quartet setup, sprint governance, or worker-role policy. If the CLI model names or flags change, override them with environment variables and read the printed launch commands before the script starts the sessions.
 
 ### Sprint Overseer Recipe
 

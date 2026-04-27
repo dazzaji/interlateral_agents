@@ -14,6 +14,8 @@ compatibility: Three or more agents (CC, CX, GM, AG)
 
 Multiple agents independently create solutions to the same challenge. Judges evaluate the submissions blind (if possible) and select a winner. Encourages diverse approaches and best-idea-wins culture.
 
+Use `mesh-comms-core` first if direct competitor notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
 ## Roles
 
 | Role | Description |
@@ -127,7 +129,7 @@ Output: projects/arch/winner.md
 - **max_turns:** 40 (default)
 - **Tie handling:** Judges deliberate; if still tied, random or synthesize
 - **No winner:** If no entry meets minimum criteria, all get feedback, re-compete
-- **Status logged to:** comms.md
+- **Status logged to:** direct notification plus `comms.md`
 
 ## Example Session
 

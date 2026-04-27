@@ -2,6 +2,13 @@
 
 This is the canonical reference for direct comms in the starter-scope repo. v0.1 is CLI-first and tmux-first: Claude Code, Codex, and Gemini CLI all communicate by injecting directly into each other's tmux panes.
 
+## Skill Map
+
+- Use `init` to launch the standard Claude/Codex duo with `me.sh`.
+- Use `mesh-comms-core` for transport setup, ACK proof, direct-send rules, and troubleshooting.
+- Use `desktop-mesh-peer` when Claude Desktop or Codex Desktop joins as a separate peer.
+- Use collaboration skills only after direct comms are proven.
+
 ## Golden Rule
 
 Never rely on `comms.md` alone. `comms.md` is the ledger, not the messenger.
@@ -15,12 +22,13 @@ Every meaningful handoff should do both:
 
 `me.sh` boots two agents by default:
 
-- Claude Code: `ia-claude`
-- Codex: `ia-codex`
+- Claude Code: `ia-claude` with `claude-opus-4-7` unless `CLAUDE_MODEL` overrides it
+- Codex: `ia-codex` with `gpt-5.5` unless `CODEX_MODEL` overrides it
 
 Gemini CLI is available via `scripts/launch-gemini-peer.sh` and uses session names like `ia-gemini-peer-NN`.
 
 - Shared tmux socket: `/tmp/interlateral-agents-tmux.sock`
+- Standard ready phrase: `Reporting for Duty!`
 
 These values are defined in `scripts/tmux-config.sh`.
 
@@ -125,7 +133,7 @@ sleep 0.1
 tmux send-keys -t "$SESSION" Enter
 ```
 
-The control scripts (`cc.js`, `codex.js`, `gemini.js`) and the helper functions in `scripts/tmux-config.sh` (`agent_send`, `codex_send_clean`, `agent_send_long`, `agent_send_long_delayed`) all implement this pattern. Always use them rather than raw `tmux send-keys`.
+The control scripts (`cc.js`, `codex.js`, `gemini.js`) and the helper functions in `scripts/tmux-config.sh` (`agent_send`, `agent_send_logged`, `codex_send_clean`, `agent_send_long`, `agent_send_long_logged`, `agent_send_long_delayed`) all implement this pattern. Prefer the `_logged` helpers for arbitrary/nonstandard sessions so the direct wake-up also appears in `comms.md`.
 
 ## Safety: C-c Behavior Per CLI
 
@@ -192,8 +200,8 @@ All three CLIs support a headless mode that bypasses the TUI entirely. This is u
 
 | Mode | Command |
 |------|---------|
-| Headless one-shot | `claude -p --dangerously-skip-permissions "task"` |
-| Headless follow-up (same conversation) | `claude -p --dangerously-skip-permissions --continue "next"` |
+| Headless one-shot | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task"` |
+| Headless follow-up (same conversation) | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 --continue "next"` |
 | Resume by session ID | `claude -p --resume SESSION_ID "continue"` |
 | Capture session ID | `session_id=$(claude -p --output-format json "task" \| jq -r '.session_id')` |
 
@@ -201,7 +209,7 @@ All three CLIs support a headless mode that bypasses the TUI entirely. This is u
 
 | Mode | Command |
 |------|---------|
-| Headless one-shot | `codex exec -m gpt-5.4 --yolo "task"` |
+| Headless one-shot | `codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox "task"` |
 | Resume session | `codex resume SESSION_ID` |
 
 **Gemini CLI:**
@@ -215,7 +223,7 @@ All three CLIs support a headless mode that bypasses the TUI entirely. This is u
 
 ```bash
 tmux send-keys -t "$SESSION" \
-  'claude --print --dangerously-skip-permissions "task" 2>&1 | tee /tmp/output.txt' Enter
+  'claude --print --dangerously-skip-permissions --model claude-opus-4-7 "task" 2>&1 | tee /tmp/output.txt' Enter
 ```
 
 ### Bound Runtime (Prevent Stuck Agents)
@@ -224,10 +232,10 @@ When dispatching headless agents, use a hard timeout so a hung process cannot bl
 
 ```bash
 # Linux
-timeout 420 claude -p --dangerously-skip-permissions "task" | tee /tmp/output.txt
+timeout 420 claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task" | tee /tmp/output.txt
 
 # macOS (requires: brew install coreutils)
-gtimeout 420 claude -p --dangerously-skip-permissions "task" | tee /tmp/output.txt
+gtimeout 420 claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task" | tee /tmp/output.txt
 ```
 
 Exit codes: `0` = completed normally, `124` = killed by timeout.
@@ -239,6 +247,7 @@ For autonomous work where an agent should keep picking up tasks:
 ```bash
 while true; do
   claude -p --dangerously-skip-permissions --continue \
+    --model claude-opus-4-7 \
     "Continue working. Read TASKS.md for context and update it when done."
   sleep 1
 done
@@ -267,7 +276,7 @@ All agents in this system run in full-permissions, no-sandbox mode by default. T
 | CLI | Flag used in this repo | Launcher file |
 |-----|----------------------|---------------|
 | Claude Code | `--dangerously-skip-permissions` | `me.sh` |
-| Codex | `--yolo` | `me.sh`, `scripts/launch-codex-peer.sh` |
+| Codex | `--dangerously-bypass-approvals-and-sandbox` | `me.sh`, `scripts/launch-codex-peer.sh` |
 | Gemini CLI | `--approval-mode=auto_edit` | `scripts/launch-gemini-peer.sh` |
 
 **General CLI equivalents (for manual or headless use):**
@@ -275,7 +284,7 @@ All agents in this system run in full-permissions, no-sandbox mode by default. T
 | CLI | Alternative flags |
 |-----|------------------|
 | Claude Code | `--dangerously-skip-permissions` (only option) |
-| Codex | `--yolo` or `--dangerously-bypass-approvals-and-sandbox` (both work) |
+| Codex | `--dangerously-bypass-approvals-and-sandbox` |
 | Gemini CLI | `-y` (yolo) or `--approval-mode=auto_edit` |
 
 These flags are required for unattended multi-agent operation. Without them, agents will block on permission prompts that no one is there to approve. When launching agents manually or in headless mode, use the flags shown above.
@@ -284,8 +293,8 @@ These flags are required for unattended multi-agent operation. Without them, age
 
 | CLI | Default model | Notes |
 |-----|--------------|-------|
-| Claude Code | Opus 4.6 | Default when launched normally |
-| Codex | gpt-5.4 (heavy reasoning) | Specify with `-m gpt-5.4` |
+| Claude Code | Opus 4.7 | `me.sh` specifies `--model claude-opus-4-7` by default |
+| Codex | gpt-5.5 | `me.sh` specifies `-m gpt-5.5` by default |
 | Gemini CLI | gemini-3.1-pro-preview | Specify with `-m gemini-3.1-pro-preview` |
 
 ### Available Model Variants
@@ -296,7 +305,8 @@ Other models are available for specific use cases. Requirements from the user or
 
 | Model | Flag | Characteristics |
 |-------|------|-----------------|
-| gpt-5.4 (default) | `-m gpt-5.4` | Heavy reasoning, general work |
+| gpt-5.5 (default) | `-m gpt-5.5` | Frontier reasoning, general work |
+| gpt-5.4 | `-m gpt-5.4` | Strong fallback when 5.5 is unavailable |
 | gpt-5.3-codex-spark | `-m gpt-5.3-codex-spark` | Faster output (~1000 tok/s), lighter reasoning |
 
 **Warning:** Do NOT use `codex-5.3` or `codex-5.2` model names with ChatGPT-linked auth — they will error.
@@ -309,7 +319,7 @@ Other models are available for specific use cases. Requirements from the user or
 
 **Claude Code variants:**
 
-Claude Code model selection is handled via its own configuration. The default (Opus 4.6) is used unless explicitly overridden.
+`me.sh` defaults to `claude-opus-4-7` through `--model`. Override with `CLAUDE_MODEL` when the installed Claude CLI expects a different model name.
 
 ### Full CLI Launch Reference
 
@@ -317,19 +327,19 @@ Claude Code model selection is handled via its own configuration. The default (O
 
 | Mode | Command |
 |------|---------|
-| Interactive (full perms) | `claude --dangerously-skip-permissions` |
-| Interactive + first prompt | `claude --dangerously-skip-permissions "prompt"` |
-| Headless one-shot | `claude -p --dangerously-skip-permissions "task"` |
-| Headless follow-up | `claude -p --dangerously-skip-permissions --continue "next"` |
+| Interactive (repo default) | `claude --dangerously-skip-permissions --model claude-opus-4-7` |
+| Interactive + first prompt | `claude --dangerously-skip-permissions --model claude-opus-4-7 "prompt"` |
+| Headless one-shot | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task"` |
+| Headless follow-up | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 --continue "next"` |
 | Resume by session | `claude -p --resume SESSION_ID "continue"` |
 
-**Codex (this repo uses `--yolo`):**
+**Codex (this repo uses `--dangerously-bypass-approvals-and-sandbox`):**
 
 | Mode | Command |
 |------|---------|
-| Interactive (repo default) | `codex -m gpt-5.4 --yolo` |
-| Interactive + first prompt | `codex -m gpt-5.4 --yolo "prompt"` |
-| Headless one-shot | `codex exec -m gpt-5.4 --yolo "task"` |
+| Interactive (repo default) | `codex -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox` |
+| Interactive + first prompt | `codex -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox "prompt"` |
+| Headless one-shot | `codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox "task"` |
 | Resume session | `codex resume SESSION_ID` |
 
 **Gemini CLI (this repo uses `--approval-mode=auto_edit`):**
@@ -347,7 +357,7 @@ Different CLIs require different boot strategies. This repo's launchers implemen
 
 | CLI | Strategy | Reason |
 |-----|----------|--------|
-| Codex | First prompt as CLI argument | Codex's TUI settles quickly; CLI-arg works reliably |
+| Codex | Bare launch, wait for `›` idle prompt, then inject with `agent_send_long` | Long or multi-line CLI-arg prompts can be truncated or stranded in the shell/TUI path |
 | Claude Code | Bare launch, wait for `❯` idle prompt, then inject | Claude's heavier TUI startup can truncate/mangle long CLI-arg prompts |
 | Gemini CLI | Bare launch with `--approval-mode=auto_edit`, wait for idle, then inject via `agent_send_long_delayed` with 1s delay | Gemini needs the delay between paste and submit; `launch-gemini-peer.sh` handles this |
 

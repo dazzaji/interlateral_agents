@@ -86,7 +86,7 @@ When the team appears substantively complete but has not marked `done_marker`, t
 - Quiet output is not automatically idleness.
 - Check worker sessions before deciding the manager is stalled.
 - Nudge only for confirmed stalls or clear drift.
-- Nudge the lead only.
+- Nudge the lead only. Workers do not receive overseer nudges.
 - Be specific: say what you observed and what the sprint expects next.
 
 Use the repo comms helpers when available:
@@ -96,6 +96,29 @@ node interlateral_dna/cc.js send "message"
 node interlateral_dna/codex.js send "message"
 node interlateral_dna/gemini.js send "message"
 ```
+
+### Lead Self-Nudge
+
+If the overseer is also the sprint lead, write the checkpoint first, then send the nudge to your own active session or treat the next turn as the nudge response.
+
+The self-nudge must still be concrete:
+- what is stalled or drifting
+- what the sprint expects next
+- what artifact or command sequence should be updated
+
+Do not use self-nudge authority to expand scope or skip evidence.
+
+### Cadence Discipline
+
+Default polling cadence is 5 minutes. Acceptable human-configured range is 3 to 5 minutes unless the sprint explicitly says otherwise.
+
+Do not poll more often than every 3 minutes for normal oversight. Faster polling increases duplicate nudges and false stall classification.
+
+Every wake-up writes a checkpoint entry with:
+- `Classification`
+- `Action taken`
+
+Even when no action is taken, record `Action taken: none`.
 
 ## Stop Condition
 

@@ -14,6 +14,8 @@ compatibility: Three or more agents (CC, CX, GM, AG)
 
 Multiple agents, each advocating for a different priority, negotiate to reach a consensus. No agent has authority; all must agree through trade-offs and compromise.
 
+Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
 ## Roles
 
 | Role | Description |
@@ -86,7 +88,7 @@ Output: projects/auth/protocol.md
 
 - **max_turns:** 30 (default)
 - **Deadlock:** If max_turns reached, exits with `[INCOMPLETE]`
-- **Status logged to:** comms.md
+- **Status logged to:** direct notification plus `comms.md`
 
 ## Example Session
 

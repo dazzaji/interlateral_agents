@@ -14,6 +14,8 @@ compatibility: Three or more agents (CC, CX, GM, AG)
 
 A collaborative pattern where all agents have equal standing. Proposals are discussed openly and decisions are made by majority vote. No single agent has veto power.
 
+Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
 ## Roles
 
 | Role | Description |
@@ -88,7 +90,7 @@ Output: projects/retro/decisions.md
 - **max_turns:** 30 (default)
 - **Tie handling:** FACILITATOR breaks ties, or re-discuss
 - **Quorum:** All members must vote (ABSTAIN counts as participation)
-- **Status logged to:** comms.md
+- **Status logged to:** direct notification plus `comms.md`
 
 ## Example Session
 

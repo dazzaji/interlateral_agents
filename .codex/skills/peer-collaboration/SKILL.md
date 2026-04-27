@@ -14,6 +14,8 @@ compatibility: Any two agents (CC, CX, GM, AG)
 
 Two agents work together as equals to co-create a single artifact. They take turns proposing, reacting, and refining until both agree the work is complete.
 
+Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
 ## Roles
 
 | Role | Description |
@@ -79,7 +81,7 @@ Output: projects/api/spec.md
 ## Safety
 
 - **max_turns:** 20 (default). If reached, skill exits with `[INCOMPLETE]`
-- **Status logged to:** comms.md
+- **Status logged to:** direct notification plus `comms.md`
 
 ## Example Session
 

@@ -10,8 +10,9 @@ unset TMUX
 
 CLAUDE_SESSION="${CC_TMUX_SESSION:-$CC_SESSION}"
 CODEX_SESSION="${CODEX_TMUX_SESSION:-$CODEX_SESSION}"
-CLAUDE_ARGS="${CLAUDE_ARGS:---dangerously-skip-permissions}"
-CODEX_ARGS="${CODEX_ARGS:--m gpt-5.4 --yolo}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-4-7}"
+CODEX_MODEL="${CODEX_MODEL:-gpt-5.5}"
+READY_PHRASE="${READY_PHRASE:-Reporting for Duty!}"
 INTERLATERAL_TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
 LAUNCH_SESSION_ID="${INTERLATERAL_SESSION_ID:-session_$(date +%s)}"
 export TMUX_SOCKET INTERLATERAL_TEAM_ID
@@ -19,10 +20,48 @@ export TMUX_SOCKET INTERLATERAL_TEAM_ID
 CLAUDE_LOG="$DNA_DIR/claude_telemetry.log"
 CODEX_LOG="$DNA_DIR/codex_telemetry.log"
 
+usage() {
+    cat <<'EOF'
+Usage:
+  ./me.sh [--force]
+
+Environment overrides:
+  CLAUDE_MODEL       Default: claude-opus-4-7
+  CODEX_MODEL        Default: gpt-5.5
+  CLAUDE_ARGS        Default: --dangerously-skip-permissions --model "$CLAUDE_MODEL"
+  CODEX_ARGS         Default: --no-alt-screen -m "$CODEX_MODEL" --dangerously-bypass-approvals-and-sandbox -C "$REPO_ROOT"
+  READY_PHRASE       Default: Reporting for Duty!
+
+This launches only the standard two-agent CLI mesh: ia-claude and ia-codex.
+The bootstrap operator that runs this script is not part of the mesh.
+EOF
+}
+
+shell_quote() {
+    local quoted
+    printf -v quoted '%q' "$1"
+    printf '%s' "$quoted"
+}
+
 need_cmd() {
     if ! command -v "$1" >/dev/null 2>&1; then
-        echo "Missing required command: $1"
+        echo "Missing required command: $1" >&2
         exit 1
+    fi
+}
+
+print_version() {
+    local cmd="$1"
+    local version
+    version="$("$cmd" --version 2>&1 | head -n 1 || true)"
+    [[ -n "$version" ]] && echo "  $cmd: $version" || echo "  $cmd: installed"
+}
+
+warn_if_help_missing() {
+    local cmd="$1"
+    local flag="$2"
+    if ! "$cmd" --help 2>&1 | grep -q -- "$flag"; then
+        echo "Warning: '$cmd --help' did not show expected flag '$flag'. The command will still be printed before launch." >&2
     fi
 }
 
@@ -56,46 +95,12 @@ wait_for_ready() {
     return 1
 }
 
-wait_for_phrase() {
-    local session="$1"
-    local phrase="$2"
-    local tries="${3:-60}"
-    local i
-    for i in $(seq 1 "$tries"); do
-        if run_tmux capture-pane -t "$session" -p | grep -Fq "$phrase"; then
-            return 0
-        fi
-        sleep 2
-    done
-    return 1
-}
-
-pane_contains() {
-    local session="$1"
-    local needle="$2"
-    run_tmux capture-pane -t "$session" -p | grep -Fq "$needle"
-}
-
-wait_for_exact_line() {
-    local session="$1"
-    local line="$2"
-    local tries="${3:-60}"
-    local i
-    for i in $(seq 1 "$tries"); do
-        if run_tmux capture-pane -t "$session" -p | grep -Fxq "$line"; then
-            return 0
-        fi
-        sleep 2
-    done
-    return 1
-}
-
 wait_for_ready_signal() {
     local session="$1"
     local tries="${2:-60}"
     local i
     for i in $(seq 1 "$tries"); do
-        if run_tmux capture-pane -t "$session" -p | grep -q 'Ready to Rock!'; then
+        if run_tmux capture-pane -t "$session" -p | grep -Fxq "$READY_PHRASE"; then
             return 0
         fi
         sleep 2
@@ -103,50 +108,57 @@ wait_for_ready_signal() {
     return 1
 }
 
-claude_needs_workspace_trust() {
-    local session="$1"
-    pane_contains "$session" "Quick safety check:"
-}
-
-confirm_claude_workspace_trust() {
-    local session="$1"
-    run_tmux send-keys -t "$session" Enter
-}
-
-prepare_claude_for_boot() {
-    local session="$1"
-    local tries="${2:-45}"
-    local i
-    for i in $(seq 1 "$tries"); do
-        if claude_needs_workspace_trust "$session"; then
-            echo "Claude workspace trust prompt detected, confirming..."
-            confirm_claude_workspace_trust "$session"
-            sleep 2
-            continue
-        fi
-        if wait_for_idle "$session" 1; then
-            return 0
-        fi
-        sleep 2
-    done
-    return 1
-}
-
-quote_file_content() {
-    local quoted
-    printf -v quoted '%q' "$1"
-    printf '%s' "$quoted"
-}
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+fi
+if [[ $# -gt 1 || ( $# -eq 1 && "${1:-}" != "--force" ) ]]; then
+    usage >&2
+    exit 1
+fi
 
 need_cmd tmux
 need_cmd node
 need_cmd codex
 need_cmd claude
 
-CLAUDE_PROMPT="Read CLAUDE.md in this repo for your operating instructions. Do not explore yet. First send Codex exactly \"ACK from Claude. Can you hear me?\" using node interlateral_dna/codex.js send \"ACK from Claude. Can you hear me?\", then wait for Codex ACK, then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
-CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do not explore yet. Watch interlateral_dna/comms.md for a stamped sender=claude entry containing \"ACK from Claude. Can you hear me?\". Do not treat that phrase inside prompt text as the signal. When you see the Claude-stamped ledger entry, reply exactly using node interlateral_dna/cc.js send \"ACK from Codex. I can hear you.\", then print exactly Ready to Rock!, then stop and wait for Dazza's assignment."
+warn_if_help_missing claude "--model"
+warn_if_help_missing codex "--dangerously-bypass-approvals-and-sandbox"
 
-CODEX_BOOT_QUOTED="$(quote_file_content "$CODEX_PROMPT")"
+CLAUDE_MODEL_Q="$(shell_quote "$CLAUDE_MODEL")"
+CODEX_MODEL_Q="$(shell_quote "$CODEX_MODEL")"
+REPO_ROOT_Q="$(shell_quote "$REPO_ROOT")"
+TMUX_SOCKET_Q="$(shell_quote "$TMUX_SOCKET")"
+TEAM_ID_Q="$(shell_quote "$INTERLATERAL_TEAM_ID")"
+CLAUDE_SESSION_Q="$(shell_quote "$CLAUDE_SESSION")"
+CODEX_SESSION_Q="$(shell_quote "$CODEX_SESSION")"
+CLAUDE_LAUNCH_ID_Q="$(shell_quote "${LAUNCH_SESSION_ID}_claude")"
+CODEX_LAUNCH_ID_Q="$(shell_quote "${LAUNCH_SESSION_ID}_codex")"
+
+CLAUDE_ARGS="${CLAUDE_ARGS:---dangerously-skip-permissions --model $CLAUDE_MODEL_Q}"
+CODEX_ARGS="${CODEX_ARGS:---no-alt-screen -m $CODEX_MODEL_Q --dangerously-bypass-approvals-and-sandbox -C $REPO_ROOT_Q}"
+
+CLAUDE_PROMPT="Read CLAUDE.md in this repo for your operating instructions. Do not explore yet. First send Codex exactly \"ACK from Claude. Can you hear me?\" using node interlateral_dna/codex.js send \"ACK from Claude. Can you hear me?\", then wait for Codex ACK, then print exactly $READY_PHRASE, then stop and wait for Dazza's assignment."
+CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do not explore yet. Wait for a direct message in this Codex pane from Claude containing \"ACK from Claude. Can you hear me?\". Use interlateral_dna/comms.md only as the audit ledger, not as the wake-up trigger. Do not treat that phrase inside this boot prompt as the signal. When the direct Claude message arrives, reply exactly using node interlateral_dna/cc.js send \"ACK from Codex. I can hear you.\", then print exactly $READY_PHRASE, then stop and wait for Dazza's assignment."
+
+CLAUDE_LAUNCH_CMD="cd $REPO_ROOT_Q && export TMUX_SOCKET=$TMUX_SOCKET_Q INTERLATERAL_TMUX_SOCKET=$TMUX_SOCKET_Q INTERLATERAL_TEAM_ID=$TEAM_ID_Q INTERLATERAL_SENDER='claude' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID=$CLAUDE_LAUNCH_ID_Q CC_TMUX_SESSION=$CLAUDE_SESSION_Q CODEX_TMUX_SESSION=$CODEX_SESSION_Q && claude $CLAUDE_ARGS"
+CODEX_LAUNCH_CMD="cd $REPO_ROOT_Q && export TMUX_SOCKET=$TMUX_SOCKET_Q INTERLATERAL_TMUX_SOCKET=$TMUX_SOCKET_Q INTERLATERAL_TEAM_ID=$TEAM_ID_Q INTERLATERAL_SENDER='codex' INTERLATERAL_AGENT_TYPE='codex' INTERLATERAL_SESSION_ID=$CODEX_LAUNCH_ID_Q CC_TMUX_SESSION=$CLAUDE_SESSION_Q CODEX_TMUX_SESSION=$CODEX_SESSION_Q && codex $CODEX_ARGS"
+
+echo "Preflight complete."
+echo "Detected CLI versions:"
+print_version claude
+print_version codex
+echo
+echo "Standard mesh duo:"
+echo "  Claude session: $CLAUDE_SESSION (model: $CLAUDE_MODEL)"
+echo "  Codex session: $CODEX_SESSION (model: $CODEX_MODEL)"
+echo "  Socket: $TMUX_SOCKET"
+echo "  Ready phrase: $READY_PHRASE"
+echo
+echo "Launch commands that will be sent:"
+echo "  $CLAUDE_LAUNCH_CMD"
+echo "  $CODEX_LAUNCH_CMD"
+echo
 
 if [[ "${1:-}" != "--force" ]]; then
     ATTACHED=""
@@ -173,8 +185,11 @@ Session started: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 Team: $INTERLATERAL_TEAM_ID
 Socket: $TMUX_SOCKET
 Claude session: $CLAUDE_SESSION
+Claude model: $CLAUDE_MODEL
 Codex session: $CODEX_SESSION
+Codex model: $CODEX_MODEL
 Launch session id: $LAUNCH_SESSION_ID
+Ready phrase: $READY_PHRASE
 EOF
 
 kill_if_exists "$CLAUDE_SESSION"
@@ -188,8 +203,8 @@ run_tmux new-session -d -s "$CODEX_SESSION" -c "$REPO_ROOT"
 run_tmux pipe-pane -t "$CLAUDE_SESSION" "cat >> '$CLAUDE_LOG'"
 run_tmux pipe-pane -t "$CODEX_SESSION" "cat >> '$CODEX_LOG'"
 
-run_tmux send-keys -t "$CODEX_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' INTERLATERAL_SENDER='codex' INTERLATERAL_AGENT_TYPE='codex' INTERLATERAL_SESSION_ID='${LAUNCH_SESSION_ID}_codex' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && codex $CODEX_ARGS $CODEX_BOOT_QUOTED" Enter
-run_tmux send-keys -t "$CLAUDE_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$INTERLATERAL_TEAM_ID' INTERLATERAL_SENDER='claude' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID='${LAUNCH_SESSION_ID}_claude' CC_TMUX_SESSION='$CLAUDE_SESSION' CODEX_TMUX_SESSION='$CODEX_SESSION' && claude $CLAUDE_ARGS" Enter
+run_tmux send-keys -t "$CODEX_SESSION" "$CODEX_LAUNCH_CMD" Enter
+run_tmux send-keys -t "$CLAUDE_SESSION" "$CLAUDE_LAUNCH_CMD" Enter
 
 "$SCRIPT_DIR/open-tmux-window.sh" "$CLAUDE_SESSION" "Interlateral Claude" >/dev/null 2>&1 || true
 "$SCRIPT_DIR/open-tmux-window.sh" "$CODEX_SESSION" "Interlateral Codex" >/dev/null 2>&1 || true
@@ -197,6 +212,16 @@ run_tmux send-keys -t "$CLAUDE_SESSION" "cd '$REPO_ROOT' && export TMUX_SOCKET='
 echo "Waiting for agent CLIs to attach..."
 wait_for_ready "$CLAUDE_SESSION" 45 || echo "Warning: Claude session did not report ready before prompt injection"
 wait_for_ready "$CODEX_SESSION" 45 || echo "Warning: Codex session did not report ready before prompt injection"
+
+echo "Waiting for Codex idle prompt..."
+if wait_for_idle "$CODEX_SESSION" 30; then
+    echo "Codex prompt detected, injecting boot context..."
+    agent_send_long "$CODEX_SESSION" "$CODEX_PROMPT" "codex_boot_${LAUNCH_SESSION_ID}_$$"
+else
+    echo "Warning: Codex prompt not detected, attempting injection anyway..."
+    agent_send_long "$CODEX_SESSION" "$CODEX_PROMPT" "codex_boot_${LAUNCH_SESSION_ID}_$$"
+fi
+
 echo "Waiting for Claude idle prompt..."
 if prepare_claude_for_boot "$CLAUDE_SESSION" 30; then
     echo "Claude prompt detected, injecting boot context..."
@@ -212,7 +237,7 @@ echo "Socket: $TMUX_SOCKET"
 echo "Claude session: $CLAUDE_SESSION"
 echo "Codex session: $CODEX_SESSION"
 echo
-echo "Waiting for Ready to Rock! confirmations..."
+echo "Waiting for $READY_PHRASE confirmations..."
 
 CLAUDE_READY=0
 CODEX_READY=0

@@ -21,6 +21,8 @@ This pattern is optimized for:
 - a single lead with three support roles
 - preventing non-lead agents from improvising while waiting for coordination
 
+Use `mesh-comms-core` for the transport layer before relying on this workflow. This skill assumes live direct-send plus ledger behavior already works.
+
 This is the house pattern for:
 - `LEAD`
 - `REVIEWER`
@@ -118,6 +120,8 @@ Each pair must complete the local wake-up handshake and visibly print:
 Ready to Rock!
 ```
 
+This phrase is deliberate for the quartet workflow. The standard two-agent `init` flow uses `Reporting for Duty!` instead.
+
 Do not treat the team as live until all four terminals visibly show that line.
 
 ### 2.5 Submission Rule
@@ -192,6 +196,33 @@ Examples:
 
 If the lead has not yet published the artifact, support agents should stay in a waiting posture and only do minimal prerequisite reading.
 
+## Evidence Path Rule (Critical)
+
+Sprint orchestration artifacts must not live in the production repo unless the human explicitly approves that write scope.
+
+For production-repo sprints, keep coordination and proof outside the target application tree, for example:
+
+```text
+/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/sprint_runs/{date}-{slug}/
+```
+
+Recommended files:
+- `sprint_prompt.md`
+- `worker_prompts.md`
+- `execution_log.md`
+- `evidence.md`
+- `reviewer_report.md`
+- `breaker_report.md`
+- `verifier_report.md`
+
+Before any push or deploy, run a guard check from the production repo:
+
+```bash
+git status --short
+```
+
+Only intended production files should appear. Evidence, logs, prompts, and review transcripts should not appear in the production repo's untracked or modified files unless the sprint specifically requires them there.
+
 ## Anti-Drift Rule
 
 This is the most important lesson from the pattern.
@@ -252,6 +283,57 @@ The lead must do all of the following early:
 5. Reconcile objections in the artifact before proceeding.
 
 If the lead delays artifact publication, support agents will either idle too long or drift.
+
+## Gate 2 Commit Order
+
+At a sprint gate where the lead will ask peers to review an exact change set, the lead should normally:
+
+1. Finish the intended file edits.
+2. Run local validation.
+3. Commit the exact reviewed patch on a feature branch.
+4. Give reviewer, breaker, and verifier the branch, commit SHA, diff summary, validation output, and evidence path.
+
+Reviewing after the commit makes the artifact stable. If peers review an uncommitted moving target, require a second delta signoff before merge or deploy.
+
+## Delta Re-Signoff On Plan Revisions
+
+If the lead materially changes the implementation plan after reviewer, breaker, or verifier signoff, the lead must publish the delta and request focused re-signoff.
+
+Material changes include:
+- changed write scope
+- changed command sequence
+- changed evidence path
+- changed deployment target
+- new dependency or credential use
+- changed rollback plan
+
+Minor wording edits to the execution artifact do not require re-signoff unless they change the work.
+
+## Non-Blocking Revision Tracker
+
+The lead should keep a small tracker in the execution artifact:
+
+```text
+OPEN OBJECTIONS:
+- REVIEWER: none|...
+- BREAKER: none|...
+- VERIFIER: none|...
+
+PLAN DELTAS SINCE SIGNOFF:
+- ...
+```
+
+Do not proceed through a risky gate while any concrete objection remains open.
+
+## Repair-Cycle Expectations
+
+If a peer finds a real defect, the lead should:
+
+1. Acknowledge the defect in the artifact.
+2. Patch the issue.
+3. Re-run the relevant validation.
+4. Publish the new diff or commit SHA.
+5. Ask only the affected peer(s) for focused re-check unless the fix changes wider scope.
 
 ## Recommended Sequence
 

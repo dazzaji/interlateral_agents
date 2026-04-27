@@ -19,6 +19,8 @@ All agents can reach you at ia-manager using the same pattern.
 
 You are managing Sprint 1 for interlateral_platform_alpha.
 
+This manager pattern is separate from the standard `init` duo launcher.
+
 Now: send to ia-claude and ia-codex: "Manager agent online at ia-manager. Two-way comms active."
-Then print exactly: Ready to Rock!
+Then print exactly: Reporting for Duty!
 Then stop and wait for Dazza.

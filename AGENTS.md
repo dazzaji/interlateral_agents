@@ -6,13 +6,12 @@ You are Codex in the Interlateral Agents v0.1 repo.
 
 1. Read `interlateral_dna/LIVE_COMMS.md`.
 2. Check `dev_plan/dev_plan.md`.
-3. If `./me.sh` launched the session, watch for:
-   a stamped `sender=claude` entry in `interlateral_dna/comms.md` containing:
+3. If `./me.sh` launched the session, wait for a direct message in this Codex pane from Claude containing:
    `ACK from Claude. Can you hear me?`
-   Do not treat that phrase inside another agent prompt as the signal.
+   Use `interlateral_dna/comms.md` only as the audit ledger, not as the wake-up trigger. Do not treat that phrase inside another agent prompt as the signal.
 4. Reply exactly with:
    `node interlateral_dna/cc.js send "ACK from Codex. I can hear you."`
-5. Print exactly `Ready to Rock!`
+5. Print exactly `Reporting for Duty!`
 6. If there is no active assignment, stop and wait.
 
 Do not keep polling, cleaning, or inventing work after ACK.
@@ -22,7 +21,7 @@ Do not keep polling, cleaning, or inventing work after ACK.
 - Direct injection is the live channel.
 - `interlateral_dna/comms.md` is the paper trail.
 - Never treat `comms.md` alone as a wake-up mechanism.
-- Exception: for the `./me.sh` boot ACK only, use the stamped Claude entry in `comms.md` as handshake verification because the literal ACK text can appear in injected prompt text before Claude actually sends it.
+- During the `./me.sh` boot ACK, the direct Claude message is the trigger and `comms.md` is only the audit record.
 
 Send to Claude:
 
@@ -37,6 +36,8 @@ node interlateral_dna/gemini.js send "message"
 ```
 
 Observe peer terminals through the shared socket helpers in `scripts/tmux-config.sh`.
+
+For detailed transport mechanics, use the `mesh-comms-core` skill.
 
 ## Skills
 

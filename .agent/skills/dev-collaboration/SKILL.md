@@ -9,13 +9,15 @@ compatibility: Requires at least two agents from {claude, codex, gemini} and acc
 
 # Dev Collaboration Pattern
 
+Use `mesh-comms-core` first if direct peer notification has not already been proven. This skill defines roles and sequence; `mesh-comms-core` defines the transport.
+
 ## Prerequisites
 
 - **Notification Scripts:** Use the repo's agent-specific scripts under `interlateral_dna/` to send direct notifications.
   - Claude Code: `node interlateral_dna/cc.js send "message"`
   - Codex: `node interlateral_dna/codex.js send "message"`
   - Gemini: `node interlateral_dna/gemini.js send "message"`
-- **Ledger:** Use `comms.md` as the shared communications ledger.
+- **Ledger:** Use `comms.md` as the shared communications ledger. Posting to `comms.md` alone does not wake a peer.
 
 ## Roles
 
@@ -89,7 +91,7 @@ The dual-hatted agent must complete each role as a separate phase and deliver se
    What: [Specific change]
    Why: [Benefit]
    ```
-4. Deliver via comms.md entry or direct notification to DRAFTER.
+4. Deliver via direct notification to DRAFTER and let the helper mirror the entry to `comms.md`.
 5. Notify DRAFTER when done.
 
 ### If You Are BREAKER
@@ -103,7 +105,7 @@ The dual-hatted agent must complete each role as a separate phase and deliver se
    Consequence: [What goes wrong]
    Prevention: [How to guard against it]
    ```
-4. Deliver via comms.md entry or direct notification to DRAFTER.
+4. Deliver via direct notification to DRAFTER and let the helper mirror the entry to `comms.md`.
 5. Notify DRAFTER when done.
 
 ## Completion Criteria
@@ -128,7 +130,7 @@ Roles:
   REVIEWER: gemini
   BREAKER: codex
 
-Deliver reviews via comms.md.
+Deliver reviews via direct notification plus the `comms.md` ledger.
 ```
 
 Two-agent example (dual-hatting):

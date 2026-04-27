@@ -9,6 +9,8 @@ compatibility: Works with any agent that can read/write files. Requires isolated
 
 # Dev-Competition Skill
 
+Use `mesh-comms-core` first if direct peer notification has not already been proven. This skill depends on injection/direct notification, not passive `comms.md` polling.
+
 ## Prerequisite: Three Agents Required
 
 This skill requires at least three available agents (Implementer A, Implementer B, and Judge). If fewer than three agents are available, STOP and report:

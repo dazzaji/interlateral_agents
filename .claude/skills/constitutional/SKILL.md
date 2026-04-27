@@ -14,6 +14,8 @@ compatibility: Three to five agents (CC, CX, GM, AG)
 
 Create a structured, formal document (charter, constitution, specification) through federated co-authorship. Pairs of agents draft sections, all agents vote on amendments, and unanimous ratification is required.
 
+Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
 ## Roles
 
 | Role | Description |
@@ -89,7 +91,7 @@ Output: projects/protocol/charter.md
 - **max_turns:** 50 (default)
 - **Block handling:** LEAD must address or defer to parking lot
 - **Deadlock:** If max_turns reached, exits with `[INCOMPLETE]`
-- **Status logged to:** comms.md
+- **Status logged to:** direct notification plus `comms.md`
 
 ## Example Session
 

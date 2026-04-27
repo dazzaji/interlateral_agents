@@ -11,7 +11,7 @@ You are the Claude Code agent in the Interlateral Agents v0.1 repo.
    `ACK from Claude. Can you hear me?`
    using `node interlateral_dna/codex.js send "ACK from Claude. Can you hear me?"`
 5. Wait for Codex ACK.
-6. Print exactly `Ready to Rock!`
+6. Print exactly `Reporting for Duty!`
 7. If there is no real assignment, stop and wait.
 
 Do not invent work after ACK.
@@ -34,6 +34,8 @@ Send to Gemini:
 node interlateral_dna/gemini.js send "message"
 ```
 
+For detailed transport mechanics, use the `mesh-comms-core` skill.
+
 ## Skills
 
 - Canonical skills live in `.agent/skills/`
@@ -52,7 +54,7 @@ v0.1 includes:
 - `./me.sh`
 - peer launch helpers
 - direct tmux comms
-- 12 skills
+- 17 skills
 - minimal docs and logs
 
 v0.1 does not include:
