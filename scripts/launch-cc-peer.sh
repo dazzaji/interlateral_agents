@@ -24,6 +24,8 @@ LOG_FILE="$DNA_DIR/${SESSION_NAME}.log"
 TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
 SESSION_ID="${INTERLATERAL_SESSION_ID:-peer_$(date +%s)}"
 CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-4-7}"
+SENDER="${INTERLATERAL_SENDER:-claude-peer}"
+AGENT_TYPE="${INTERLATERAL_AGENT_TYPE:-claude}"
 
 for cmd in tmux claude; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
@@ -32,7 +34,7 @@ for cmd in tmux claude; do
     fi
 done
 
-if run_tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+if run_tmux has-session -t "=$SESSION_NAME" 2>/dev/null; then
     echo "Session '$SESSION_NAME' already exists on $TMUX_SOCKET" >&2
     exit 1
 fi
@@ -41,7 +43,7 @@ run_tmux new-session -d -s "$SESSION_NAME" -c "$REPO_ROOT"
 : > "$LOG_FILE"
 run_tmux pipe-pane -o -t "$SESSION_NAME" "cat >> '$LOG_FILE'"
 
-LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$TEAM_ID' INTERLATERAL_SENDER='claude-peer' INTERLATERAL_AGENT_TYPE='claude' INTERLATERAL_SESSION_ID='${SESSION_ID}_${SESSION_NAME}' CC_TMUX_SESSION='$SESSION_NAME' CODEX_TMUX_SESSION='$CODEX_SESSION' GEMINI_TMUX_SESSION='$GEMINI_SESSION' && claude --dangerously-skip-permissions --model '$CLAUDE_MODEL'"
+LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TEAM_ID='$TEAM_ID' INTERLATERAL_SENDER='$SENDER' INTERLATERAL_AGENT_TYPE='$AGENT_TYPE' INTERLATERAL_SESSION_ID='${SESSION_ID}_${SESSION_NAME}' CC_TMUX_SESSION='$SESSION_NAME' CODEX_TMUX_SESSION='$CODEX_SESSION' GEMINI_TMUX_SESSION='$GEMINI_SESSION' && claude --dangerously-skip-permissions --model '$CLAUDE_MODEL'"
 run_tmux send-keys -t "$SESSION_NAME" "$LAUNCH_CMD" Enter
 
 if prepare_claude_for_boot "$SESSION_NAME" 30; then

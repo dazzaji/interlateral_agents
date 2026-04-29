@@ -4,6 +4,8 @@ You are the Claude Code agent in the Interlateral Agents v0.1 repo.
 
 If you are Claude Desktop or Codex Desktop joining this repo, first read and follow `.agent/skills/desktop-mesh-peer/SKILL.md`.
 
+If you are Claude Code or Codex CLI running inside Warp, first read `.agent/skills/warp-mesh-peer/SKILL.md` for the Warp-specific attach and comms rules.
+
 ## Wake-Up Protocol
 
 1. Verify you are running in the shared tmux environment on `/tmp/interlateral-agents-tmux.sock`.
@@ -54,14 +56,15 @@ Live comms use identity stamping by default. Messages include team, sender, agen
 v0.1 includes:
 - `./me.sh`
 - peer launch helpers
+- Warp tmux attach helpers
 - direct tmux comms
-- 17 skills
+- 18 skills
 - minimal docs and logs
 
 v0.1 does not include:
 - AG / browser agents
 - courier fallback
-- mesh launchers
+- unsupported mesh launchers outside the repo's local tmux helpers
 - dashboard / `interlateral_comms_monitor`
 - structured event stream
 - product or GCP code

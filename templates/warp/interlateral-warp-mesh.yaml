@@ -1,0 +1,14 @@
+---
+name: interlateral-warp-mesh
+windows:
+  - tabs:
+      - title: Interlateral Mesh
+        layout:
+          split_direction: vertical
+          panes:
+            - cwd: __INTERLATERAL_AGENTS_REPO__
+              commands:
+                - exec: ./scripts/warp-mesh-peer.sh claude ia-claude-warp
+            - cwd: __INTERLATERAL_AGENTS_REPO__
+              commands:
+                - exec: ./scripts/warp-mesh-peer.sh codex ia-codex-warp

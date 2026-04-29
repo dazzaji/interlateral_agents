@@ -7,6 +7,7 @@ This is the canonical reference for direct comms in the starter-scope repo. v0.1
 - Use `init` to launch the standard Claude/Codex duo with `me.sh`.
 - Use `mesh-comms-core` for transport setup, ACK proof, direct-send rules, and troubleshooting.
 - Use `desktop-mesh-peer` when Claude Desktop or Codex Desktop joins as a separate peer.
+- Use `warp-mesh-peer` when Claude Code or Codex CLI should be visible in Warp while staying on the standard tmux mesh.
 - Use collaboration skills only after direct comms are proven.
 
 ## Golden Rule
@@ -26,6 +27,11 @@ Every meaningful handoff should do both:
 - Codex: `ia-codex` with `gpt-5.5` unless `CODEX_MODEL` overrides it
 
 Gemini CLI is available via `scripts/launch-gemini-peer.sh` and uses session names like `ia-gemini-peer-NN`.
+
+Warp-visible CLI peers use:
+
+- Claude Code in Warp: `ia-claude-warp`
+- Codex CLI in Warp: `ia-codex-warp`
 
 - Shared tmux socket: `/tmp/interlateral-agents-tmux.sock`
 - Standard ready phrase: `Reporting for Duty!`
@@ -53,6 +59,27 @@ Desktop peers now participate as tmux peers too, but with one important differen
 - When proving a new desktop peer, use a nonce challenge rather than a generic hello.
 
 Desktop onboarding now lives in the in-repo `desktop-mesh-peer` skill. The `init` skill is the standard CLI bootstrap entrypoint and points operators to `desktop-mesh-peer` and `mesh-comms-core` for desktop and transport-specific live comms.
+
+## Warp Peers
+
+Warp peers are regular CLI peers attached from Warp panes to the shared tmux socket. Warp is the visible terminal surface; tmux remains the transport.
+
+Open the Warp mesh with:
+
+```bash
+scripts/install-warp-launch-config.sh --force
+open "warp://launch/interlateral-warp-mesh"
+```
+
+For direct sends to Warp peers, target the exact tmux session:
+
+```bash
+source scripts/tmux-config.sh
+claude_send_long_logged =ia-claude-warp: "message to Warp Claude"
+agent_send_long_logged =ia-codex-warp: "message to Warp Codex"
+```
+
+Use `warp-mesh-peer` for attach, liveness, stale-session recovery, and acceptance checks.
 
 ## Why The Control Scripts Matter
 

@@ -4,6 +4,8 @@ You are Codex in the Interlateral Agents v0.1 repo.
 
 If you are Claude Desktop or Codex Desktop joining this repo, first read and follow `.agent/skills/desktop-mesh-peer/SKILL.md`.
 
+If you are Claude Code or Codex CLI running inside Warp, first read `.agent/skills/warp-mesh-peer/SKILL.md` for the Warp-specific attach and comms rules.
+
 ## Wake-Up Protocol
 
 1. Read `interlateral_dna/LIVE_COMMS.md`.
@@ -64,7 +66,7 @@ This keeps peer traffic legible in `interlateral_dna/comms.md`.
 Work fully inside the repo for the assigned task. Do not widen scope on your own. In particular, do not add:
 - AG / browser transports
 - courier
-- mesh launchers
+- unsupported mesh launchers outside the repo's local tmux helpers
 - dashboard code
 - product/platform/GCP code
 

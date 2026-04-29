@@ -1,6 +1,6 @@
 # Interlateral Agents
 
-Interlateral Agents v0.1 is a small, working multi-agent starter repo built around the `init` skill. It gives you a fast Claude Code + Codex duo, peer helpers for adding more CLI agents on the same tmux socket, a canonical 17-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
+Interlateral Agents v0.1 is a small, working multi-agent starter repo built around the `init` skill. It gives you a fast Claude Code + Codex duo, peer helpers for adding more CLI agents on the same tmux socket, a canonical 18-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
 
 ## Prerequisites
 
@@ -58,6 +58,31 @@ The `init` skill runs the standard launcher underneath and brings up:
 Under the hood, `init` runs `./me.sh`. The script prints CLI versions and the exact Claude/Codex commands before launch, performs the ACK handshake, and waits for both peers to print `Reporting for Duty!`.
 
 Direct peer injection is the live comms path. `interlateral_dna/comms.md` is the audit ledger, not the wake-up channel.
+
+## Warp Quick Start
+
+The normal Quick Start above is still the baseline path. Use Warp when you want Claude Code and Codex CLI visible in Warp panes while they remain normal tmux mesh peers.
+
+1. Install or refresh the Warp launch configuration:
+
+   ```bash
+   scripts/install-warp-launch-config.sh --force
+   ```
+
+2. Open the Warp mesh:
+
+   ```bash
+   open "warp://launch/interlateral-warp-mesh"
+   ```
+
+3. Wait for the Warp panes to attach or create:
+
+   ```text
+   ia-claude-warp
+   ia-codex-warp
+   ```
+
+Warp is the terminal surface. The mesh transport is still the shared tmux socket and the direct-send helpers documented in `mesh-comms-core`. For details, use the `warp-mesh-peer` skill.
 
 ## Choosing An Operating Mode
 
@@ -151,6 +176,7 @@ The comms setup is now split into focused skills:
 - `init` launches only the standard two-agent CLI mesh with `me.sh` underneath.
 - `mesh-comms-core` documents the transport substrate: tmux socket, direct-send helpers, `comms.md` ledger, identity stamping, safe TUI submission, idle checks, and ACK proof.
 - `desktop-mesh-peer` joins Claude Desktop or Codex Desktop separately with its own inbox session and nonce ACK proof.
+- `warp-mesh-peer` opens Claude Code and Codex CLI as Warp-visible tmux peers while keeping the same mesh transport.
 
 Collaboration-pattern skills now treat `comms.md` as the ledger rather than the wake-up path. Use direct helper scripts such as `node interlateral_dna/cc.js send "message"` and let the helpers mirror stamped entries into `interlateral_dna/comms.md`.
 
