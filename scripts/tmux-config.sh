@@ -74,6 +74,25 @@ agent_send_long_delayed() {
     run_tmux send-keys -t "$session" Enter
 }
 
+claude_send() {
+    local session="${1:?session name required}"
+    local prompt="${2:?prompt required}"
+    run_tmux send-keys -t "$session" -l "$prompt"
+    sleep 0.2
+    run_tmux send-keys -t "$session" C-m
+}
+
+claude_send_long() {
+    local session="${1:?session name required}"
+    local prompt="${2:?prompt required}"
+    local buffer="${3:-claude_send_long_$$}"
+    printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -
+    run_tmux paste-buffer -t "$session" -b "$buffer"
+    run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
+    sleep 0.3
+    run_tmux send-keys -t "$session" C-m
+}
+
 agent_log_ledger() {
     local target_session="${1:?target session required}"
     local message="${2:?message required}"
@@ -107,6 +126,21 @@ agent_send_long_logged() {
     local prompt="${2:?prompt required}"
     local buffer="${3:-agent_send_long_logged_$$}"
     agent_send_long "$session" "$prompt" "$buffer"
+    agent_log_ledger "$session" "$prompt"
+}
+
+claude_send_logged() {
+    local session="${1:?session name required}"
+    local prompt="${2:?prompt required}"
+    claude_send "$session" "$prompt"
+    agent_log_ledger "$session" "$prompt"
+}
+
+claude_send_long_logged() {
+    local session="${1:?session name required}"
+    local prompt="${2:?prompt required}"
+    local buffer="${3:-claude_send_long_logged_$$}"
+    claude_send_long "$session" "$prompt" "$buffer"
     agent_log_ledger "$session" "$prompt"
 }
 
@@ -220,9 +254,13 @@ if [[ -n "${BASH_VERSION:-}" ]]; then
     export -f codex_send_clean 2>/dev/null || true
     export -f agent_send_long 2>/dev/null || true
     export -f agent_send_long_delayed 2>/dev/null || true
+    export -f claude_send 2>/dev/null || true
+    export -f claude_send_long 2>/dev/null || true
     export -f agent_log_ledger 2>/dev/null || true
     export -f agent_send_logged 2>/dev/null || true
     export -f agent_send_long_logged 2>/dev/null || true
+    export -f claude_send_logged 2>/dev/null || true
+    export -f claude_send_long_logged 2>/dev/null || true
     export -f agent_capture_recent 2>/dev/null || true
     export -f agent_capture_deep 2>/dev/null || true
     export -f pane_contains 2>/dev/null || true

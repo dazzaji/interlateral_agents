@@ -49,7 +49,7 @@ if prepare_claude_for_boot "$SESSION_NAME" 30; then
 else
     echo "Warning: Claude peer prompt not detected; injecting startup prompt anyway" >&2
 fi
-agent_send_long "$SESSION_NAME" "$STARTUP_PROMPT" "claude_peer_${SESSION_NAME}_$$"
+claude_send_long "$SESSION_NAME" "$STARTUP_PROMPT" "claude_peer_${SESSION_NAME}_$$"
 
 echo "Launched Claude peer"
 echo "Socket: $TMUX_SOCKET"

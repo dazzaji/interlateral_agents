@@ -56,7 +56,7 @@ Desktop onboarding now lives in the in-repo `desktop-mesh-peer` skill. The `init
 
 ## Why The Control Scripts Matter
 
-Do not use raw `tmux send-keys` for agent-to-agent messages. Claude, Codex, and Gemini all need a short delay between text injection and `Enter`, otherwise messages can remain stuck in the input buffer.
+Do not use raw `tmux send-keys` for agent-to-agent messages unless you are deliberately testing the transport. Claude, Codex, and Gemini need target-specific submit timing and keys, otherwise messages can remain stuck in the input buffer.
 
 Use:
 
@@ -64,6 +64,22 @@ Use:
 node interlateral_dna/cc.js send "message"
 node interlateral_dna/codex.js send "message"
 node interlateral_dna/gemini.js send "message"
+```
+
+For arbitrary Claude sessions, use the Claude-specific helper:
+
+```bash
+source scripts/tmux-config.sh
+claude_send_logged ia-claude-peer-01 "message"
+claude_send_long_logged ia-claude-peer-01 "long or multiline message"
+```
+
+For arbitrary Codex or Gemini sessions, continue to use the generic logged helpers:
+
+```bash
+source scripts/tmux-config.sh
+agent_send_logged ia-codex-peer-01 "message"
+agent_send_long_logged ia-codex-peer-01 "long or multiline message"
 ```
 
 ## Observation
@@ -103,9 +119,9 @@ If a launcher helper creates a new peer, it should join the same socket and use 
 
 ## How Injection Works
 
-All three CLI agents (Claude Code, Codex, Gemini CLI) use TUI frameworks with autocomplete overlays that intercept `Enter` sent programmatically via tmux. Bare `Enter` or `C-m` creates a newline in the input box instead of submitting. This affects all programmatic input: tmux `send-keys`, VS Code `terminal.sendText()`, AppleScript, etc.
+CLI agent TUIs do not all handle programmatic submission the same way. tmux can report success even when the target TUI leaves text in the input box instead of submitting it, so delivery must be proven with pane capture or a nonce ACK.
 
-**The fix: Escape-then-Enter.** `Escape` dismisses the autocomplete/suggestion overlay. After that, `Enter` actually submits. This is the primary proven pattern — tested on Claude Code, Codex, and Gemini CLI at scale in 10+ agent systems.
+For current Codex and Gemini sessions, the proven generic pattern is Escape-then-Enter. `Escape` dismisses autocomplete/suggestion overlays; `Enter` submits after the overlay is gone.
 
 ```bash
 # 1. Send prompt text in literal mode (-l preserves special chars)
@@ -120,18 +136,25 @@ sleep 0.1
 tmux send-keys -t "$SESSION" Enter
 ```
 
-For long or multi-line prompts, use tmux's paste buffer instead of `send-keys -l`:
+For current Claude Code 2.1.x, the proven pattern is literal or paste-buffer input followed by `C-m`:
+
+```bash
+# Short Claude prompt
+tmux send-keys -t "$SESSION" -l "Your follow-up prompt here"
+sleep 0.2
+tmux send-keys -t "$SESSION" C-m
+```
+
+For long or multi-line Claude prompts, use tmux's paste buffer followed by `C-m`:
 
 ```bash
 printf '%s' "$prompt" | tmux load-buffer -
 tmux paste-buffer -t "$SESSION"
 sleep 0.3
-tmux send-keys -t "$SESSION" Escape
-sleep 0.1
-tmux send-keys -t "$SESSION" Enter
+tmux send-keys -t "$SESSION" C-m
 ```
 
-The control scripts (`cc.js`, `codex.js`, `gemini.js`) and the helper functions in `scripts/tmux-config.sh` (`agent_send`, `agent_send_logged`, `codex_send_clean`, `agent_send_long`, `agent_send_long_logged`, `agent_send_long_delayed`) all implement this pattern. Prefer the `_logged` helpers for arbitrary/nonstandard sessions so the direct wake-up also appears in `comms.md`.
+The control scripts and helper functions encode these target-specific paths. `cc.js`, `claude_send_logged`, and `claude_send_long_logged` use the Claude-specific `C-m` submit path. `codex.js`, `gemini.js`, `agent_send_logged`, `agent_send_long_logged`, and `agent_send_long_delayed` preserve the generic Escape-then-Enter path. Prefer the `_logged` helpers for arbitrary/nonstandard sessions so the direct wake-up also appears in `comms.md`.
 
 ## Safety: C-c Behavior Per CLI
 
@@ -391,14 +414,15 @@ tmux kill-session -t "$SESSION"
 
 ## Verified Test Results
 
-The Escape-then-Enter pattern and related techniques have been tested across CLI versions:
+The submit patterns and related techniques have been tested across CLI versions:
 
 | Pattern | Claude Code | Codex | Gemini CLI |
 |---------|-------------|-------|------------|
 | Plain `Enter` follow-up | FAIL | FAIL | FAIL |
-| `C-m` alone | FAIL | FAIL | not tested |
-| `-l` text then Escape then Enter | **PASS** | **PASS** | **PASS** |
-| paste-buffer then Escape then Enter | **PASS** | **PASS** | **PASS** |
+| `-l` text then Escape then Enter | FAIL on Claude Code 2.1.123 | **PASS** | **PASS** |
+| paste-buffer then Escape then Enter | FAIL on Claude Code 2.1.123 | **PASS** | **PASS** |
+| `-l` text then `C-m` | **PASS** on Claude Code 2.1.123 | not needed | not tested |
+| paste-buffer then `C-m` | **PASS** on Claude Code 2.1.123 | not needed | not tested |
 | `C-c` buffer clear | Safe | **KILLS CLI** | Safe |
 | `Escape` buffer clear | Safe | Safe | Safe |
 | Idle detection | **PASS** | **PASS** | **PASS** |

@@ -85,10 +85,8 @@ function send(message) {
   }
 
   runTmux(['send-keys', '-t', SESSION, '-l', stamped]);
-  sleep(1000);
-  runTmux(['send-keys', '-t', SESSION, 'Escape']);
-  sleep(100);
-  runTmux(['send-keys', '-t', SESSION, 'Enter']);
+  sleep(200);
+  runTmux(['send-keys', '-t', SESSION, 'C-m']);
   appendLedger('@Claude', stamped);
 }
 

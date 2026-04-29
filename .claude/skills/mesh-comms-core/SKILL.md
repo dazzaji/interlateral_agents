@@ -38,7 +38,7 @@ Every agent handoff depends on these rules. Keep them in the active path wheneve
 2. Never rely on `comms.md` alone as a wake-up mechanism.
 3. Use the shared socket every time: `/tmp/interlateral-agents-tmux.sock`.
 4. Use repo helpers before raw `tmux send-keys`.
-5. The helpers submit with Escape-then-Enter because CLI TUIs intercept bare `Enter`.
+5. Use the target-specific helper when one exists; current Claude Code uses `claude_send*_logged`, while Codex/Gemini continue to use the generic helpers.
 6. For Codex, never send `C-c` to clear input; it can kill the CLI.
 7. Prove new or uncertain comms with a nonce ACK.
 8. Check idle before follow-up prompts so text is not injected into a busy agent.
@@ -78,8 +78,8 @@ Arbitrary session sends:
 
 ```bash
 source scripts/tmux-config.sh
-agent_send_logged ia-codex-peer-01 "Short prompt"
-agent_send_long_logged ia-claude-peer-01 "Long or multiline prompt"
+agent_send_logged ia-codex-peer-01 "Short prompt to Codex"
+claude_send_long_logged ia-claude-peer-01 "Long or multiline prompt to Claude"
 ```
 
 The `_logged` helpers both inject into the tmux pane and append a stamped audit entry to `interlateral_dna/comms.md`.
@@ -113,11 +113,12 @@ For nonstandard sessions, source the helper library and use the logged helpers:
 
 ```bash
 source scripts/tmux-config.sh
-agent_send_logged ia-codex-peer-01 "Short prompt"
-agent_send_long_logged ia-claude-peer-01 "Long prompt"
+agent_send_logged ia-codex-peer-01 "Short prompt to Codex"
+claude_send_logged ia-claude-peer-01 "Short prompt to Claude"
+claude_send_long_logged ia-claude-peer-01 "Long prompt to Claude"
 ```
 
-The helpers implement the Escape-then-Enter pattern required by Claude Code, Codex, and Gemini CLI TUIs. The `_logged` variants also append the stamped event to `interlateral_dna/comms.md`.
+The generic helpers implement the Escape-then-Enter pattern that remains valid for Codex and Gemini. Current Claude Code 2.1.x needs literal or paste-buffer input followed by `C-m`, so use `claude_send_logged` or `claude_send_long_logged` for nonstandard Claude sessions. The `_logged` variants also append the stamped event to `interlateral_dna/comms.md`.
 
 ## ACK Proof
 
