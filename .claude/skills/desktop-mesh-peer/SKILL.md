@@ -16,17 +16,18 @@ Use this skill when a desktop agent needs to join the live Interlateral comms me
 
 Desktop peers are not launched by `init` or `me.sh`. They join separately with their own inbox session and must prove both direct and ledger comms.
 
-## Prerequisite
+## Required Comms Rules
 
-Use `mesh-comms-core` first if the shared socket, helper scripts, or current sessions are not already known.
+This skill is self-contained for desktop peer onboarding. Use `mesh-comms-core` first if the shared socket, helper scripts, or current CLI sessions are not already known.
 
-Detailed desktop reference:
+Every desktop peer must:
+- own a tmux inbox session on the shared socket `/tmp/interlateral-agents-tmux.sock`
+- use a stable desktop identity such as `codex-desktop` or `claude-desktop`
+- receive live messages by direct tmux injection, not by `comms.md` polling
+- mirror important messages to `interlateral_dna/comms.md` as the audit ledger
+- prove join with a nonce challenge visible in both the direct path and the ledger
 
-```text
-$INTERLATERAL_PLATFORM_REPO/docs/ops/comms/DESKTOP_FIRST.md
-```
-
-That platform doc is an optional local reference. This skill contains the minimum desktop peer procedure.
+Desktop peers are full mesh peers, but they are manually joined peers. The standard `init` skill only launches the CLI duo.
 
 ## Identity Choices
 
@@ -51,6 +52,12 @@ tmux -S "$TMUX_SOCKET" new-session -d -s ia-codex-desktop \
 Adjust the session name and text for Claude Desktop.
 
 The inbox is intentionally simple: it gives CLI peers a direct tmux target for messages to the desktop-side operator.
+
+To observe the inbox:
+
+```bash
+tmux -S "$TMUX_SOCKET" capture-pane -t ia-codex-desktop -p -S -120
+```
 
 ## Outbound Messages From Desktop
 
@@ -79,6 +86,8 @@ For `claude-desktop`, target `ia-claude-desktop`. If there is no dedicated helpe
 source scripts/tmux-config.sh
 agent_send_logged ia-codex-desktop "ACK challenge: desktop-ack-123. Reply in comms.md and direct to ia-codex."
 ```
+
+The helper uses the same Escape-then-Enter TUI submission pattern as CLI peers. Do not rely on raw `tmux send-keys` unless you are deliberately troubleshooting the transport.
 
 ## Proof Of Join
 

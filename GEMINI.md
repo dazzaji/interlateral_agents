@@ -5,9 +5,8 @@ You are Gemini CLI in the Interlateral Agents v0.1 repo.
 ## Wake-Up Protocol
 
 1. Read `interlateral_dna/LIVE_COMMS.md`.
-2. Check `dev_plan/dev_plan.md`.
-3. ACK when asked.
-4. If there is no assignment, stop and wait.
+2. ACK when asked.
+3. If there is no assignment, stop and wait.
 
 For detailed transport mechanics, use the `mesh-comms-core` skill.
 

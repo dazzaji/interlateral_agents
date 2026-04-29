@@ -52,9 +52,7 @@ Desktop peers now participate as tmux peers too, but with one important differen
 - For `claude-desktop`, there is currently no dedicated helper script in `interlateral_dna`; the proven route is direct pane/tty delivery to `ia-claude-desktop` plus a ledger mirror to `@Claude Desktop`.
 - When proving a new desktop peer, use a nonce challenge rather than a generic hello.
 
-Desktop onboarding details live in:
-
-`/Users/dazzagreenwood/Documents/GitHub/interlateral_platform_alpha/docs/ops/comms/DESKTOP_FIRST.md`
+Desktop onboarding now lives in the in-repo `desktop-mesh-peer` skill. The `init` skill is the standard CLI bootstrap entrypoint and points operators to `desktop-mesh-peer` and `mesh-comms-core` for desktop and transport-specific live comms.
 
 ## Why The Control Scripts Matter
 

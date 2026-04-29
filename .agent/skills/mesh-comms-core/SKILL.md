@@ -24,22 +24,32 @@ It covers transport mechanics only:
 
 It does not assign roles, choose sprint process, onboard desktop peers, or define review/breaker/verifier workflows.
 
-## Canonical References
+## Desktop Boundary
 
-Primary transport reference:
+Use this skill for CLI mesh transport. If Claude Desktop or Codex Desktop needs to join the mesh, switch to `desktop-mesh-peer` at `.agent/skills/desktop-mesh-peer/SKILL.md`.
+
+Desktop agents are manually joined peers. They need their own tmux inbox session, stable identity, direct ACK, and ledger mirror. Do not treat `comms.md` polling as a desktop join path.
+
+## Always In The Path
+
+Every agent handoff depends on these rules. Keep them in the active path whenever agents are coordinating:
+
+1. Direct-send wakes the peer; `comms.md` records the event.
+2. Never rely on `comms.md` alone as a wake-up mechanism.
+3. Use the shared socket every time: `/tmp/interlateral-agents-tmux.sock`.
+4. Use repo helpers before raw `tmux send-keys`.
+5. The helpers submit with Escape-then-Enter because CLI TUIs intercept bare `Enter`.
+6. For Codex, never send `C-c` to clear input; it can kill the CLI.
+7. Prove new or uncertain comms with a nonce ACK.
+8. Check idle before follow-up prompts so text is not injected into a busy agent.
+
+Primary in-repo transport reference:
 
 ```text
 interlateral_dna/LIVE_COMMS.md
 ```
 
-Operational docs that informed this skill:
-
-```text
-$INTERLATERAL_PLATFORM_REPO/docs/ops/comms/CLI_FIRST.md
-$INTERLATERAL_PLATFORM_REPO/docs/ops/comms/DESKTOP_FIRST.md
-```
-
-Those platform docs are optional local references. This skill is self-contained for the agents repo.
+Desktop peers use the in-repo `desktop-mesh-peer` skill. This skill is the self-contained CLI transport reference for the agents repo.
 
 ## Constants
 
@@ -54,14 +64,25 @@ House sessions:
 - Codex: `ia-codex`
 - Gemini base: `ia-gemini`
 
-## Golden Rules
+## CLI Comms Quick Path
 
-1. Direct-send wakes the peer; `comms.md` records the event.
-2. Never rely on `comms.md` alone as a wake-up mechanism.
-3. Use the shared socket every time: `tmux -S /tmp/interlateral-agents-tmux.sock ...`.
-4. Use repo helpers before raw `tmux send-keys`.
-5. For Codex, never send `C-c` to clear input; it can kill the CLI.
-6. Prove live comms with a nonce ACK when joining or debugging.
+Standard peer sends:
+
+```bash
+node interlateral_dna/cc.js send "message to Claude"
+node interlateral_dna/codex.js send "message to Codex"
+node interlateral_dna/gemini.js send "message to Gemini"
+```
+
+Arbitrary session sends:
+
+```bash
+source scripts/tmux-config.sh
+agent_send_logged ia-codex-peer-01 "Short prompt"
+agent_send_long_logged ia-claude-peer-01 "Long or multiline prompt"
+```
+
+The `_logged` helpers both inject into the tmux pane and append a stamped audit entry to `interlateral_dna/comms.md`.
 
 ## Preflight
 

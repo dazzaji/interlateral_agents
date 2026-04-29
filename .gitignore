@@ -13,6 +13,7 @@ temp/
 # Runtime logs and ledgers
 interlateral_dna/comms.md
 interlateral_dna/*.log
+.claude/scheduled_tasks.lock
 .runtime/
 .observability/
 

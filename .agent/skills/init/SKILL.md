@@ -30,8 +30,10 @@ Do not use this skill for:
 - long-running collaboration patterns
 
 For desktop peers, use `desktop-mesh-peer`.
-For transport details or troubleshooting, use `mesh-comms-core`.
+For transport details, live comms mechanics, ACK proof, direct-send rules, and troubleshooting, use `mesh-comms-core`.
 For quartet work, use `ready-rock-quartet`.
+
+`init` is the normal CLI bootstrap entrypoint. It also orients operators to the rest of the live-comms skill map: `desktop-mesh-peer` for Claude Desktop or Codex Desktop, and `mesh-comms-core` for the shared tmux/direct-injection substrate.
 
 ## Defaults
 
@@ -55,7 +57,7 @@ CLAUDE_ARGS="..." CODEX_ARGS="..." ./me.sh
 1. Change to the agents repo:
 
 ```bash
-cd /Users/dazzagreenwood/Documents/GitHub/interlateral_agents
+cd path/to/interlateral_agents
 ```
 
 2. Run the standard initializer:

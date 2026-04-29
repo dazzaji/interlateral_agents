@@ -42,7 +42,7 @@ Name the skill explicitly in your prompt, for example:
 ```text
 Use the dev-collaboration skill at .agent/skills/dev-collaboration/SKILL.md.
 CC is Drafter. Codex is Reviewer+Breaker.
-Artifact: dev_plan/dev_plan.md
+Artifact: path/to/work-plan.md
 ```
 
 After deployment, Claude Code reads from `.claude/skills/` and Codex reads from `.codex/skills/`.

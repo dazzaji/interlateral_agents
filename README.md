@@ -16,6 +16,8 @@ The launcher used by `init` starts agents in fully permissive mode (`--dangerous
 
 ## Quick Start
 
+If you are Claude Desktop or Codex Desktop joining this repo, first read and follow `.agent/skills/desktop-mesh-peer/SKILL.md`.
+
 1. Open a terminal and `cd` into this repo:
 
    ```bash
@@ -57,6 +59,23 @@ Under the hood, `init` runs `./me.sh`. The script prints CLI versions and the ex
 
 Direct peer injection is the live comms path. `interlateral_dna/comms.md` is the audit ledger, not the wake-up channel.
 
+## Choosing An Operating Mode
+
+Interlateral Agents can be used in several modes depending on how much control you want.
+
+For the concierge path, follow Quick Start to bring up the mesh. Then give the live agents your goal and ask them to choose the right skill or collaboration pattern.
+
+For a hands-on hierarchical workflow, use the `hierarchical` skill: appoint one agent as the manager who delegates tasks to the rest, reviews their output, and approves or requests changes.
+
+For maximum manual control, run the working-team patterns directly yourself. You can invoke any one or combination of these skills as useful starting points:
+
+- `ready-rock-quartet` for a visible four-agent Lead / Reviewer / Breaker / Verifier team
+- `dev-collaboration` for a focused Drafter / Reviewer / Breaker workflow
+- `peer-collaboration` for two agents iterating as equals
+- `dev-competition` when you want independent implementations and a judge
+
+For long-running, complex, or high-stakes sprints in any mode, layer `sprint-overseer` on top. A team of overseer agents periodically reviews current sprint progress, confirms when work is on track, and nudges or intervenes when it drifts. It also writes a sprint-local log of progress, drift, interventions, major problems, and closeout evidence. See Sprint Overseer Recipe below for invocation.
+
 ## Under The Hood: me.sh
 
 You should rarely need to invoke `me.sh` directly; the `init` skill owns the normal bootstrap UX. Use the launcher knobs here when CLI defaults change or you need a specific model or argument combination.
@@ -74,7 +93,7 @@ Use `./me.sh --force` only when you explicitly accept replacing attached `ia-cla
 If you want to run `me.sh` from anywhere as `me.sh` instead of `./me.sh`, add this repo to your shell `PATH` in `~/.zshrc` or the equivalent startup file for your shell:
 
 ```bash
-export PATH="$PATH:/Users/dazzagreenwood/Documents/GitHub/interlateral_agents"
+export PATH="$PATH:/path/to/interlateral_agents"
 ```
 
 Reload your shell config after editing it:
@@ -122,7 +141,7 @@ Invoke a skill by naming it in your prompt, for example:
 ```text
 Use the dev-collaboration skill at .agent/skills/dev-collaboration/SKILL.md.
 CC is Drafter. Codex is Reviewer+Breaker.
-Artifact: dev_plan/dev_plan.md
+Artifact: path/to/work-plan.md
 ```
 
 ### Comms And Init Skills

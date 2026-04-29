@@ -61,18 +61,18 @@ The following reusable skills were removed from the v0.1 catalog and are deferre
 - a **donor source path** for where the source material exists today
 
 - **create-skin** — dashboard skin generation (depends on comms monitor / skins system, see 4.3)
-  - Restoration target path (future in-repo location, not present until restored): `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/create-skin/SKILL.md`
-  - Donor source path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/create-skin/SKILL.md`
+  - Restoration target path (future in-repo location, not present until restored): `.agent/skills/create-skin/SKILL.md`
+  - Donor source: deferred upstream skill source
   - Restored only when dashboard / skin infrastructure is back in scope
 
 - **evals** — eval and trace tooling (depends on Lake Merritt eval system, see 5.1)
-  - Restoration target path (future in-repo location, not present until restored): `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/evals/SKILL.md`
-  - Donor source path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/evals/SKILL.md`
+  - Restoration target path (future in-repo location, not present until restored): `.agent/skills/evals/SKILL.md`
+  - Donor source: deferred upstream skill source
   - Restored only when traces, eval packs, and supporting scripts are back in scope
 
 - **hyperdomo** — advanced manager-agent orchestration (depends on router.js, session.js, skills registry, see 6.1)
-  - Restoration target path (future in-repo location, not present until restored): `/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/.agent/skills/hyperdomo/SKILL.md`
-  - Donor source path: `/Users/dazzagreenwood/Documents/GitHub/interlateral_alpha/.agent/skills/hyperdomo/SKILL.md`
+  - Restoration target path (future in-repo location, not present until restored): `.agent/skills/hyperdomo/SKILL.md`
+  - Donor source: deferred upstream skill source
   - Restored only when manager/worker orchestration infrastructure is back in scope
 
 `test-4-series` is intentionally not listed here as a deferred reusable skill. It was a one-off project/test skill and is considered complete rather than something to restore into the standing v0.1 catalog.
@@ -204,7 +204,7 @@ These are NOT part of this repo unless strategy changes:
 - Simulation runners
 - GCP cost guard and ops runbooks
 
-These stay in interlateral_platform_alpha.
+These stay in the separate platform repo.
 
 ---
 
@@ -214,11 +214,11 @@ Capabilities consolidated from five source repos:
 
 | Source Repo | Role |
 |---|---|
-| interlateral_platform_alpha | Duo launcher kernel, identity.js, peer helpers, tmux ergonomics |
-| interlateral_prototype_alphasa_uiax | Historical AG/CDP reference, dashboard lineage |
-| interlateral_design_pattern_factory | Skills workshop, conformance spec source |
-| interlateral_alpha-upstream | Quad-agent distribution template, evals, Skills catalog |
-| interlateral_alpha | Most mature reference implementation — primary base |
+| Platform prototype | Duo launcher kernel, identity.js, peer helpers, tmux ergonomics |
+| Historical prototype | Historical AG/CDP reference, dashboard lineage |
+| Design-pattern workshop | Skills workshop, conformance spec source |
+| Upstream distribution template | Quad-agent distribution template, evals, Skills catalog |
+| Mature reference implementation | Primary base for v0.1 consolidation |
 
 Novel additions from reconciliation: router.js, session.js, event schema, artifact model, five-plane framework, registry.json, watch-session.sh, launch-gemini-peer.sh, approval workflow events.
 

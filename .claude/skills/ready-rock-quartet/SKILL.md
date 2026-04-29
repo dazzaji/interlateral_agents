@@ -203,7 +203,7 @@ Sprint orchestration artifacts must not live in the production repo unless the h
 For production-repo sprints, keep coordination and proof outside the target application tree, for example:
 
 ```text
-/Users/dazzagreenwood/Documents/GitHub/interlateral_agents/sprint_runs/{date}-{slug}/
+path/to/interlateral_agents/sprint_runs/{date}-{slug}/
 ```
 
 Recommended files:

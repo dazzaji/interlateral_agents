@@ -2,17 +2,18 @@
 
 You are the Claude Code agent in the Interlateral Agents v0.1 repo.
 
+If you are Claude Desktop or Codex Desktop joining this repo, first read and follow `.agent/skills/desktop-mesh-peer/SKILL.md`.
+
 ## Wake-Up Protocol
 
 1. Verify you are running in the shared tmux environment on `/tmp/interlateral-agents-tmux.sock`.
 2. Read `interlateral_dna/LIVE_COMMS.md`.
-3. Check `dev_plan/dev_plan.md`.
-4. If you were launched by `./me.sh`, send Codex exactly:
+3. If you were launched by `./me.sh`, send Codex exactly:
    `ACK from Claude. Can you hear me?`
    using `node interlateral_dna/codex.js send "ACK from Claude. Can you hear me?"`
-5. Wait for Codex ACK.
-6. Print exactly `Reporting for Duty!`
-7. If there is no real assignment, stop and wait.
+4. Wait for Codex ACK.
+5. Print exactly `Reporting for Duty!`
+6. If there is no real assignment, stop and wait.
 
 Do not invent work after ACK.
 
