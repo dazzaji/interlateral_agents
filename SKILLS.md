@@ -9,7 +9,7 @@ Deployed copies:
 
 Use `scripts/deploy-skills.sh` after editing the canonical copy.
 
-v0.1 now ships an 18-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
+v0.1 now ships a 20-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
 
 `projects/` is reserved for downstream user work. Do not put system skills there.
 
@@ -25,11 +25,13 @@ v0.1 now ships an 18-skill canonical set. Three reusable skills (`create-skin`, 
 | `desktop-mesh-peer` | `.agent/skills/desktop-mesh-peer/SKILL.md` | Desktop peer inbox, identity, and ACK proof |
 | `dev-collaboration` | `.agent/skills/dev-collaboration/SKILL.md` | Drafter / reviewer / breaker workflow |
 | `dev-competition` | `.agent/skills/dev-competition/SKILL.md` | Dual implementation + judge |
+| `gate-keeper` | `.agent/skills/gate-keeper/SKILL.md` | Two-agent proxy approval council for delegated sprint gates |
 | `hierarchical` | `.agent/skills/hierarchical/SKILL.md` | Boss / worker delegation pattern |
 | `init` | `.agent/skills/init/SKILL.md` | Standard two-agent CLI mesh initializer via `me.sh` |
 | `mesh-comms-core` | `.agent/skills/mesh-comms-core/SKILL.md` | Direct-send, tmux, identity, ledger, and ACK transport mechanics |
 | `negotiation` | `.agent/skills/negotiation/SKILL.md` | Structured trade-off process |
 | `peer-collaboration` | `.agent/skills/peer-collaboration/SKILL.md` | Two-peer collaboration loop |
+| `peer-superset` | `.agent/skills/peer-superset/SKILL.md` | Independent review/redteam plus consensus superset revision list |
 | `publication-pipeline` | `.agent/skills/publication-pipeline/SKILL.md` | Editorial multi-round pipeline |
 | `ready-rock-quartet` | `.agent/skills/ready-rock-quartet/SKILL.md` | Four-agent visible-terminal launch and role-lock workflow |
 | `search-synth` | `.agent/skills/search-synth/SKILL.md` | Search and synthesis workflow |
