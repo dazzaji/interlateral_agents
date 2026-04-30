@@ -88,7 +88,15 @@ Warp is the terminal surface. The mesh transport is still the shared tmux socket
 
 Interlateral Agents can be used in several modes depending on how much control you want.
 
-For the concierge path, follow Quick Start to bring up the mesh. Then give the live agents your goal and ask them to choose the right skill or collaboration pattern.
+For the lightest guided path, start a capable CLI agent such as Claude Code with Opus 4.7 or Codex 5.5, point it at this repo, and ask it to act as your personal project concierge. Have it get familiar with the repo, help you get onto the mesh, choose the right collaboration pattern, invoke the right skills, brief the other agents, and keep you updated. This role is more like a majordomo managing a household staff, or a Navy Master Chief keeping the operation moving, than a formal workflow.
+
+This is intentionally not a skill. Current frontier agents are already well adapted to this kind of judgment-heavy coordination, and too many instructions can make them worse. A lightweight prompt is usually better when you want one capable agent helping you use this repo, rather than personally invoking and managing the collaboration-pattern skills yourself.
+
+Example prompt:
+
+```text
+Please get familiar with this repo and act as my personal concierge for using the Interlateral Agents mesh. Help me choose and invoke the right skills and agents, keep the work moving, give me clear status when I ask, and only add heavier process when it is genuinely needed.
+```
 
 For a hands-on hierarchical workflow, use the `hierarchical` skill: appoint one agent as the manager who delegates tasks to the rest, reviews their output, and approves or requests changes.
 
