@@ -9,7 +9,7 @@ Deployed copies:
 
 Use `scripts/deploy-skills.sh` after editing the canonical copy.
 
-v0.1 now ships a 20-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
+v0.1 now ships a 21-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
 
 `projects/` is reserved for downstream user work. Do not put system skills there.
 
@@ -20,6 +20,7 @@ v0.1 now ships a 20-skill canonical set. Three reusable skills (`create-skin`, `
 | `add-comments` | `.agent/skills/add-comments/SKILL.md` | Shared review/comments helper |
 | `adherence-check` | `.agent/skills/adherence-check/SKILL.md` | Conformance-style validation workflow |
 | `competition` | `.agent/skills/competition/SKILL.md` | Parallel competition pattern |
+| `concierge` | `.agent/skills/concierge/SKILL.md` | Senior autonomous sprint concierge for mesh work, oversight, gates, evidence, and scope discipline |
 | `constitutional` | `.agent/skills/constitutional/SKILL.md` | Federated drafting and ratification |
 | `democratic` | `.agent/skills/democratic/SKILL.md` | Equal-vote decision process |
 | `desktop-mesh-peer` | `.agent/skills/desktop-mesh-peer/SKILL.md` | Desktop peer inbox, identity, and ACK proof |
