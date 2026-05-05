@@ -177,6 +177,20 @@ CC is Drafter. Codex is Reviewer+Breaker.
 Artifact: path/to/work-plan.md
 ```
 
+### When To Change A Skill
+
+Hard lessons from a sprint should not automatically become permanent SKILL rules. A SKILL should be changed only when the lesson is truly general.
+
+“Truly necessary” means all of these are true:
+
+1. **The problem is inside the skill itself.** The skill currently tells agents to do something wrong, ambiguous, too heavy, or unsafe as a general rule.
+2. **The problem is reusable, not sprint-specific.** It affects many future uses of the skill, not just one project, sprint, or deploy.
+3. **A lighter fix is insufficient.** A template note, sprint-specific instruction, README note, or example would not reliably prevent the failure.
+4. **The edit makes the skill simpler or safer.** It should clarify, prune, or correct. It should not add a large new doctrine block.
+5. **The blast radius is understood.** Since SKILLS affect future agents AND FUTURE SPRINTS, the change must be reviewed more carefully than a sprint-specific template.
+
+When in doubt, keep the SKILL small and put sprint-specific process in a template or sprint spec.
+
 ### Comms And Init Skills
 
 The comms setup is now split into focused skills:
