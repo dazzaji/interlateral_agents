@@ -9,6 +9,7 @@ package-lock.json
 
 # Scratch / working docs (preserved in git history)
 temp/
+docs/
 interlateral_dna/**/working_files/
 
 # Runtime logs and ledgers
