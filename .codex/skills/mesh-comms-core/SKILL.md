@@ -24,6 +24,8 @@ It covers transport mechanics only:
 
 It does not assign roles, choose sprint process, onboard desktop peers, or define review/breaker/verifier workflows.
 
+Sprint-specific evidence regimes, gate tables, and approval policies belong in sprint specs or templates, not in this transport skill.
+
 ## Desktop Boundary
 
 Use this skill for CLI mesh transport. If Claude Desktop or Codex Desktop needs to join the mesh, switch to `desktop-mesh-peer` at `.agent/skills/desktop-mesh-peer/SKILL.md`.
@@ -36,12 +38,13 @@ Every agent handoff depends on these rules. Keep them in the active path wheneve
 
 1. Direct-send wakes the peer; `comms.md` records the event.
 2. Never rely on `comms.md` alone as a wake-up mechanism.
-3. Use the shared socket every time: `/tmp/interlateral-agents-tmux.sock`.
-4. Use repo helpers before raw `tmux send-keys`.
-5. Use the target-specific helper when one exists; current Claude Code uses `claude_send*_logged`, while Codex/Gemini continue to use the generic helpers.
-6. For Codex, never send `C-c` to clear input; it can kill the CLI.
-7. Prove new or uncertain comms with a nonce ACK.
-8. Check idle before follow-up prompts so text is not injected into a busy agent.
+3. Pane text alone does not count. A message drafted in a terminal has not been delivered until it is submitted through a live path and, when available, mirrored to the ledger.
+4. Use the shared socket every time: `/tmp/interlateral-agents-tmux.sock`.
+5. Use repo helpers before raw `tmux send-keys`.
+6. Use the target-specific helper when one exists; current Claude Code uses `claude_send*_logged`, while Codex/Gemini continue to use the generic helpers.
+7. For Codex, never send `C-c` to clear input; it can kill the CLI.
+8. Prove new or uncertain comms with a nonce ACK.
+9. Check idle before follow-up prompts so text is not injected into a busy agent.
 
 Primary in-repo transport reference:
 

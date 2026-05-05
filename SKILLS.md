@@ -67,3 +67,20 @@ scripts/sprint_overseer.sh /abs/path/to/project/docs/sprint.md \
   --stop-marker "STATUS: OVERSEER-DONE" \
   --interval 300
 ```
+
+## Process Selection
+
+Before adding heavy coordination, choose the lightest process that fits the task:
+
+- Level 0: solo task
+- Level 1: peer collaboration
+- Level 2: team collaboration
+- Level 3: overseen sprint
+- Level 4: gatekeeper sprint
+
+See:
+
+- `templates/sprint/process-levels.md`
+- `templates/sprint/sprint-template.md`
+
+The levels are guides, not mandatory gates. Use heavier skills only when the risk justifies them.

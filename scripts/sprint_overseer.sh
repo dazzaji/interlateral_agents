@@ -23,7 +23,7 @@ Options:
   --manager SESSION     Sprint lead tmux session (default: ia-claude)
   --overseer SESSION    Overseer tmux session (default: ia-codex)
   --closeout-file PATH  Explicit team-completion artifact to watch
-  --done-marker TEXT    Team done marker (default: STATUS: WORKSHOP-READY)
+  --done-marker TEXT    Team done marker (default: STATUS: DONE)
   --stop-file PATH      Explicit overseer-completion artifact to watch (default: closeout-file)
   --stop-marker TEXT    Overseer stop marker (default: done-marker)
   --team-pattern GLOB   Worker session glob for overseer context (default: sprint*)
@@ -54,7 +54,7 @@ fi
 INTERVAL_SEC=300
 MANAGER_SESSION="${CC_SESSION:-ia-claude}"
 OVERSEER_SESSION="${CODEX_SESSION:-ia-codex}"
-DONE_MARKER="STATUS: WORKSHOP-READY"
+DONE_MARKER="STATUS: DONE"
 TEAM_PATTERN="sprint*"
 CLOSEOUT_FILE=""
 STOP_FILE=""
@@ -357,11 +357,9 @@ log "  Overseer log:     $OVERSEER_LOG"
 log "  Timer log:        $TIMER_LOG"
 
 # --- Launch Preflight ---
-# MANDATORY: The timer MUST pass preflight before entering the main loop.
-# The overseer timer is mandatory for every sprint. An agent cannot decide
-# to skip it. Only Dazza (the human owner) can waive this requirement.
-# WHO STARTS THE TIMER: The human operator or the overseer boot script
-# starts the timer BEFORE the team boot sequence. The timer must show at
+# When a sprint chooses a mechanical overseer timer, the timer must pass
+# preflight before entering the main loop. For long-running or high-risk
+# autonomous sprints, start it before the team boot sequence and confirm at
 # least one "Timer alive" entry before the first team prompt is injected.
 preflight_check
 

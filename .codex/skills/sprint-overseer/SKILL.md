@@ -26,7 +26,7 @@ Required:
 Optional:
 - `manager_session`: tmux session name for the sprint lead. Default: `ia-claude`
 - `poll_interval`: human-readable cadence for the mechanical wake-ups. Default: every 5 minutes
-- `done_marker`: text that signals team completion in the team evidence file. Default: `STATUS: WORKSHOP-READY`
+- `done_marker`: text that signals team completion in the team evidence file. Default: `STATUS: DONE`
 - `sprint_team_pattern`: tmux session glob for sprint workers. Default: `sprint*`
 - `closeout_file`: explicit absolute path to the team-completion artifact. Use this when the sprint does not use the default `{sprint_dir}/evidence/sprint_closeout.md`.
 - `stop_file`: explicit absolute path to the overseer-completion artifact. Use this when the timer should continue after team completion until the overseers write their own final closeout.
@@ -170,11 +170,11 @@ Team status: on-track, LEAD actively coding. No action."`
 
 Keep entries concise and scannable.
 
-## Who Starts the Timer (MANDATORY)
+## When To Use The Timer
 
-**The overseer timer is mandatory for every sprint. An agent cannot decide to skip it. Only the human owner (Dazza) can waive this requirement.**
+The mechanical overseer timer is optional sprint scaffolding, not a universal requirement. Use it when the sprint is long-running, unattended, multi-agent, or high-risk enough that silent stalls matter. Skip it for ordinary short tasks where a simple closeout is enough.
 
-The timer MUST be started by the **human operator or the overseer boot script** BEFORE the team boot sequence begins. The timer must show at least one "Timer alive" entry in its log before the first team prompt is injected.
+When a sprint chooses the timer, start it by the human operator or overseer boot script BEFORE the team boot sequence begins. The timer should show at least one "Timer alive" entry in its log before the first team prompt is injected.
 
 **Startup order:**
 1. Start the overseer timer(s)
@@ -182,11 +182,24 @@ The timer MUST be started by the **human operator or the overseer boot script** 
 3. THEN boot the team sessions
 4. THEN inject the lead prompt
 
-If an agent proposes skipping the timer (e.g., "we'll supervise manually"), that proposal MUST be rejected unless Dazza explicitly approves. Manual supervision without a mechanical wake-up is not viable — agent sessions will go idle and nothing will wake them.
+For overnight, high-risk, or complex autonomous sprints, do not replace the timer with vague manual supervision unless the sprint spec or human explicitly accepts that risk. Agent sessions can go idle and nothing will wake them.
 
 Before any overnight sprint or new overseer topology, run `scripts/heartbeat_validation_harness.sh` first to prove visible injection and HEARTBEAT_ID acknowledgment on the real target CLI session.
 
 **The timer runs the heartbeat acknowledgment protocol:** Each heartbeat carries a unique HEARTBEAT_ID. The overseer must echo that ID in their checkpoint log entry. A cycle counts as successful only when the ID appears in the overseer log. If 3 consecutive heartbeats receive no acknowledgment, the timer logs a WARNING to comms.md for escalation.
+
+### Timer Exit Contract
+
+When the mechanical timer is used, the sprint spec or launch record must capture:
+
+- the `--closeout-file` path;
+- the exact `--done-marker` string;
+- the `--stop-file` path;
+- the exact `--stop-marker` string;
+- who is responsible for writing each marker;
+- how the team verifies the timer has stopped.
+
+Sprint closeout is not complete until the exact `done_marker` appears in the team evidence file, the exact `stop_marker` appears in the overseer stop file, and a process or final-log check confirms the timer is no longer running for that sprint. If those literal strings are not written, the timer will keep polling even when the sprint is substantively done.
 
 ## Recommended Mechanical Wake-Up
 

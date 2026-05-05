@@ -1,6 +1,6 @@
 # Interlateral Agents
 
-Interlateral Agents v0.1 is a small, working multi-agent starter repo built around the `init` skill. It gives you a fast Claude Code + Codex duo, peer helpers for adding more CLI agents on the same tmux socket, a canonical 18-skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
+Interlateral Agents v0.1 is a small, working multi-agent starter repo built around the `init` skill. It gives you a fast Claude Code + Codex duo, peer helpers for adding more CLI agents on the same tmux socket, a canonical skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
 
 ## Prerequisites
 
@@ -109,6 +109,25 @@ For maximum manual control, run the working-team patterns directly yourself. You
 
 For long-running, complex, or high-stakes sprints in any mode, layer `sprint-overseer` on top. A team of overseer agents periodically reviews current sprint progress, confirms when work is on track, and nudges or intervenes when it drifts. It also writes a sprint-local log of progress, drift, interventions, major problems, and closeout evidence. See Sprint Overseer Recipe below for invocation.
 
+## Choosing Process Weight
+
+Use the lightest process that fits the actual risk. The repo provides process levels as guides, not achievement levels or mandatory gates:
+
+- **Level 0: Solo task.** One agent handles a bounded request.
+- **Level 1: Peer collaboration.** Two agents collaborate, for example with `peer-collaboration` or `peer-superset`.
+- **Level 2: Team collaboration.** Three or more agents use explicit roles, for example a Lead / Reviewer / Breaker / Verifier quartet.
+- **Level 3: Overseen sprint.** Add liveness oversight for longer autonomous work, for example with `sprint-overseer`.
+- **Level 4: Gatekeeper sprint.** Add formal delegated approvals for live, sensitive, mission-critical, public, destructive, or hard-to-reverse work, for example with `gate-keeper`.
+
+Quick risk test: would a wrong action affect production users, mutate live data, spend money, expose credentials, or be hard to reverse without human help? If yes, consider Level 3 or Level 4. If no, prefer Level 0-2.
+
+Templates:
+
+- `templates/sprint/process-levels.md`
+- `templates/sprint/sprint-template.md`
+
+Canonical reference: `templates/sprint/process-levels.md`. If this summary and the canonical reference disagree, the canonical reference wins.
+
 ## Under The Hood: me.sh
 
 You should rarely need to invoke `me.sh` directly; the `init` skill owns the normal bootstrap UX. Use the launcher knobs here when CLI defaults change or you need a specific model or argument combination.
@@ -204,6 +223,8 @@ Collaboration-pattern skills now treat `comms.md` as the ledger rather than the 
 
 ### Sprint Overseer Recipe
 
+Use sprint overseers when the work is long-running, easy to stall, or needs periodic independent liveness checks. Do not use overseers for ordinary short tasks just because the skill exists.
+
 To oversee a sprint in any working repo, point the skill at the absolute sprint file path:
 
 ```text
@@ -232,6 +253,8 @@ The skill derives sprint-local paths from `sprint_file`, writes `sprint-overseer
 - a separate sprint-specific overseer closeout via `--stop-file`
 
 That separation lets the timer keep running after the team finishes so the overseers can still perform Joint ACK and final closeout.
+
+If you use the mechanical timer, the sprint closeout must satisfy the timer's exact exit contract: write the literal `--done-marker` into the `--closeout-file`, write the literal `--stop-marker` into the `--stop-file`, and verify the timer process has stopped. Otherwise the overseer can keep polling after the sprint is done.
 
 ## Troubleshooting
 

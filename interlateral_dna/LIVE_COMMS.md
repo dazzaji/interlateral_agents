@@ -19,6 +19,8 @@ Every meaningful handoff should do both:
 1. Send directly with `node interlateral_dna/*.js send "message"`
 2. Let the control script append the stamped message to `interlateral_dna/comms.md`
 
+Pane text alone does not count. A message typed or drafted in an agent terminal has not been delivered until it is actually submitted through a live path and, when available, mirrored to the ledger.
+
 ## Current Sessions
 
 `me.sh` boots two agents by default:
