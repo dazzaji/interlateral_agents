@@ -51,6 +51,9 @@ Preferred roster:
 - Codex as `BREAKER`
 - Claude as `VERIFIER`
 
+Do not substitute Gemini CLI, Antigravity CLI, or Antigravity Desktop into the
+quartet unless Dazza explicitly selects that peer for this run.
+
 Recommended session naming:
 - `13-codex-lead` -> `LEAD`
 - `13-claude-reviewer` -> `REVIEWER`

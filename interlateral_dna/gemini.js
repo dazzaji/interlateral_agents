@@ -70,6 +70,23 @@ function read() {
   process.stdout.write(runTmux(['capture-pane', '-t', SESSION, '-p', '-S', '-']));
 }
 
+// Stamped messages are always pasted through a tmux buffer. `paste-buffer -r`
+// preserves literal LF bytes; without -r, tmux translates LF to CR, which can
+// submit multi-line prompts line by line in terminal TUIs.
+function deliver(text) {
+  const buffer = `gemini_send_${process.pid}`;
+  runTmux(['load-buffer', '-b', buffer, '-'], { input: text });
+  try {
+    runTmux(['paste-buffer', '-r', '-t', SESSION, '-b', buffer]);
+  } finally {
+    try { runTmux(['delete-buffer', '-b', buffer]); } catch {}
+  }
+  sleep(1000);
+  runTmux(['send-keys', '-t', SESSION, 'Escape']);
+  sleep(100);
+  runTmux(['send-keys', '-t', SESSION, 'Enter']);
+}
+
 function send(message) {
   if (!message) {
     console.error('Usage: node interlateral_dna/gemini.js send "message"');
@@ -85,11 +102,7 @@ function send(message) {
     console.error(`Warning: session '${SESSION}' is not running Gemini CLI. Sending anyway.`);
   }
 
-  runTmux(['send-keys', '-t', SESSION, '-l', stamped]);
-  sleep(1000);
-  runTmux(['send-keys', '-t', SESSION, 'Escape']);
-  sleep(100);
-  runTmux(['send-keys', '-t', SESSION, 'Enter']);
+  deliver(stamped);
   appendLedger('@Gemini', stamped);
 }
 

@@ -4,19 +4,24 @@ description: Role-based collaboration pattern (Drafter, Reviewer, Breaker). Assi
 metadata:
   owner: interlateral
   version: "0.1"
-compatibility: Requires at least two agents from {claude, codex, gemini} and access to comms.md ledger and agent notification scripts.
+compatibility: Requires at least two selected agents and access to comms.md ledger and agent notification scripts. Default to Claude Code + Codex; Gemini and Antigravity are opt-in only when explicitly selected by the human.
 ---
 
 # Dev Collaboration Pattern
 
 Use `mesh-comms-core` first if direct peer notification has not already been proven. This skill defines roles and sequence; `mesh-comms-core` defines the transport.
 
+Default roster: assign roles to Claude Code and Codex peers. Do not launch,
+recruit, or assign Gemini CLI, Antigravity CLI, or Antigravity Desktop unless
+the human prompt explicitly names that peer.
+
 ## Prerequisites
 
 - **Notification Scripts:** Use the repo's agent-specific scripts under `interlateral_dna/` to send direct notifications.
   - Claude Code: `node interlateral_dna/cc.js send "message"`
   - Codex: `node interlateral_dna/codex.js send "message"`
-  - Gemini: `node interlateral_dna/gemini.js send "message"`
+  - Gemini, only when explicitly selected: `node interlateral_dna/gemini.js send "message"`
+  - Antigravity CLI, only when explicitly selected: `node interlateral_dna/agy.js send "message"`
 - **Ledger:** Use `comms.md` as the shared communications ledger. Posting to `comms.md` alone does not wake a peer.
 
 ## Roles
@@ -27,7 +32,8 @@ Use `mesh-comms-core` first if direct peer notification has not already been pro
 | **REVIEWER** | Reviews for correctness, clarity, completeness | List of actionable suggestions |
 | **BREAKER** | Adversarial testing; finds flaws, edge cases, failure modes | List of ways the artifact could break |
 
-Any v0.1 agent (`claude`, `codex`, `gemini`) may hold any role.
+Any explicitly selected v0.1 peer may hold any role. In routine use, choose
+Claude Code and Codex; treat Gemini and Antigravity as special opt-in peers.
 
 ## Prompt Requirements
 
@@ -127,7 +133,7 @@ artifact_path: plans/integration_plan.md
 
 Roles:
   DRAFTER: claude
-  REVIEWER: gemini
+  REVIEWER: codex
   BREAKER: codex
 
 Deliver reviews via direct notification plus the `comms.md` ledger.

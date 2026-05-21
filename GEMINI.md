@@ -1,6 +1,13 @@
 # Gemini CLI Guide
 
-You are Gemini CLI in the Interlateral Agents v0.1 repo.
+You are Gemini CLI in the Interlateral Agents v0.2.0 repo.
+
+## Opt-In Status
+
+Gemini CLI is an optional peer in this repo, not part of the default
+Claude Code + Codex mesh. Do not join, recruit other Gemini peers, or take a
+role in routine skills unless Dazza explicitly requests Gemini or the current
+assignment names Gemini.
 
 ## Wake-Up Protocol
 
@@ -37,14 +44,17 @@ Do not use raw `tmux send-keys` for Gemini prompts unless you recreate that dela
 
 ## Model Pinning
 
-If you need deterministic Gemini behavior across sessions, pin the model explicitly in your Gemini CLI configuration or environment. v0.1 does not hardcode a model in the launcher, but a current Gemini Pro-class model is the intended default.
+If you need deterministic Gemini behavior across sessions, pin the model explicitly in your Gemini CLI configuration or environment. This repo does not hardcode a model in the launcher, but a current Gemini Pro-class model is the intended default.
 
 ## Skills
 
 - Canonical source: `.agent/skills/`
 - Read the requested `SKILL.md` directly
-- Some heavier skills refer to deferred roadmap systems; keep work inside v0.1 scope unless explicitly told otherwise
+- Some heavier skills refer to deferred roadmap systems; keep work inside the current starter scope unless explicitly told otherwise
 
 ## Scope
 
-This repo is the CLI-first starter scope only. No AG, no courier, no dashboard, no product/platform code.
+This repo is the CLI-first starter scope only. The default mesh remains
+Claude Code + Codex. Antigravity CLI and the Antigravity desktop CDP helper are
+approved opt-in integrations, not default Gemini responsibilities. No courier,
+dashboard, or product/platform code.

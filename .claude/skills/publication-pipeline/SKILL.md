@@ -12,6 +12,10 @@ metadata:
 ## Purpose
 Rigorous three-round review process for high-stakes content.
 
+Default roster: use Claude Code and Codex peers. Do not assign Gemini CLI,
+Antigravity CLI, or Antigravity Desktop unless the human prompt explicitly
+selects that peer.
+
 ## Roles
 - `DRAFTER` - Creates and revises the document
 - `REVIEWER` - Reviews for technical accuracy
@@ -49,6 +53,6 @@ PUBLISHER signals `[APPROVE]` to complete. `[REJECT]` sends back to DRAFTER.
 ```
 Use publication-pipeline to publish the quarterly report.
 Read work.md first: projects/q4-report/work.md
-DRAFTER=CC, REVIEWER=CX, REDTEAM=GM, ANALYST=CX, EDITOR=GM, PUBLISHER=CC.
+DRAFTER=CC, REVIEWER=CX, REDTEAM=CC-peer-02, ANALYST=CX, EDITOR=CC-peer-02, PUBLISHER=CC.
 Output: projects/q4-report/final.md
 ```

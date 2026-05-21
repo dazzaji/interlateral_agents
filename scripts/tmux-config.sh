@@ -8,6 +8,7 @@ export TMUX_SOCKET="${TMUX_SOCKET:-$INTERLATERAL_TMUX_SOCKET}"
 export CC_SESSION="${CC_SESSION:-ia-claude}"
 export CODEX_SESSION="${CODEX_SESSION:-ia-codex}"
 export GEMINI_SESSION="${GEMINI_SESSION:-ia-gemini}"
+export AGY_SESSION="${AGY_SESSION:-ia-agy}"
 
 if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
     TMUX_CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -49,8 +50,13 @@ agent_send_long() {
     local buffer="${3:-agent_send_long_$$}"
     run_tmux send-keys -t "$session" Escape
     sleep 0.3
-    printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -
-    run_tmux paste-buffer -t "$session" -b "$buffer"
+    if ! printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -; then
+        return 1
+    fi
+    if ! run_tmux paste-buffer -r -t "$session" -b "$buffer"; then
+        run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
+        return 1
+    fi
     run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
     sleep 0.3
     run_tmux send-keys -t "$session" Escape
@@ -65,8 +71,13 @@ agent_send_long_delayed() {
     local buffer="${4:-agent_send_long_delayed_$$}"
     run_tmux send-keys -t "$session" Escape
     sleep 0.3
-    printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -
-    run_tmux paste-buffer -t "$session" -b "$buffer"
+    if ! printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -; then
+        return 1
+    fi
+    if ! run_tmux paste-buffer -r -t "$session" -b "$buffer"; then
+        run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
+        return 1
+    fi
     run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
     sleep "$delay"
     run_tmux send-keys -t "$session" Escape
@@ -86,8 +97,13 @@ claude_send_long() {
     local session="${1:?session name required}"
     local prompt="${2:?prompt required}"
     local buffer="${3:-claude_send_long_$$}"
-    printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -
-    run_tmux paste-buffer -t "$session" -b "$buffer"
+    if ! printf '%s' "$prompt" | run_tmux load-buffer -b "$buffer" -; then
+        return 1
+    fi
+    if ! run_tmux paste-buffer -r -t "$session" -b "$buffer"; then
+        run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
+        return 1
+    fi
     run_tmux delete-buffer -b "$buffer" 2>/dev/null || true
     sleep 0.3
     run_tmux send-keys -t "$session" C-m
@@ -136,6 +152,31 @@ claude_send_logged() {
     agent_log_ledger "$session" "$prompt"
 }
 
+# The Antigravity CLI (agy) TUI submits on a plain Enter, not the Codex
+# Escape-then-Enter pattern. Do not use agent_send* for an agy session: the
+# Escape can cancel its input. These helpers route through interlateral_dna/
+# agy.js, which requires agy in the pane foreground process group plus visible
+# readiness markers before default sends, pastes long messages reliably, and
+# stamps the ledger. Pass a third arg of --force only when you have manually
+# confirmed the pane is a running agy; agy.js requires the force flag before the
+# message, so this wrapper preserves that ordering.
+agy_send() {
+    local session="${1:?session name required}"
+    local prompt="${2:?prompt required}"
+    local extra="${3:-}"
+    if [[ -n "$extra" ]]; then
+        AGY_TMUX_SESSION="$session" node "$INTERLATERAL_AGENTS_REPO/interlateral_dna/agy.js" send "$extra" "$prompt"
+    else
+        AGY_TMUX_SESSION="$session" node "$INTERLATERAL_AGENTS_REPO/interlateral_dna/agy.js" send "$prompt"
+    fi
+}
+
+# agy.js already stamps the ledger; agy_send_logged is kept as an alias so
+# callers expecting the *_logged naming still work.
+agy_send_logged() {
+    agy_send "$@"
+}
+
 claude_send_long_logged() {
     local session="${1:?session name required}"
     local prompt="${2:?prompt required}"
@@ -171,6 +212,9 @@ pane_seems_cli() {
     local session="${1:?session name required}"
     local cmd
     cmd="$(pane_current_command "$session")"
+    # Note: the Antigravity CLI (agy) usually reports its pane process as `zsh`,
+    # so this process-name helper cannot classify it. For agy sessions confirm
+    # liveness with `node interlateral_dna/agy.js status`.
     [[ "$cmd" =~ ^(claude|codex|gemini|node|[0-9]+\.[0-9]+\.[0-9]+)$ ]]
 }
 
@@ -260,6 +304,8 @@ if [[ -n "${BASH_VERSION:-}" ]]; then
     export -f agent_send_logged 2>/dev/null || true
     export -f agent_send_long_logged 2>/dev/null || true
     export -f claude_send_logged 2>/dev/null || true
+    export -f agy_send 2>/dev/null || true
+    export -f agy_send_logged 2>/dev/null || true
     export -f claude_send_long_logged 2>/dev/null || true
     export -f agent_capture_recent 2>/dev/null || true
     export -f agent_capture_deep 2>/dev/null || true

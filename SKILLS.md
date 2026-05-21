@@ -7,9 +7,11 @@ Deployed copies:
 - `.claude/skills/`
 - `.codex/skills/`
 
-Use `scripts/deploy-skills.sh` after editing the canonical copy.
+Use `scripts/deploy-skills.sh` after editing the canonical copy, then run
+`scripts/check-skills-parity.sh` to verify `.claude/skills` and `.codex/skills`
+still match the canonical tree.
 
-v0.1 now ships a 20-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the v0.1 catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
+The current release target ships a 21-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the starter catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
 
 `projects/` is reserved for downstream user work. Do not put system skills there.
 
@@ -19,6 +21,7 @@ v0.1 now ships a 20-skill canonical set. Three reusable skills (`create-skin`, `
 |---|---|---|
 | `add-comments` | `.agent/skills/add-comments/SKILL.md` | Shared review/comments helper |
 | `adherence-check` | `.agent/skills/adherence-check/SKILL.md` | Conformance-style validation workflow |
+| `agy-cli-peer` | `.agent/skills/agy-cli-peer/SKILL.md` | Antigravity CLI (`agy`) as a native mesh peer |
 | `competition` | `.agent/skills/competition/SKILL.md` | Parallel competition pattern |
 | `constitutional` | `.agent/skills/constitutional/SKILL.md` | Federated drafting and ratification |
 | `democratic` | `.agent/skills/democratic/SKILL.md` | Equal-vote decision process |

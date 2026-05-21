@@ -13,6 +13,10 @@ compatibility: Works with any text/markdown file. No dependencies.
 
 Safely add your work to a shared file without overwriting or interfering with other agents' work. Each agent has an isolated workspace section.
 
+Default peer policy: the Antigravity workspace exists only for an explicitly
+selected Antigravity peer. Do not recruit or assume Antigravity participation
+just because this skill reserves a workspace header for it.
+
 ## When to Use
 
 - When asked to "add comments" to a file
@@ -29,8 +33,8 @@ Each agent has exactly ONE workspace section. You write ONLY there.
 | Agent | Workspace Header (EXACT match required) |
 |-------|----------------------------------------|
 | Claude Code | `## Claude Code Workspace` |
-| Antigravity | `## Antigravity Workspace` |
 | Codex | `## Codex Workspace` |
+| Antigravity, only when explicitly selected | `## Antigravity Workspace` |
 
 **Header matching:** Use EXACT string match only. Do NOT match partial headers like "## Workspace" or "## CC Workspace".
 
@@ -77,7 +81,8 @@ Look for your EXACT workspace header under the main header.
 
 **If your workspace does NOT exist:**
 - Add it after any existing workspaces (preserve existing order)
-- If no workspaces exist yet, use this order: Claude Code first, Antigravity second, Codex third
+- If no workspaces exist yet, use this default order: Claude Code first, Codex second
+- If Antigravity was explicitly selected for this file, place `## Antigravity Workspace` after Claude Code and before Codex when creating a new set of workspaces
 - Do NOT reorder existing workspaces
 
 **EXACT header format required** (copy from table in Rule 1).
@@ -144,22 +149,6 @@ Suggested fixes provided inline.
 After reviewing the suggested changes, confirmed the null check fix
 resolves the edge case failures in test suite.
 
----
-
-## Antigravity Workspace
-
-### 2026-01-22 14:35:00 UTC - Architecture Review
-
-The current architecture has these strengths:
-- Clean separation of concerns
-- Good use of dependency injection
-
-Potential improvements:
-- Consider adding a caching layer
-- The event system could use batching
-
----
-
 ## Codex Workspace
 
 ### 2026-01-22 14:40:00 UTC - Edge Case Analysis
@@ -219,7 +208,7 @@ These are WRONG - do not do these:
 ```
 1. Open target file (or create with just main header if new)
 2. Find LAST "# AI AGENT COMMENTS AND WORK FOLLOW" header
-3. Find your EXACT workspace header (## Claude Code Workspace / ## Antigravity Workspace / ## Codex Workspace)
+3. Find your EXACT workspace header (## Claude Code Workspace / ## Codex Workspace; ## Antigravity Workspace only when explicitly selected)
 4. If workspace missing: add after existing workspaces, don't reorder
 5. INSERT (not append) your entry at END of your workspace, BEFORE next ##:
    ### YYYY-MM-DD HH:MM:SS UTC - Title (up to 10 words)
@@ -265,7 +254,7 @@ These are WRONG - do not do these:
 
 ---
 
-## Antigravity Review - 2026-01-22
+## Optional Antigravity Review - 2026-01-22
 
 ### What Works Well
 - **Rules 1-3:** The strict isolation rules are excellent for preventing merge conflicts in shared files.
@@ -278,7 +267,7 @@ These are WRONG - do not do these:
 - **Rule 3 Clarification:** "Append to the END of your workspace" could be ambiguous if the workspace is in the middle of a file. Explicitly state "Insert before the next header" to be safe.
 
 ### Breaker Notes (What Could Go Wrong)
-- **Insertion vs Append:** If AG is sandwiched between CC and Codex, a naive "append to file" operation breaks the structure. The agent must strictly *insert* into its block, not just append to the file end.
+- **Insertion vs Append:** If an explicitly selected Antigravity workspace is sandwiched between CC and Codex, a naive "append to file" operation breaks the structure. The agent must strictly *insert* into its block, not just append to the file end.
 - **Header Hallucination:** Agents might match partial headers (e.g., "## Workspace") if the exact string isn't enforced strictly against regex.
 
 ### Cold-Start Test
@@ -294,7 +283,7 @@ These are WRONG - do not do these:
 - The 7-point measurable adherence checklist makes it easy to verify correct usage programmatically
 - Anti-patterns table is excellent - showing what NOT to do is often more valuable than showing what to do
 - Quick Reference Card at the end provides a fast mental model for repeat use
-- Workspace ordering (CC first, AG second, Codex third) prevents race condition ambiguity
+- Workspace ordering for default peers prevents race condition ambiguity; the optional Antigravity slot is defined only when Antigravity is explicitly selected
 
 ### Suggestions for Improvement
 - **Handle edge case of very long content:** If an agent's workspace entry is 1000+ lines, the file becomes hard to navigate. Consider: "For entries exceeding 50 lines, summarize in the entry and link to a separate file"
@@ -324,10 +313,10 @@ These are WRONG - do not do these:
 | 2 | Codex | Added blank line guidance for non-markdown files | Prevents header gluing to prior content | Step 2: "add a blank line before" |
 | 3 | Codex | Added "use LAST main header" rule | Handles duplicate headers edge case | Step 2: "search from bottom... use the LAST one" |
 | 4 | Codex | Added warning about copying example verbatim | Prevents invalid placeholder content | Anti-patterns table: new row |
-| 5 | AG | Increased title limit to 10 words | 3-7 too restrictive for complex titles | Step 4: "up to 10 words" |
-| 6 | AG | Specified UTC timezone | Removes timezone ambiguity | Timestamp format now includes "UTC" everywhere |
-| 7 | AG | Clarified "insert before next header" | Prevents naive file-append breaking structure | Rule 3 rewritten + Step 4 + Quick Reference |
-| 8 | AG | Added exact header match requirement | Prevents header hallucination | Rule 1: "EXACT match required", Anti-patterns: new row |
+| 5 | Optional AG review | Increased title limit to 10 words | 3-7 too restrictive for complex titles | Step 4: "up to 10 words" |
+| 6 | Optional AG review | Specified UTC timezone | Removes timezone ambiguity | Timestamp format now includes "UTC" everywhere |
+| 7 | Optional AG review | Clarified "insert before next header" | Prevents naive file-append breaking structure | Rule 3 rewritten + Step 4 + Quick Reference |
+| 8 | Optional AG review | Added exact header match requirement | Prevents header hallucination | Rule 1: "EXACT match required", Anti-patterns: new row |
 | 9 | CC | Added 50-line guidance with link-out | Prevents workspace pollution from huge entries | Step 4: "if exceeding 50 lines, summarize" |
 | 10 | CC | Added Rule 4: Use Edit Operations Only | Prevents Write tool destroying other agents' work | New Rule 4, Anti-patterns: new row, Checklist item 8 |
 | 11 | CC | Added concurrency warning section | Documents file locking limitation | New "Concurrency Warning" section |

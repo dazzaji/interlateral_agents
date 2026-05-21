@@ -26,6 +26,11 @@ It does not assign roles, choose sprint process, onboard desktop peers, or defin
 
 Sprint-specific evidence regimes, gate tables, and approval policies belong in sprint specs or templates, not in this transport skill.
 
+Default peer policy: the normal mesh is Claude Code + Codex. Gemini CLI,
+Antigravity CLI, and Antigravity Desktop helpers are documented here only so
+operators can use them after an explicit opt-in decision. Do not treat helper
+availability as permission to recruit those peers.
+
 ## Desktop Boundary
 
 Use this skill for CLI mesh transport. If Claude Desktop or Codex Desktop needs to join the mesh, switch to `desktop-mesh-peer` at `.agent/skills/desktop-mesh-peer/SKILL.md`.
@@ -41,7 +46,7 @@ Every agent handoff depends on these rules. Keep them in the active path wheneve
 3. Pane text alone does not count. A message drafted in a terminal has not been delivered until it is submitted through a live path and, when available, mirrored to the ledger.
 4. Use the shared socket every time: `/tmp/interlateral-agents-tmux.sock`.
 5. Use repo helpers before raw `tmux send-keys`.
-6. Use the target-specific helper when one exists; current Claude Code uses `claude_send*_logged`, while Codex/Gemini continue to use the generic helpers.
+6. Use the target-specific helper when one exists; current Claude Code uses `claude_send*_logged`, while Codex and explicitly selected Gemini peers continue to use the generic helpers.
 7. For Codex, never send `C-c` to clear input; it can kill the CLI.
 8. Prove new or uncertain comms with a nonce ACK.
 9. Check idle before follow-up prompts so text is not injected into a busy agent.
@@ -65,7 +70,8 @@ COMMS=interlateral_dna/comms.md
 House sessions:
 - Claude Code: `ia-claude`
 - Codex: `ia-codex`
-- Gemini base: `ia-gemini`
+- Optional Gemini base: `ia-gemini`
+- Optional Antigravity CLI: `ia-agy`
 
 ## CLI Comms Quick Path
 
@@ -74,8 +80,13 @@ Standard peer sends:
 ```bash
 node interlateral_dna/cc.js send "message to Claude"
 node interlateral_dna/codex.js send "message to Codex"
-node interlateral_dna/gemini.js send "message to Gemini"
+node interlateral_dna/gemini.js send "message to Gemini"               # opt-in only
+node interlateral_dna/agy.js send "message to the Antigravity CLI peer" # opt-in only
 ```
+
+The Antigravity CLI peer (`ia-agy`) joins via the `agy-cli-peer` skill. Its TUI
+submits on a plain `Enter`, so `agy.js` does not use the Codex Escape-then-Enter
+pattern.
 
 Arbitrary session sends:
 
@@ -109,7 +120,8 @@ From any mesh peer:
 ```bash
 node interlateral_dna/cc.js send "message to Claude"
 node interlateral_dna/codex.js send "message to Codex"
-node interlateral_dna/gemini.js send "message to Gemini"
+node interlateral_dna/gemini.js send "message to Gemini"               # opt-in only
+node interlateral_dna/agy.js send "message to the Antigravity CLI peer" # opt-in only
 ```
 
 For nonstandard sessions, source the helper library and use the logged helpers:

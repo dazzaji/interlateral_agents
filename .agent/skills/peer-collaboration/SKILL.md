@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: light
-compatibility: Any two agents (CC, CX, GM, AG)
+compatibility: Default pair is Claude Code + Codex. Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Peer Collaboration
@@ -15,6 +15,10 @@ compatibility: Any two agents (CC, CX, GM, AG)
 Two agents work together as equals to co-create a single artifact. They take turns proposing, reacting, and refining until both agree the work is complete.
 
 Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
+Default roster: use Claude Code and Codex peers. Do not substitute or add
+Gemini CLI, Antigravity CLI, or Antigravity Desktop unless the human prompt
+explicitly names that peer.
 
 ## Roles
 
@@ -66,7 +70,7 @@ Build a todo API spec. Use peer-collaboration. CC + CX.
 ### With output:
 ```
 Use peer-collaboration to write a haiku about recursion.
-CC is PEER_A, GM is PEER_B.
+CC is PEER_A, CX is PEER_B.
 Output: projects/haiku/recursion.md
 ```
 

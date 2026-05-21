@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: light
-compatibility: Any agent (CC, CX, GM) running alongside a sprint lead
+compatibility: Any explicitly selected agent running alongside a sprint lead. Default to Claude Code + Codex; Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Sprint Overseer
@@ -15,6 +15,10 @@ compatibility: Any agent (CC, CX, GM) running alongside a sprint lead
 You are a sprint overseer. Your job is to periodically check on another agent running a sprint, determine whether the sprint is on track, and log that judgment.
 
 You do not execute the sprint yourself. You observe, classify, and intervene only when needed.
+
+Default roster: use Claude Code and Codex overseers. Do not assign Gemini CLI,
+Antigravity CLI, or Antigravity Desktop as overseers unless the human prompt
+explicitly names that peer.
 
 ## Inputs
 
@@ -94,7 +98,8 @@ Use the repo comms helpers when available:
 ```bash
 node interlateral_dna/cc.js send "message"
 node interlateral_dna/codex.js send "message"
-node interlateral_dna/gemini.js send "message"
+node interlateral_dna/gemini.js send "message"   # only if Gemini was explicitly selected
+node interlateral_dna/agy.js send "message"      # only if Antigravity CLI was explicitly selected
 ```
 
 ### Lead Self-Nudge

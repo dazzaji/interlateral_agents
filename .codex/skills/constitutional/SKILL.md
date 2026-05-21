@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: heavy
-compatibility: Three to five agents (CC, CX, GM, AG)
+compatibility: Three to five explicitly selected agents. Default to Claude Code + Codex peers; Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Constitutional
@@ -15,6 +15,10 @@ compatibility: Three to five agents (CC, CX, GM, AG)
 Create a structured, formal document (charter, constitution, specification) through federated co-authorship. Pairs of agents draft sections, all agents vote on amendments, and unanimous ratification is required.
 
 Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
+Default roster: use Claude Code and Codex peers. Do not include Gemini CLI,
+Antigravity CLI, or Antigravity Desktop unless the human prompt explicitly
+names that peer.
 
 ## Roles
 
@@ -74,7 +78,7 @@ All inputs come from the prompt.
 ```
 Use constitutional to create a Team Charter.
 LEAD=CC. Sections: Communication, Decisions, Conflict.
-Co-authors: Communication=[CC,CX], Decisions=[CX,GM], Conflict=[GM,CC].
+Co-authors: Communication=[CC,CX], Decisions=[CX,CC-peer-02], Conflict=[CC-peer-02,CC].
 ```
 
 ### With output:
@@ -82,7 +86,7 @@ Co-authors: Communication=[CC,CX], Decisions=[CX,GM], Conflict=[GM,CC].
 Use constitutional for Interlateral Protocol v1.0.
 Sections: Speed, Security, Reliability, UX.
 LEAD=CC.
-Co-authors: Speed=[CC,CX], Security=[CX,GM], Reliability=[GM,CC], UX=[GM,CX].
+Co-authors: Speed=[CC,CX], Security=[CX,CC-peer-02], Reliability=[CC-peer-02,CC], UX=[CC-peer-02,CX].
 Output: projects/protocol/charter.md
 ```
 
@@ -108,7 +112,7 @@ PRIORITY: Speed - real-time responsiveness
 RED LINE: p99 under 200ms
 CONCESSION: Accept eventual consistency for bulk operations
 
-[STATEMENT - GM]
+[STATEMENT - CC-peer-02]
 PRIORITY: Security - all communication authenticated
 RED LINE: No plaintext transmission
 CONCESSION: Can use faster algorithms where proven safe
@@ -118,7 +122,7 @@ CONCESSION: Can use faster algorithms where proven safe
 [LEAD - CC]
 Pairs assigned. Begin drafting:
 - Speed section: CC + CX
-- Security section: CX + GM
+- Security section: CX + CC-peer-02
 
 [DRAFT - Speed Section - CC & CX]
 ## Article 1: Speed
@@ -128,7 +132,7 @@ Pairs assigned. Begin drafting:
 
 === PHASE 3: CROSS-REVIEW ===
 
-[REVIEW - GM on Speed Section]
+[REVIEW - CC-peer-02 on Speed Section]
 [KEEP] 1.1 - Acceptable target
 [AMEND] 1.2 - Add "after security handshake complete"
 [KEEP] 1.3 - Agreed
@@ -138,7 +142,7 @@ Pairs assigned. Begin drafting:
 [AMENDMENT A1] Add "after security handshake" to 1.2
 [SUPPORT - CC]
 [SUPPORT - CX]
-[SUPPORT - GM]
+[SUPPORT - CC-peer-02]
 Amendment A1 ADOPTED (3/3)
 
 === PHASE 5: RATIFICATION ===
@@ -148,7 +152,7 @@ Final document ready. Calling for ratification.
 
 [RATIFY - CC]
 [RATIFY - CX]
-[RATIFY - GM]
+[RATIFY - CC-peer-02]
 
 [DONE] - Document ratified unanimously.
 ```
@@ -160,7 +164,7 @@ SKILL: constitutional
 STATUS: RATIFIED
 TURNS: 24
 OUTPUT: projects/protocol/charter.md
-PARTICIPANTS: CC (LEAD, Speed), CX (Speed, Security), GM (Security)
+PARTICIPANTS: CC (LEAD, Speed), CX (Speed, Security), CC-peer-02 (Security)
 VOTE: 3/3 RATIFY
 PARKING_LOT: None
 ```

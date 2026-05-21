@@ -1,10 +1,23 @@
 # Codex Guide
 
-You are Codex in the Interlateral Agents v0.1 repo.
+You are Codex in the Interlateral Agents v0.2.0 repo.
 
 If you are Claude Desktop or Codex Desktop joining this repo, first read and follow `.agent/skills/desktop-mesh-peer/SKILL.md`.
 
 If you are Claude Code or Codex CLI running inside Warp, first read `.agent/skills/warp-mesh-peer/SKILL.md` for the Warp-specific attach and comms rules.
+
+If you are the Antigravity CLI (`agy`) joining the mesh, first read `.agent/skills/agy-cli-peer/SKILL.md`. For the Antigravity desktop app, see `ANTIGRAVITY.md`.
+
+## Default Peer Policy
+
+The default live mesh is the two-agent Claude Code + Codex CLI duo launched by
+`init` / `me.sh`.
+
+Do not launch, recruit, assign work to, or rely on Gemini CLI, Antigravity CLI
+(`agy`), or the Antigravity desktop CDP path unless Dazza explicitly requests
+that peer or the current assignment names it. Their helper scripts are available
+for deliberate opt-in use; availability is not permission to include them in
+routine skills, reviews, or startup flows.
 
 ## Wake-Up Protocol
 
@@ -38,6 +51,12 @@ Send to Gemini:
 node interlateral_dna/gemini.js send "message"
 ```
 
+Send to the Antigravity CLI peer:
+
+```bash
+node interlateral_dna/agy.js send "message"
+```
+
 Observe peer terminals through the shared socket helpers in `scripts/tmux-config.sh`.
 
 For detailed transport mechanics, use the `mesh-comms-core` skill.
@@ -48,7 +67,7 @@ For detailed transport mechanics, use the `mesh-comms-core` skill.
 - Codex deployment copy: `.codex/skills/`
 - Human-readable index: `SKILLS.md`
 
-If the human names a skill, read its `SKILL.md` and follow it. Some heavier skills mention future systems that are not part of v0.1; do not silently implement those systems.
+If the human names a skill, read its `SKILL.md` and follow it. Some heavier skills mention future systems that are not part of the current release target; do not silently implement those systems.
 
 ## Identity Stamping
 
@@ -64,10 +83,14 @@ This keeps peer traffic legible in `interlateral_dna/comms.md`.
 ## Shared-House Rule
 
 Work fully inside the repo for the assigned task. Do not widen scope on your own. In particular, do not add:
-- AG / browser transports
+- new browser/CDP transports beyond the existing `ag.js` Antigravity desktop path
 - courier
 - unsupported mesh launchers outside the repo's local tmux helpers
 - dashboard code
 - product/platform/GCP code
 
-If a task points outside the v0.1 starter boundary, flag it before proceeding.
+The Antigravity CLI (`agy`) mesh peer and the Antigravity desktop `ag.js` CDP
+path are in scope (see `ANTIGRAVITY.md`). They were explicitly approved and are
+not the "browser transport" expansion this rule guards against.
+
+If a task points outside the current starter boundary, flag it before proceeding.

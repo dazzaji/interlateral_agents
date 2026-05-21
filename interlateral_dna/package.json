@@ -1,7 +1,7 @@
 {
   "name": "interlateral-dna",
-  "version": "0.1.0",
-  "description": "Direct tmux comms control scripts for Interlateral Agents v0.1",
+  "version": "0.2.0",
+  "description": "Direct tmux comms control scripts for Interlateral Agents v0.2",
   "main": "cc.js",
   "scripts": {
     "cc:status": "node cc.js status",
@@ -20,5 +20,9 @@
   "license": "Apache-2.0",
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "puppeteer-core": "24.43.1",
+    "ws": "8.20.1"
   }
 }

@@ -1,8 +1,29 @@
 # ROADMAP — Interlateral Agents
 
-Current: **v0.1** (duo launcher + peer helpers + Skills + live comms + basic logs)
+Current release target: **v0.2.0** (duo launcher + opt-in peer helpers + Skills + live comms + basic logs)
 
-Everything below is intentionally excluded from v0.1. Nothing has been dropped.
+Default startup remains the two-agent Claude Code + Codex mesh. Gemini CLI,
+Antigravity CLI, and Antigravity desktop control are opt-in peers, not default
+bootstrap capacity.
+
+## Delivered Since The v0.1 Baseline
+
+### Antigravity Integration — DELIVERED (pending release tag, 2026-05-20)
+Delivered:
+- interlateral_dna/agy.js + `agy-cli-peer` skill — Antigravity CLI (`agy`) as a
+  native mesh peer; the recommended opt-in Antigravity path
+- scripts/launch-agy-peer.sh — peer launcher
+- interlateral_dna/ag.js — Antigravity desktop-app CDP control (send / read /
+  status / screenshot / watch); the fallback opt-in path
+- ANTIGRAVITY.md — documents both transports
+
+Default `init` / `me.sh` startup remains unchanged and does not include
+Antigravity.
+
+## Deferred / Excluded From v0.2.0
+
+Everything below is intentionally excluded from the current release target.
+Nothing has been dropped.
 
 ---
 
@@ -28,7 +49,16 @@ Everything below is intentionally excluded from v0.1. Nothing has been dropped.
 - Event types: session/agent lifecycle, message sent/received, skill lifecycle, operational state (blocked, degraded, timeout, failed), approval workflow (requested, granted, denied)
 - Why deferred: comms.md is the v0.1 log
 
-### 1.5 docs/ARTIFACT_MODEL.md
+### 1.5 Direct-Send Readiness Guards
+- Move `cc.js`, `codex.js`, and `gemini.js` toward explicit readiness fields
+  and fail-closed default sends, with a deliberate `--force` override
+- Preserve current operator escape hatches while preventing large prompts from
+  being pasted into stale panes such as shells, editors, pagers, or crashed TUIs
+- Why deferred: this changes long-standing direct-send behavior and needs a
+  focused compatibility pass across the existing Claude+Codex mesh before it is
+  safe for current users
+
+### 1.6 docs/ARTIFACT_MODEL.md
 - First-class artifact model: typed, indexed, attributable outputs
 - Session packages at .observability/sessions/<session-id>/
 - Link-not-copy, retention policy, export-to-archive
@@ -43,7 +73,9 @@ Everything below is intentionally excluded from v0.1. Nothing has been dropped.
 - mesh.sh (full quad with AG)
 - preflight-mesh.sh (formal mode with eval hooks)
 - bootstrap-full.sh and bootstrap-cli.sh
-- Why deferred: peer helpers cover manual expansion for now
+- Why deferred: peer helpers cover manual expansion for now, and Gemini/AG
+  should remain special opt-in peers until Dazza explicitly wants wider default
+  mesh launchers
 
 ### 2.2 Worker-Pool Normalization
 - Standardize peer-pool conventions across Codex and Gemini
@@ -132,6 +164,16 @@ The following reusable skills were removed from the v0.1 catalog and are deferre
 - scripts/export-session.sh for portable archives
 - Depends on: ARTIFACT_MODEL.md, event stream
 
+### 4.6 Runtime Log Retention and Cleanup
+- Move per-session pipe-pane logs out of `interlateral_dna/` into an ignored
+  run-scoped runtime directory such as `.runtime/runs/<run-id>/`
+- Add `scripts/rotate-logs.sh` or equivalent retention cleanup for large local
+  logs, with a clear default retention policy
+- Document log privacy and cleanup in `TROUBLESHOOTING.md`
+- Why deferred: current logs are ignored but can grow large (local audits saw
+  about 1GB under `interlateral_dna/`); the retention policy needs a deliberate
+  owner decision before implementation
+
 ---
 
 ## 5. Evals and Quality
@@ -178,16 +220,15 @@ The following reusable skills were removed from the v0.1 catalog and are deferre
 
 ## 7. AG and Browser-Based Agents
 
-### 7.1 AG CDP Transport
-- interlateral_dna/ag.js (puppeteer-core, port 9222, iframe injection)
-- ANTIGRAVITY.md
-- Why deferred: most complex transport, not needed for CLI-first workflow
+### 7.1 AG Telemetry and Observation
+- ag.js already includes basic `watch` and `screenshot`; a structured
+  telemetry/observation layer (dashboards, event stream) remains deferred
+- Why deferred: depends on the structured event stream (section 6)
 
-### 7.2 AG Telemetry and Observation
-- AG-specific telemetry watcher, screenshots, log integration
-
-### 7.3 Full Quad-Agent Bootstrap
+### 7.2 Full Quad-Agent Bootstrap
 - AG in bootstrap-full.sh, health checks, graceful degradation
+- Keep deferred unless Dazza explicitly decides AG should become standard
+  startup capacity.
 
 ---
 

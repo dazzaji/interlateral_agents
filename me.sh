@@ -225,10 +225,10 @@ fi
 echo "Waiting for Claude idle prompt..."
 if prepare_claude_for_boot "$CLAUDE_SESSION" 30; then
     echo "Claude prompt detected, injecting boot context..."
-    agent_send "$CLAUDE_SESSION" "$CLAUDE_PROMPT"
+    claude_send_long "$CLAUDE_SESSION" "$CLAUDE_PROMPT" "claude_boot_${LAUNCH_SESSION_ID}_$$"
 else
     echo "Warning: Claude prompt not detected, attempting injection anyway..."
-    agent_send "$CLAUDE_SESSION" "$CLAUDE_PROMPT"
+    claude_send_long "$CLAUDE_SESSION" "$CLAUDE_PROMPT" "claude_boot_${LAUNCH_SESSION_ID}_$$"
 fi
 
 echo

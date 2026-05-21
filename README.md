@@ -1,6 +1,6 @@
 # Interlateral Agents
 
-Interlateral Agents v0.1 is a small, working multi-agent starter repo built around the `init` skill. It gives you a fast Claude Code + Codex duo, peer helpers for adding more CLI agents on the same tmux socket, a canonical skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
+Interlateral Agents v0.2.0 is a small, working multi-agent starter repo built around the `init` skill. It gives you a fast Claude Code + Codex duo, opt-in peer helpers for adding more CLI agents on the same tmux socket, a canonical skill catalog, direct live comms with identity stamping, and a simple `interlateral_dna/comms.md` session ledger.
 
 ## Prerequisites
 
@@ -8,11 +8,14 @@ Interlateral Agents v0.1 is a small, working multi-agent starter repo built arou
 - `tmux`
 - `claude`
 - `codex`
-- `gemini` if you want Gemini peer sessions
+- Optional: `gemini` for manually selected Gemini peer sessions
+- Optional: `agy` for manually selected Antigravity CLI peer sessions
 
 ## Security Notice
 
 The launcher used by `init` starts agents in fully permissive mode (`--dangerously-skip-permissions` for Claude Code, `--dangerously-bypass-approvals-and-sandbox` for Codex). This disables all safety prompts and approval gates. Only run it in environments and on codebases where you accept that risk.
+
+Optional peer launchers use the same trust model. Gemini CLI and Antigravity CLI peers are powerful local agents once launched; only add them when you have deliberately chosen them for the task.
 
 ## Quick Start
 
@@ -58,6 +61,8 @@ The `init` skill runs the standard launcher underneath and brings up:
 Under the hood, `init` runs `./me.sh`. The script prints CLI versions and the exact Claude/Codex commands before launch, performs the ACK handshake, and waits for both peers to print `Reporting for Duty!`.
 
 Direct peer injection is the live comms path. `interlateral_dna/comms.md` is the audit ledger, not the wake-up channel.
+
+`init` / `me.sh` do not launch Gemini, Antigravity CLI, Antigravity Desktop, or desktop inbox peers. Those are opt-in expansions.
 
 ## Warp Quick Start
 
@@ -106,6 +111,8 @@ For maximum manual control, run the working-team patterns directly yourself. You
 - `dev-collaboration` for a focused Drafter / Reviewer / Breaker workflow
 - `peer-collaboration` for two agents iterating as equals
 - `dev-competition` when you want independent implementations and a judge
+
+Unless the human prompt explicitly selects otherwise, collaboration skills should build their roster from Claude Code and Codex peers. Gemini CLI, Antigravity CLI, and Antigravity Desktop are special opt-in participants, not default capacity.
 
 For long-running, complex, or high-stakes sprints in any mode, layer `sprint-overseer` on top. A team of overseer agents periodically reviews current sprint progress, confirms when work is on track, and nudges or intervenes when it drifts. It also writes a sprint-local log of progress, drift, interventions, major problems, and closeout evidence. See Sprint Overseer Recipe below for invocation.
 
@@ -158,13 +165,24 @@ source ~/.zshrc
 
 ## Adding More Agents
 
-Launch more peers on the same socket:
+The default mesh is still Claude Code + Codex. Add peers only when the task needs
+them and the human has selected them.
+
+Launch additional Claude or Codex peers on the same socket:
 
 ```bash
 scripts/launch-codex-peer.sh
 scripts/launch-cc-peer.sh
-scripts/launch-gemini-peer.sh
 ```
+
+Advanced opt-in peers:
+
+```bash
+scripts/launch-gemini-peer.sh
+scripts/launch-agy-peer.sh
+```
+
+Antigravity has two paths: the CLI peer (`scripts/launch-agy-peer.sh`, `interlateral_dna/agy.js`) is the normal opt-in path; the desktop-app CDP helper (`interlateral_dna/ag.js`) is a fallback for cases where the visible desktop app specifically must be controlled. See `ANTIGRAVITY.md`.
 
 Send a follow-up prompt to a Codex peer:
 
@@ -217,6 +235,7 @@ The comms setup is now split into focused skills:
 - `init` launches only the standard two-agent CLI mesh with `me.sh` underneath.
 - `mesh-comms-core` documents the transport substrate: tmux socket, direct-send helpers, `comms.md` ledger, identity stamping, safe TUI submission, idle checks, and ACK proof.
 - `desktop-mesh-peer` joins Claude Desktop or Codex Desktop separately with its own inbox session and nonce ACK proof.
+- `agy-cli-peer` joins Antigravity CLI as an explicitly selected native CLI peer.
 - `warp-mesh-peer` opens Claude Code and Codex CLI as Warp-visible tmux peers while keeping the same mesh transport.
 
 Collaboration-pattern skills now treat `comms.md` as the ledger rather than the wake-up path. Use direct helper scripts such as `node interlateral_dna/cc.js send "message"` and let the helpers mirror stamped entries into `interlateral_dna/comms.md`.
@@ -262,4 +281,11 @@ See `TROUBLESHOOTING.md`.
 
 ## Roadmap
 
-Everything intentionally excluded from v0.1 is tracked in `ROADMAP.md`.
+Everything intentionally excluded from the current release target is tracked in `ROADMAP.md`.
+
+## Release Versioning
+
+When this Antigravity integration is merged, cut a GitHub release and keep the
+repo version references aligned. This change adds a new opt-in peer family, so
+the chosen release target is `v0.2.0`; the GitHub release tag and in-repo
+metadata should match that version.

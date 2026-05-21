@@ -22,6 +22,11 @@ Available: [list agents]
 
 Do not attempt a degraded single-implementer run.
 
+Default roster: use Claude Code and Codex peers, including additional launched
+Claude/Codex peers when needed. Do not use Gemini CLI, Antigravity CLI, or
+Antigravity Desktop as an implementer or judge unless the human explicitly
+selects that peer.
+
 ## Required Parameters
 
 | Parameter | Description |
@@ -91,7 +96,8 @@ Posting to `comms.md` alone does NOT wake agents. You must:
 2. Send via injection (to actually deliver):
    - To CC: `node interlateral_dna/cc.js send "message"`
    - To Codex: `node interlateral_dna/codex.js send "message"`
-   - To Gemini: `node interlateral_dna/gemini.js send "message"`
+   - To Gemini, only when explicitly selected: `node interlateral_dna/gemini.js send "message"`
+   - To Antigravity CLI, only when explicitly selected: `node interlateral_dna/agy.js send "message"`
 
 During the parallel implementation phase:
 - Implementers must NOT post detailed progress to `comms.md`
@@ -269,9 +275,9 @@ competition_dir: projects/experiments/auth_implementation/
 requirement_path: projects/specs/auth-middleware-spec.md
 
 Assign roles:
-- Implementer A: CC
-- Implementer B: Gemini
-- Judge: Codex
+- Implementer A: claude-peer-01
+- Implementer B: codex-peer-01
+- Judge: codex
 
 Start Phase 1 setup, then dispatch to implementers.
 ```
@@ -286,7 +292,7 @@ Do NOT post implementation details to comms.md.
 Signal when complete via injection.
 ```
 
-**Lead sends to Implementer B (Gemini) via `node interlateral_dna/gemini.js send`:**
+**Lead sends to Implementer B (Codex peer) via `node interlateral_dna/codex.js send`:**
 ```
 You are Implementer B in a dev-competition.
 Read: projects/specs/auth-middleware-spec.md

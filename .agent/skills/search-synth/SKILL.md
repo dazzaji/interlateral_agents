@@ -32,12 +32,17 @@ agents:
   - name: Codex
     role: SEARCHER
     can_search: true
-    search_tool: web.run
-  - name: Gemini
+    search_tool: <declared web-search tool>
+  - name: Codex-peer-02
     role: SEARCHER
     can_search: true
-    search_tool: google_web_search
+    search_tool: <declared web-search tool>
 ```
+
+Default roster: use Claude Code and Codex peers. Gemini CLI, Antigravity CLI,
+and Antigravity Desktop may participate only when the human explicitly selects
+them for this search run. Do not add them merely because they have a helper or
+search capability.
 
 ### Pre-flight Check (Mandatory)
 
@@ -230,8 +235,8 @@ Topic: "What is retrieval-augmented generation (RAG)?"
 Output: projects/research/rag-synthesis.md
 Agents:
   - CC (MANAGER, no search)
-  - Codex (SEARCHER, web.run)
-  - Gemini (SEARCHER, google_web_search)
+  - Codex (SEARCHER, declared web-search tool)
+  - Codex-peer-02 (SEARCHER, declared web-search tool)
 Chief author: CC
 ```
 
@@ -242,7 +247,7 @@ Topic: "History of computational law"
 Output: projects/research/complaw-history.md
 Agents:
   - CC (MANAGER + CHIEF_AUTHOR, no search)
-  - Gemini (SEARCHER, google_web_search)
+  - Codex (SEARCHER, declared web-search tool)
   - CC-instance-2 (SEARCHER, brave_web_search via MCP)
 ```
 

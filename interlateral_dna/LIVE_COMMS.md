@@ -1,6 +1,6 @@
-# LIVE COMMS: Interlateral Agents v0.1
+# LIVE COMMS: Interlateral Agents v0.2.0
 
-This is the canonical reference for direct comms in the starter-scope repo. v0.1 is CLI-first and tmux-first: Claude Code, Codex, and Gemini CLI all communicate by injecting directly into each other's tmux panes.
+This is the canonical reference for direct comms in the starter-scope repo. The current release is CLI-first and tmux-first. The default mesh is Claude Code + Codex; optional peers such as Gemini CLI and Antigravity CLI also communicate by injecting directly into tmux panes when Dazza explicitly selects them.
 
 ## Skill Map
 
@@ -28,7 +28,7 @@ Pane text alone does not count. A message typed or drafted in an agent terminal 
 - Claude Code: `ia-claude` with `claude-opus-4-7` unless `CLAUDE_MODEL` overrides it
 - Codex: `ia-codex` with `gpt-5.5` unless `CODEX_MODEL` overrides it
 
-Gemini CLI is available via `scripts/launch-gemini-peer.sh` and uses session names like `ia-gemini-peer-NN`.
+Gemini CLI is available via `scripts/launch-gemini-peer.sh` and uses session names like `ia-gemini-peer-NN`, but it is an opt-in peer. Antigravity CLI is available via `scripts/launch-agy-peer.sh` / `interlateral_dna/agy.js` and is also opt-in. Do not recruit either for routine skills unless the assignment names that peer.
 
 Warp-visible CLI peers use:
 
@@ -42,11 +42,14 @@ These values are defined in `scripts/tmux-config.sh`.
 
 ## Send Matrix
 
-| Sender | Claude | Codex | Gemini |
-|---|---|---|---|
-| Claude | self | `node interlateral_dna/codex.js send "msg"` | `node interlateral_dna/gemini.js send "msg"` |
-| Codex | `node interlateral_dna/cc.js send "msg"` | self | `node interlateral_dna/gemini.js send "msg"` |
-| Gemini | `node interlateral_dna/cc.js send "msg"` | `node interlateral_dna/codex.js send "msg"` | self |
+Gemini and Antigravity entries are shown for explicitly selected peers only.
+
+| Sender | Claude | Codex | Gemini | Antigravity CLI |
+|---|---|---|---|---|
+| Claude | self | `node interlateral_dna/codex.js send "msg"` | `node interlateral_dna/gemini.js send "msg"` | `node interlateral_dna/agy.js send "msg"` |
+| Codex | `node interlateral_dna/cc.js send "msg"` | self | `node interlateral_dna/gemini.js send "msg"` | `node interlateral_dna/agy.js send "msg"` |
+| Gemini | `node interlateral_dna/cc.js send "msg"` | `node interlateral_dna/codex.js send "msg"` | self | `node interlateral_dna/agy.js send "msg"` |
+| Antigravity CLI | `node interlateral_dna/cc.js send "msg"` | `node interlateral_dna/codex.js send "msg"` | `node interlateral_dna/gemini.js send "msg"` | self |
 
 ## Desktop Peers
 
@@ -142,7 +145,7 @@ If a peer does not respond:
 2. Confirm the pane is running the agent CLI, not an idle shell.
 3. Re-send via the control script instead of raw tmux.
 
-If a launcher helper creates a new peer, it should join the same socket and use the same control scripts. There is no courier fallback in v0.1.
+If a launcher helper creates a new peer, it should join the same socket and use the same control scripts. There is no courier fallback in the current release.
 
 ---
 
@@ -178,7 +181,7 @@ For long or multi-line Claude prompts, use tmux's paste buffer followed by `C-m`
 
 ```bash
 printf '%s' "$prompt" | tmux load-buffer -
-tmux paste-buffer -t "$SESSION"
+tmux paste-buffer -r -t "$SESSION"
 sleep 0.3
 tmux send-keys -t "$SESSION" C-m
 ```
@@ -328,6 +331,7 @@ All agents in this system run in full-permissions, no-sandbox mode by default. T
 | Claude Code | `--dangerously-skip-permissions` | `me.sh` |
 | Codex | `--dangerously-bypass-approvals-and-sandbox` | `me.sh`, `scripts/launch-codex-peer.sh` |
 | Gemini CLI | `--approval-mode=auto_edit` | `scripts/launch-gemini-peer.sh` |
+| Antigravity CLI | `--dangerously-skip-permissions` | `scripts/launch-agy-peer.sh` |
 
 **General CLI equivalents (for manual or headless use):**
 
@@ -336,6 +340,7 @@ All agents in this system run in full-permissions, no-sandbox mode by default. T
 | Claude Code | `--dangerously-skip-permissions` (only option) |
 | Codex | `--dangerously-bypass-approvals-and-sandbox` |
 | Gemini CLI | `-y` (yolo) or `--approval-mode=auto_edit` |
+| Antigravity CLI | `--dangerously-skip-permissions` |
 
 These flags are required for unattended multi-agent operation. Without them, agents will block on permission prompts that no one is there to approve. When launching agents manually or in headless mode, use the flags shown above.
 
@@ -346,6 +351,7 @@ These flags are required for unattended multi-agent operation. Without them, age
 | Claude Code | Opus 4.7 | `me.sh` specifies `--model claude-opus-4-7` by default |
 | Codex | gpt-5.5 | `me.sh` specifies `-m gpt-5.5` by default |
 | Gemini CLI | gemini-3.1-pro-preview | Specify with `-m gemini-3.1-pro-preview` |
+| Antigravity CLI | Gemini 3.5 Flash | Provided by `agy`; launch via `scripts/launch-agy-peer.sh` when explicitly selected |
 
 ### Available Model Variants
 
@@ -401,6 +407,15 @@ Other models are available for specific use cases. Requirements from the user or
 | Headless one-shot | `gemini -m gemini-3.1-pro-preview -p "task"` |
 | Resume session | `gemini -m gemini-3.1-pro-preview --resume latest` |
 
+**Antigravity CLI (`agy`, opt-in only):**
+
+| Mode | Command |
+|------|---------|
+| Persistent mesh peer | `scripts/launch-agy-peer.sh [session-name]` |
+| Manual interactive peer | `agy -i "prompt" --dangerously-skip-permissions --add-dir /path/to/repo` |
+| Send to peer | `node interlateral_dna/agy.js send "message"` |
+| Status/read peer | `node interlateral_dna/agy.js status` / `node interlateral_dna/agy.js read` |
+
 ## Split Boot Strategy
 
 Different CLIs require different boot strategies. This repo's launchers implement these:
@@ -410,8 +425,12 @@ Different CLIs require different boot strategies. This repo's launchers implemen
 | Codex | Bare launch, wait for `›` idle prompt, then inject with `agent_send_long` | Long or multi-line CLI-arg prompts can be truncated or stranded in the shell/TUI path |
 | Claude Code | Bare launch, wait for `❯` idle prompt, then inject | Claude's heavier TUI startup can truncate/mangle long CLI-arg prompts |
 | Gemini CLI | Bare launch with `--approval-mode=auto_edit`, wait for idle, then inject via `agent_send_long_delayed` with 1s delay | Gemini needs the delay between paste and submit; `launch-gemini-peer.sh` handles this |
+| Antigravity CLI | Launch `agy -i` through `scripts/launch-agy-peer.sh`; send through `agy.js` with plain `Enter` submit and foreground-process readiness checks | Antigravity's TUI differs from Codex/Gemini and must not receive the generic Escape-then-Enter path |
 
 If building launchers or dispatching new peer agents, test the boot path independently — do not assume all CLIs behave the same at startup.
+
+For Antigravity-specific setup, trust boundaries, and desktop-app CDP fallback
+details, use `ANTIGRAVITY.md` and the `agy-cli-peer` skill.
 
 ## Reading Worker Output
 

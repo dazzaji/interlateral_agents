@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: medium
-compatibility: Two to four agents (CC, CX, GM, AG)
+compatibility: Two to four explicitly selected agents. Default to Claude Code + Codex peers; Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Hierarchical
@@ -15,6 +15,10 @@ compatibility: Two to four agents (CC, CX, GM, AG)
 A structured delegation pattern where a boss agent assigns work to worker agents, reviews their output, and makes final approval decisions. Clear chain of command.
 
 Use `mesh-comms-core` first if direct worker notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
+Default roster: use Claude Code and Codex peers. Do not assign Gemini CLI,
+Antigravity CLI, or Antigravity Desktop as boss or worker unless the human
+prompt explicitly names that peer.
 
 ## Roles
 
@@ -78,7 +82,7 @@ All inputs come from the prompt.
 ### Minimal:
 ```
 Use hierarchical to build a landing page.
-CC is BOSS. CX and GM are WORKERs.
+CC is BOSS. CX and CC-peer-02 are WORKERs.
 ```
 
 ### With specific tasks:
@@ -86,7 +90,7 @@ CC is BOSS. CX and GM are WORKERs.
 Use hierarchical for code review workflow.
 BOSS=CC (Tech Lead).
 WORKER=CX (implements feature).
-WORKER=GM (writes tests).
+WORKER=CC-peer-02 (writes tests).
 Output: projects/feature/implementation.md
 ```
 
@@ -103,7 +107,7 @@ Output: projects/feature/implementation.md
 Project: Create a press release for our new AI product.
 
 @CX: Write the headline and first paragraph (hook)
-@GM: Write the product details and features section
+@CC-peer-02: Write the product details and features section
 
 ACCEPTANCE CRITERIA:
 - Compelling headline (under 10 words)
@@ -120,7 +124,7 @@ where AI systems work together like a real team.
 
 NOTES: Went for impact over cleverness.
 
-[SUBMIT - GM]
+[SUBMIT - CC-peer-02]
 TASK: Product details and features
 DELIVERABLE:
 ## Key Features
@@ -133,9 +137,9 @@ NOTES: Kept it to three as requested.
 
 [REVIEW - CC (BOSS)]
 @CX: [APPROVE] - Headline is strong. Good hook.
-@GM: [REVISE] - Add one more feature about safety/reliability.
+@CC-peer-02: [REVISE] - Add one more feature about safety/reliability.
 
-[SUBMIT - GM]
+[SUBMIT - CC-peer-02]
 TASK: Revised features
 DELIVERABLE:
 ## Key Features
@@ -148,7 +152,7 @@ DELIVERABLE:
 NOTES: Added safety feature as requested.
 
 [REVIEW - CC (BOSS)]
-@GM: [APPROVE] - Perfect.
+@CC-peer-02: [APPROVE] - Perfect.
 
 [DONE] - All work approved. Compiling final document.
 ```
@@ -160,7 +164,7 @@ SKILL: hierarchical
 STATUS: DONE
 TURNS: 6
 OUTPUT: projects/press/release.md
-PARTICIPANTS: CC (BOSS), CX (WORKER), GM (WORKER)
+PARTICIPANTS: CC (BOSS), CX (WORKER), CC-peer-02 (WORKER)
 SUBMISSIONS: 3
 APPROVALS: 3
 REVISIONS: 1

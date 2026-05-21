@@ -29,6 +29,16 @@ Every desktop peer must:
 
 Desktop peers are full mesh peers, but they are manually joined peers. The standard `init` skill only launches the CLI duo.
 
+Default peer policy: desktop peers are opt-in. Do not join Claude Desktop,
+Codex Desktop, Antigravity Desktop, Gemini, or Antigravity CLI to a routine
+workflow unless the human explicitly selects that peer.
+
+Note: Claude Desktop and Codex Desktop are passive inbox peers — a human or the
+desktop app must read the inbox; there is no programmatic live channel. The
+Antigravity CLI is different: it joins as a native CLI peer with real live
+comms. To put Antigravity on the mesh, use the `agy-cli-peer` skill, not this
+one. See `ANTIGRAVITY.md` for the full picture.
+
 ## Identity Choices
 
 Use stable sender identities:
@@ -66,7 +76,7 @@ Desktop peers should send to CLI peers with the same helper scripts:
 ```bash
 node interlateral_dna/cc.js send "message to Claude CLI"
 node interlateral_dna/codex.js send "message to Codex CLI"
-node interlateral_dna/gemini.js send "message to Gemini CLI"
+node interlateral_dna/gemini.js send "message to Gemini CLI" # only if Gemini was explicitly selected
 ```
 
 Set sender identity before sending when possible:

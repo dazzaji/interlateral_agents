@@ -18,6 +18,10 @@ This skill starts exactly the standard duo:
 - Claude Code in `ia-claude`
 - Codex in `ia-codex`
 
+It does not launch Gemini CLI, Antigravity CLI, Antigravity Desktop, desktop
+inbox peers, or extra workers. Those peers are opt-in only when Dazza explicitly
+selects them outside the standard init flow.
+
 The agent running this skill is the bootstrap operator. It is not a mesh peer and should not claim a mesh identity.
 
 ## Boundaries
@@ -26,6 +30,7 @@ Do not use this skill for:
 - desktop peers
 - quartet teams
 - extra workers
+- Gemini or Antigravity peers
 - sprint role assignment
 - long-running collaboration patterns
 

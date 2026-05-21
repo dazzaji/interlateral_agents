@@ -13,6 +13,9 @@ fi
 
 for target in "${TARGET_DIRS[@]}"; do
     mkdir -p "$target"
+    if find "$target" -mindepth 1 -maxdepth 1 | grep -q .; then
+        echo "Replacing deployed skill mirror: $target"
+    fi
     find "$target" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
     while IFS= read -r skill_dir; do
         cp -R "$skill_dir" "$target/"

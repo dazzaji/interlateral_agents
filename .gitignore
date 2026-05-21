@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 package-lock.json
+# but track the interlateral_dna lockfile so the ag.js CDP dependency
+# (puppeteer-core) resolves reproducibly
+!interlateral_dna/package-lock.json
 
 # Environment
 .env
@@ -15,9 +18,14 @@ interlateral_dna/**/working_files/
 # Runtime logs and ledgers
 interlateral_dna/comms.md
 interlateral_dna/*.log
+interlateral_dna/ag_log.md
 .claude/scheduled_tasks.lock
 .runtime/
 .observability/
+
+# Antigravity CLI / desktop runtime state (local only, not versioned)
+.gemini/
+.antigravitycli/
 
 # Python
 __pycache__/

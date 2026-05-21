@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: medium
-compatibility: Three or more agents (CC, CX, GM, AG)
+compatibility: Three or more explicitly selected agents. Default to Claude Code + Codex peers; Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Democratic
@@ -15,6 +15,10 @@ compatibility: Three or more agents (CC, CX, GM, AG)
 A collaborative pattern where all agents have equal standing. Proposals are discussed openly and decisions are made by majority vote. No single agent has veto power.
 
 Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
+Default roster: use Claude Code and Codex peers. Do not include Gemini CLI,
+Antigravity CLI, or Antigravity Desktop unless the human prompt explicitly
+names that peer.
 
 ## Roles
 
@@ -74,13 +78,13 @@ All inputs come from the prompt.
 ### Minimal:
 ```
 Use democratic to decide on project priorities.
-Members: CC, CX, GM.
+Members: CC, CX, CC-peer-02.
 ```
 
 ### With facilitator:
 ```
 Use democratic for team retrospective.
-FACILITATOR=CC. Members: CC, CX, GM.
+FACILITATOR=CC. Members: CC, CX, CC-peer-02.
 Items: What went well, What to improve, Action items.
 Output: projects/retro/decisions.md
 ```
@@ -104,7 +108,7 @@ TITLE: Focus on Performance
 DESCRIPTION: Spend next sprint on optimization and benchmarking
 RATIONALE: Users complaining about slow load times
 
-[PROPOSAL - GM] #2
+[PROPOSAL - CC-peer-02] #2
 TITLE: Focus on Security Audit
 DESCRIPTION: Review and harden authentication/authorization
 RATIONALE: We're handling sensitive data, need to be proactive
@@ -117,7 +121,7 @@ Security is critical but less visible until it's a problem.
 Security audit could be done by external team.
 Performance needs our specific codebase knowledge.
 
-[DISCUSSION - GM]
+[DISCUSSION - CC-peer-02]
 External audit is expensive. We know our code best.
 But I see the performance point.
 
@@ -129,14 +133,14 @@ REASON: Direct user impact, measurable improvement
 [YES - CX] on #1
 REASON: I proposed it, still believe it's priority
 
-[NO - GM] on #1
+[NO - CC-peer-02] on #1
 REASON: Security should come first, but I accept the group decision
 
 RESULT: #1 PASSES (2-1)
 
 [FACILITATOR - CC]
 Performance focus approved for next sprint.
-GM, we'll schedule security audit for sprint after next.
+CC-peer-02, we'll schedule security audit for sprint after next.
 
 [DONE] - All agenda items resolved.
 ```
@@ -148,7 +152,7 @@ SKILL: democratic
 STATUS: DONE
 TURNS: 10
 OUTPUT: projects/sprint/decisions.md
-PARTICIPANTS: CC, CX, GM
+PARTICIPANTS: CC, CX, CC-peer-02
 PROPOSALS: 2
 VOTES_HELD: 1
 DECISIONS_MADE: 1

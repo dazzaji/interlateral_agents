@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: medium
-compatibility: Three or more agents (CC, CX, GM, AG)
+compatibility: Three or more explicitly selected agents. Default to Claude Code + Codex peers; Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Negotiation
@@ -15,6 +15,10 @@ compatibility: Three or more agents (CC, CX, GM, AG)
 Multiple agents, each advocating for a different priority, negotiate to reach a consensus. No agent has authority; all must agree through trade-offs and compromise.
 
 Use `mesh-comms-core` first if direct peer notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
+Default roster: use Claude Code and Codex peers. Do not include Gemini CLI,
+Antigravity CLI, or Antigravity Desktop unless the human prompt explicitly
+names that peer.
 
 ## Roles
 
@@ -74,13 +78,13 @@ All inputs come from the prompt.
 ### Minimal:
 ```
 Use negotiation to decide on team meeting frequency.
-CC=Productivity, CX=Work-Life-Balance, GM=Collaboration.
+CC=Productivity, CX=Work-Life-Balance, CC-peer-02=Collaboration.
 ```
 
 ### With output:
 ```
 Use negotiation for authentication protocol design.
-CC advocates Reliability, CX advocates Speed, GM advocates Security.
+CC advocates Reliability, CX advocates Speed, CC-peer-02 advocates Security.
 Output: projects/auth/protocol.md
 ```
 
@@ -105,7 +109,7 @@ RATIONALE: Real-time feel is essential for UX
 RED LINE: p99 latency must stay under 200ms
 WILLING TO TRADE: Can accept eventual consistency for non-critical messages
 
-[ADVOCATE - GM]
+[ADVOCATE - CC-peer-02]
 PRIORITY: Security
 RATIONALE: Messages must be authenticated and encrypted
 RED LINE: No plaintext transmission
@@ -121,7 +125,7 @@ I OFFER: Accept at-least-once (may require dedup on client)
 I WANT: Fast path for messages under 1KB (skip some validation)
 RATIONALE: 90% of messages are small, can optimize the common case
 
-[CONSENT CHECK - GM]
+[CONSENT CHECK - CC-peer-02]
 Current proposal:
 - 150ms p99 target
 - At-least-once delivery
@@ -130,7 +134,7 @@ Current proposal:
 
 [CONSENT - CC]
 [CONSENT - CX]
-[CONSENT - GM]
+[CONSENT - CC-peer-02]
 
 [DONE] - Consensus reached.
 ```
@@ -142,6 +146,6 @@ SKILL: negotiation
 STATUS: DONE
 TURNS: 8
 OUTPUT: projects/auth/protocol.md
-PARTICIPANTS: CC (Reliability), CX (Speed), GM (Security)
+PARTICIPANTS: CC (Reliability), CX (Speed), CC-peer-02 (Security)
 CONSENSUS: Achieved
 ```

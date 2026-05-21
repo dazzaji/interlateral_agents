@@ -5,7 +5,7 @@ metadata:
   owner: interlateral
   version: "1.0"
   weight: heavy
-compatibility: Three or more agents (CC, CX, GM, AG)
+compatibility: Three or more explicitly selected agents. Default to Claude Code + Codex peers; Gemini and Antigravity are opt-in only when the human explicitly selects them.
 ---
 
 # Competition
@@ -15,6 +15,10 @@ compatibility: Three or more agents (CC, CX, GM, AG)
 Multiple agents independently create solutions to the same challenge. Judges evaluate the submissions blind (if possible) and select a winner. Encourages diverse approaches and best-idea-wins culture.
 
 Use `mesh-comms-core` first if direct competitor notification has not already been proven. `comms.md` is the ledger, not the wake-up path.
+
+Default roster: use Claude Code and Codex peers. Do not use Gemini CLI,
+Antigravity CLI, or Antigravity Desktop as competitors or judges unless the
+human prompt explicitly names that peer.
 
 ## Roles
 
@@ -102,7 +106,7 @@ All inputs come from the prompt.
 ### Minimal:
 ```
 Use competition to design a logo concept.
-Competitors: CX, GM.
+Competitors: CX, CC-peer-02.
 Judge: CC.
 ```
 
@@ -110,7 +114,7 @@ Judge: CC.
 ```
 Use competition for writing a product tagline.
 Competitors: CC, CX.
-Judges: GM.
+Judges: CC-peer-02.
 Criteria: Memorable, Clear, Under 8 words.
 Output: projects/marketing/tagline.md
 ```
@@ -118,8 +122,8 @@ Output: projects/marketing/tagline.md
 ### Multiple judges:
 ```
 Use competition for architecture proposal.
-Competitors: CC, GM.
-Judges: CX (technical), AG (business).
+Competitors: CC, CX.
+Judges: CC-peer-02 (technical), CX-peer-02 (business).
 Criteria: Scalability, Maintainability, Cost.
 Output: projects/arch/winner.md
 ```
@@ -157,8 +161,8 @@ ended with concrete value (six patterns).
 [ENTRY - CX]
 SUBMISSION:
 "What if AI agents could actually work together? Interlateral
-makes it happen. Our framework connects multiple AI systems—
-Claude, GPT, Gemini—into collaborative teams that tackle complex
+makes it happen. Our framework connects multiple AI systems
+into collaborative teams that tackle complex
 projects through natural conversation. Choose from battle-tested
 patterns like peer collaboration, competitive challenges, or
 democratic decision-making. Your AI team, your rules."
@@ -166,7 +170,7 @@ democratic decision-making. Your AI team, your rules."
 APPROACH: Started with a hook question, emphasized multi-vendor,
 ended with user empowerment.
 
-[SCORE - GM (JUDGE)]
+[SCORE - CC-peer-02 (JUDGE)]
 ENTRY: CC
 Clarity: 8/10 - Clear but "AI chaos" might confuse newcomers
 Compelling: 7/10 - Solid but a bit formal
@@ -200,7 +204,7 @@ STATUS: DONE
 TURNS: 8
 OUTPUT: projects/marketing/description.md
 COMPETITORS: CC, CX
-JUDGES: GM
+JUDGES: CC-peer-02
 WINNER: CX
 SCORES: CC=24, CX=26
 ```
