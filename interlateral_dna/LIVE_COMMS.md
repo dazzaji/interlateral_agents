@@ -1,6 +1,6 @@
 # LIVE COMMS: Interlateral Agents v0.2.0
 
-This is the canonical reference for direct comms in the starter-scope repo. The current release is CLI-first and tmux-first. The default mesh is Claude Code + Codex; optional peers such as Gemini CLI and Antigravity CLI also communicate by injecting directly into tmux panes when Dazza explicitly selects them.
+This is the canonical reference for direct comms in the starter-scope repo. The current release is CLI-first and tmux-first. The default mesh is Claude Code + Codex; optional peers such as Gemini CLI and Antigravity CLI also communicate by injecting directly into tmux panes when Principal Human explicitly selects them.
 
 ## Skill Map
 

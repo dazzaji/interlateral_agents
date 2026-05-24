@@ -5,7 +5,7 @@ Read AGENTS.md for operating instructions. Read interlateral_dna/LIVE_COMMS.md f
 Your session: ia-manager
 Socket: /tmp/interlateral-agents-tmux.sock
 
-This manager pattern is separate from the standard `init` duo launcher. Do not assume a project, sprint, or worker roster until Dazza gives you one.
+This manager pattern is separate from the standard `init` duo launcher. Do not assume a project, sprint, or worker roster until Principal Human gives you one.
 
 Expected baseline peers:
 - ia-claude
@@ -44,4 +44,4 @@ Then print exactly:
 Reporting for Duty!
 ```
 
-Then stop and wait for Dazza's assignment.
+Then stop and wait for Principal Human's assignment.

@@ -75,7 +75,7 @@ On every wake-up, perform these steps:
 5. Classify the sprint state:
    - `on-track`: active work or clear progress
    - `off-track`: active work, but on the wrong thing or looping
-   - `idle/stalled`: no material progress for 15+ minutes across manager, workers, and evidence
+   - `idle/stalled`: no material gate-evidence progress for 20+ minutes across manager, workers, and evidence
    - `team-complete-overseer-open`: the sprint team appears done, but the overseers still owe final health/evidence review, peer coordination, or final closeout
 6. Act:
    - `on-track`: log only
@@ -84,6 +84,26 @@ On every wake-up, perform these steps:
    - `team-complete-overseer-open`: stop nudging the team, coordinate Joint ACK with the peer overseer, and write the overseer closeout if the final review is green
 
 When the team appears substantively complete but has not marked `done_marker`, the overseers may use the Override Authority below to break deadlock.
+
+### Stall, False-Green, And Spiral Controls
+
+Default stall threshold: 20 minutes without new material gate-evidence progress. Terminal activity alone is not progress. New material progress means a new or updated expected evidence artifact, a gate packet, a review/breaker/verifier result, a verified command result, or a concrete controller decision tied to the sprint spec.
+
+Calibration override rule: any shorter, longer, or gate-specific threshold must be explicit in the sprint spec or launch packet, reviewed, and pinned before launch/use. Gatekeepers and overseers must not invent thresholds at decision time. If no reviewed pinned override exists, use the 20-minute default.
+
+False-green rule: do not classify `on-track` from chatty terminal output, repeated status text, unchanged timestamps, stale evidence, missing done/stop markers, or an ACK-only heartbeat. If the manager is active but evidence does not advance before the stall threshold, classify `idle/stalled` or `off-track` and nudge with the missing artifact or decision.
+
+Retry-loop rule: repeated attempts against the same failure are progress only when the retry packet or log states the prior failure, what changed, and remaining budget. Otherwise classify as `off-track` before it becomes a stall.
+
+Review-spiral threshold: default 3 reviewer/breaker rounds without a class-1 finding. After the third round, require materiality triage: class 1 and 2 findings block, class 3 may be deferred with rationale, and class 4 must not block. Escalate to the controller for stop/patch/defer/accept disposition when the team cannot close the loop.
+
+### Local Classification Logic Check
+
+When overseer stall, false-green, retry-loop, or review-spiral classification
+thresholds are changed or calibrated, `scripts/watcher-control-sim.js all` can
+exercise local classification examples. It does not validate a live overseer
+topology, timer, manager session, evidence directory, heartbeat loop, injection
+path, or stop condition, and it is not required for ordinary short tasks.
 
 ## Nudge Rules
 

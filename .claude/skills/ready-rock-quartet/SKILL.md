@@ -52,7 +52,7 @@ Preferred roster:
 - Claude as `VERIFIER`
 
 Do not substitute Gemini CLI, Antigravity CLI, or Antigravity Desktop into the
-quartet unless Dazza explicitly selects that peer for this run.
+quartet unless Principal Human explicitly selects that peer for this run.
 
 Recommended session naming:
 - `13-codex-lead` -> `LEAD`
@@ -352,6 +352,20 @@ If a peer finds a real defect, the lead should:
 9. REVIEWER / BREAKER / VERIFIER respond
 10. LEAD reconciles and only then proceeds
 ```
+
+### Autonomous Sprint Repair Loop (Optional, Level 3+)
+
+Use for autonomous, live-risk, credential-bearing, or repeated-review work.
+Skip for ordinary clear fixes.
+
+Loop:
+1. LEAD publishes the artifact and requested review scope.
+2. REVIEWER and BREAKER report material findings.
+3. LEAD classifies findings by materiality and patches clear defects directly.
+4. Use controller triage only for high-risk, authority-ambiguous, credential-bearing, live-risk, or repeated materiality disputes.
+5. LEAD publishes the focused diff or new artifact.
+6. Affected peers re-check the changed surface.
+7. VERIFIER goes last after revision requests are resolved or explicitly deferred.
 
 ## Human Operator Checks
 

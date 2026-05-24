@@ -74,7 +74,7 @@ Nothing has been dropped.
 - preflight-mesh.sh (formal mode with eval hooks)
 - bootstrap-full.sh and bootstrap-cli.sh
 - Why deferred: peer helpers cover manual expansion for now, and Gemini/AG
-  should remain special opt-in peers until Dazza explicitly wants wider default
+  should remain special opt-in peers until Principal Human explicitly wants wider default
   mesh launchers
 
 ### 2.2 Worker-Pool Normalization
@@ -227,7 +227,7 @@ The following reusable skills were removed from the v0.1 catalog and are deferre
 
 ### 7.2 Full Quad-Agent Bootstrap
 - AG in bootstrap-full.sh, health checks, graceful degradation
-- Keep deferred unless Dazza explicitly decides AG should become standard
+- Keep deferred unless Principal Human explicitly decides AG should become standard
   startup capacity.
 
 ---

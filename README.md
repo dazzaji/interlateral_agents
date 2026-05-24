@@ -135,6 +135,17 @@ Templates:
 
 Canonical reference: `templates/sprint/process-levels.md`. If this summary and the canonical reference disagree, the canonical reference wins.
 
+## Control Plane Tools
+
+Most tasks do not need these tools. Use them when work is autonomous, long-running, live-risk, credential-bearing, delegated, or serious enough that a missed gate would be expensive to recover from. None of these helpers is a complete safety proof; see `templates/sprint/process-levels.md` for proof boundaries.
+
+| Tool | Use when | Hint |
+| --- | --- | --- |
+| `scripts/gate-packet-lint.js` | A delegated gate adopts the strict packet contract. | `node scripts/gate-packet-lint.js <packet.md>` |
+| `scripts/identity-direct-send-compat.js` | Fresh, uncertain, changed, desktop-joined, or high-risk transport needs post-send evidence validation. | `node scripts/identity-direct-send-compat.js --help` |
+| `scripts/watcher-control-sim.js` | Overseer stall, false-green, retry-loop, or review-spiral classification logic changed. | `node scripts/watcher-control-sim.js all` |
+| `scripts/credential-hygiene-lint.js` | Files mention credentials, tokens, secret stores, cloud auth, or auth headers. | `node scripts/credential-hygiene-lint.js <file> [file...]` |
+
 ## Under The Hood: me.sh
 
 You should rarely need to invoke `me.sh` directly; the `init` skill owns the normal bootstrap UX. Use the launcher knobs here when CLI defaults change or you need a specific model or argument combination.

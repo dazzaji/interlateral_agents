@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DNA_DIR="$REPO_ROOT/interlateral_dna"
-DEFAULT_PROMPT="You are an Antigravity CLI mesh peer in the Interlateral agent mesh. Read AGENTS.md, interlateral_dna/LIVE_COMMS.md, ANTIGRAVITY.md, and .agent/skills/agy-cli-peer/SKILL.md. Gemini and Antigravity peers are opt-in only; do not recruit Gemini or Antigravity peers unless Dazza explicitly selects them. Direct injection is the live channel; interlateral_dna/comms.md is the audit ledger only, not a wake-up trigger. Stay interactive, wait for direct assignments, and do not invent work."
+DEFAULT_PROMPT="You are an Antigravity CLI mesh peer in the Interlateral agent mesh. Read AGENTS.md, interlateral_dna/LIVE_COMMS.md, ANTIGRAVITY.md, and .agent/skills/agy-cli-peer/SKILL.md. Gemini and Antigravity peers are opt-in only; do not recruit Gemini or Antigravity peers unless Principal Human explicitly selects them. Direct injection is the live channel; interlateral_dna/comms.md is the audit ledger only, not a wake-up trigger. Stay interactive, wait for direct assignments, and do not invent work."
 
 source "$SCRIPT_DIR/tmux-config.sh"
 unset TMUX

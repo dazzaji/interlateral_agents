@@ -147,6 +147,22 @@ A valid proof has both:
 - a visible direct reply in the target pane
 - a stamped ledger entry in `interlateral_dna/comms.md`
 
+For fresh, uncertain, desktop-joined, changed, or high-risk transport, the
+optional helper `scripts/identity-direct-send-compat.js` can validate captured
+receiver and ledger evidence for nonce, sender, session id, and target after a
+direct send. It does not send the message, capture the pane, prove the peer is
+idle, or prove ongoing transport health.
+
+```bash
+node scripts/identity-direct-send-compat.js \
+  --nonce NONCE \
+  --receiver-file PATH \
+  --ledger PATH \
+  --sender EXPECTED_SENDER \
+  --sid EXPECTED_SESSION_ID \
+  --target EXPECTED_TARGET
+```
+
 ## Collaboration Pattern Boundary
 
 After transport is proven, invoke a separate collaboration skill for the actual work:

@@ -9,6 +9,19 @@ Would a wrong action affect production users, mutate live data, spend money, exp
 - If no, prefer Level 0-2.
 - If yes, consider Level 3 or Level 4.
 
+## Control Plane Helper Mapping
+
+Most tasks do not need these helpers. Use them when they match the actual risk,
+and keep them advisory unless a sprint spec, approval policy, or gate request
+explicitly makes one required.
+
+| Helper | Typical level | Use when | Boundary |
+| --- | --- | --- | --- |
+| `credential-hygiene-lint.js` | Any level when credential material is touched; especially Level 2+ or autonomous work | Scripts, prompts, runbooks, gate packets, helper code, or docs mention credentials, tokens, secret stores, cloud auth, or auth headers. | Conservative local line-pattern guard only. It does not read environment values, secret stores, cloud services, 1Password, Secret Manager, GCP, Cloudflare, credential files, or prove semantic data flow is safe. |
+| `gate-packet-lint.js` | Level 3-4 when a strict packet contract is adopted | Formal delegated gates or high-risk mutation approvals that use the script's packet schema. | Checks a strict gate-packet field/content contract. It does not prove delegation authority, evidence freshness, hash truth, command safety, rollback quality, proxy independence, or human approval. |
+| `watcher-control-sim.js` | Level 3-4 when overseer classification logic changes | Overseer stall, false-green, retry-loop, or review-spiral thresholds are changed or calibrated. | Exercises local classification examples only. It does not inspect a live timer, manager session, worker session, evidence directory, heartbeat loop, injection path, or stop condition. |
+| `identity-direct-send-compat.js` | Any level when transport proof needs extra scrutiny | Transport is fresh, uncertain, desktop-joined, high-risk, or direct-send/ledger helpers changed. | Validates already-captured receiver and ledger evidence for nonce, sender, session id, and target after a direct send. It does not send the message, capture a pane, prove the peer is idle, or prove ongoing transport health. |
+
 ## Level 0: Solo Task
 
 Use for bounded work one capable agent can finish directly.

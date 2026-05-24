@@ -30,7 +30,7 @@ If both approve, they issue a scoped, verifiable approval token. If either denie
 
 All inputs come from the prompt, sprint spec, or gate request packet.
 
-- `principal`: human whose judgment is being represented, for example `Dazza`
+- `principal`: human whose judgment is being represented, for example `Principal Human`
 - `gate`: exact gate token requested, for example `GO DEPLOY PILOT`
 - `delegation_authority`: path or quoted human instruction proving the principal authorized this proxy council for this gate or gate family
 - `request_id`: stable id for this gate request, including sprint/run id and attempt number
@@ -212,6 +212,14 @@ Required fields:
 - expiry/invalidation condition
 
 If the packet is incomplete, deny with missing items.
+
+When a sprint adopts the strict gate-packet contract checked by
+`scripts/gate-packet-lint.js`, that helper may be used as local evidence for
+packet completeness. It is not a universal gatekeeper schema and does not prove
+delegation authority, evidence freshness, hash truth, command safety, rollback
+quality, proxy independence, or human approval. `scripts/credential-hygiene-lint.js`
+may be used as a conservative local line-pattern guard for secret-shaped text,
+but findings are review items and a pass is not a full credential-safety proof.
 
 ## Evidence Freshness
 

@@ -20,7 +20,7 @@ and sends with the standard repo helpers. No Chrome DevTools Protocol, no
 Electron automation, no permission-prompt cards.
 
 Antigravity CLI is an opt-in peer. Do not launch or recruit it for routine
-skills unless Dazza explicitly requests Antigravity CLI or the current
+skills unless Principal Human explicitly requests Antigravity CLI or the current
 assignment names `agy`.
 
 ## Boundary

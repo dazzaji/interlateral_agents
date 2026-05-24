@@ -5,7 +5,7 @@ ways. They are independent — pick one per peer.
 
 Antigravity is always opt-in. `init` / `me.sh` do not launch the CLI peer, do
 not attach the desktop app, and collaboration skills should not recruit either
-Antigravity path unless Dazza explicitly requests it or the assignment names it.
+Antigravity path unless Principal Human explicitly requests it or the assignment names it.
 
 ## 1. Antigravity CLI peer — recommended
 

@@ -14,7 +14,7 @@ The default live mesh is the two-agent Claude Code + Codex CLI duo launched by
 `init` / `me.sh`.
 
 Do not launch, recruit, assign work to, or rely on Gemini CLI, Antigravity CLI
-(`agy`), or the Antigravity desktop CDP path unless Dazza explicitly requests
+(`agy`), or the Antigravity desktop CDP path unless Principal Human explicitly requests
 that peer or the current assignment names it. Their helper scripts are available
 for deliberate opt-in use; availability is not permission to include them in
 routine skills, reviews, or startup flows.
@@ -90,4 +90,4 @@ Current release does not include:
 - structured event stream
 - product or GCP code
 
-Stay inside that boundary unless Dazza explicitly changes it.
+Stay inside that boundary unless Principal Human explicitly changes it.

@@ -86,6 +86,8 @@ claude_send_long_logged "$claude_session" "prompt"
 agent_send_long_logged "$codex_session" "prompt"
 ```
 
+For fresh, uncertain, changed, or high-risk transport, `scripts/identity-direct-send-compat.js` is an optional post-send evidence validator for nonce/sender/sid/target; it is not required for routine peer-superset sessions.
+
 ## Artifact Layout
 
 Place all artifacts in `output_dir`:

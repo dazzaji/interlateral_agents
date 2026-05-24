@@ -197,3 +197,77 @@ Example checks:
 - human-only decisions identified;
 - open risks documented;
 - supervisor exit contract satisfied, if used.
+
+## Optional Module: Autonomous / Level 3+ Controls
+
+Skip this Level 3+ module cluster for ordinary Level 0-2 work.
+
+Use when work is autonomous, live-risk, credential-bearing, delegated,
+long-running, or hard to reverse.
+
+Keep this cluster short. If these controls need more than terse fields, move
+them to `templates/sprint/autonomous-sprint-template.md` and leave only a
+pointer here.
+
+### Step 0 Preflight
+
+Purpose: prove prerequisites before tasking agents.
+Skip when local context and permissions are already obvious.
+
+Record:
+- required credentials or logins:
+- access checks already passed:
+- current git status:
+- current runtime/service state, if relevant:
+
+### Declared Write Roots And Forbidden Adjacent Actions
+
+Purpose: keep autonomous edits inside the intended surface.
+Skip when a normal small edit has an obvious single file or directory.
+
+Record:
+- allowed write roots:
+- files or directories explicitly out of scope:
+- forbidden adjacent actions:
+
+### Credential Readiness
+
+Purpose: avoid mid-sprint stalls caused by missing auth.
+Skip when the task does not touch credentials, cloud auth, secret stores, or
+credential-bearing docs/scripts.
+
+Record:
+- credentials needed:
+- readiness check:
+- fallback if auth expires:
+- secret-handling rule:
+
+### Controller Triage
+
+Purpose: handle ambiguous Reviewer/Breaker findings without process drift.
+Skip when findings are clear, low-risk, and directly patchable.
+
+Use controller triage for:
+- live-risk, credential-bearing, or authority-ambiguous findings;
+- repeated materiality disputes;
+- proposed scope expansion.
+
+### Verifier-Last Closeout
+
+Purpose: keep final verification independent after revisions settle.
+Skip when the chosen process level only needs self-check or peer-check.
+
+Record:
+- verifier artifact:
+- final evidence checked:
+- remaining residual risk:
+
+### SHA Sidecar Pinning
+
+Purpose: pin reviewed prompts, specs, packets, or evidence that must not drift.
+Skip when ordinary git diff/review is enough.
+
+Record:
+- artifact:
+- SHA-256:
+- when to refresh:

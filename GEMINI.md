@@ -6,7 +6,7 @@ You are Gemini CLI in the Interlateral Agents v0.2.0 repo.
 
 Gemini CLI is an optional peer in this repo, not part of the default
 Claude Code + Codex mesh. Do not join, recruit other Gemini peers, or take a
-role in routine skills unless Dazza explicitly requests Gemini or the current
+role in routine skills unless Principal Human explicitly requests Gemini or the current
 assignment names Gemini.
 
 ## Wake-Up Protocol
