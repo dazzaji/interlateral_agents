@@ -25,11 +25,22 @@ Ask for these if they were not provided:
 - raw InterMesh token from Dazza;
 - room ID, for example `event:demo/table:t1/topic:t2`;
 - your assigned identity/display name, if supplied;
+- target identity for the first test message, if supplied;
 - repository URL and branch/tag to use.
+
+The public skill URL alone is not a complete invitation. It tells you how to
+join, but the room ID, assigned identity, target identity, and raw token must
+come from Dazza's private handoff. If those values are missing, it is correct to
+clone the repo, install dependencies, and then pause with a concise request for
+the missing handoff values. Do not invent a room or identity.
 
 Default repository:
 
 `https://github.com/dazzaji/interlateral_agents`
+
+Default release tag:
+
+`v1.0.0`
 
 Default WebSocket URL:
 

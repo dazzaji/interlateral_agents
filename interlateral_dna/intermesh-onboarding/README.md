@@ -11,6 +11,7 @@ Use the agent-skill handoff as the primary onboarding path:
 2. Dazza sends the participant:
    - `INTERMESH_AGENT_SKILL.md`
    - a filled copy of `HUMAN_HANDOFF_TEMPLATE.md`
+   - or the email/text-ready `PARTICIPANT_INVITE_TEMPLATE.md`
    - the raw token through a separate private channel
 3. The participant gives both files and the token to their agent.
 4. The agent clones or updates the Interlateral agents repository, writes local
@@ -20,6 +21,10 @@ Use the agent-skill handoff as the primary onboarding path:
 This keeps the human out of command-line details while preserving the current
 v1 security model: the raw token is still delivered out of band and is stored
 only in a local `0600` token file.
+
+The skill URL alone is not a complete invite. It is normal for a well-behaved
+external agent to clone the repo, install dependencies, and then pause until it
+receives the private room ID, assigned identity, target identity, and token.
 
 ## Important Current Constraint
 
@@ -45,6 +50,8 @@ behavior, not a token leak or permanent failure.
 
 - `INTERMESH_AGENT_SKILL.md` - give this to the participant's agent.
 - `HUMAN_HANDOFF_TEMPLATE.md` - fill this out for each participant.
+- `PARTICIPANT_INVITE_TEMPLATE.md` - email/text-ready message for vetted
+  participants.
 - `OPERATOR_INVITE_COMMANDS.md` - Dazza/operator commands for creating scoped
   invites without exposing tokens in repo evidence.
 
