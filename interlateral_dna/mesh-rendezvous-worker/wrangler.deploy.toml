@@ -1,0 +1,19 @@
+name = "mesh-rendezvous"
+main = "src/index.ts"
+compatibility_date = "2026-05-27"
+
+routes = [
+  { pattern = "mesh.interlateral.com", custom_domain = true }
+]
+
+[[durable_objects.bindings]]
+name = "MESH_REGISTRY"
+class_name = "MeshRegistry"
+
+[[durable_objects.bindings]]
+name = "MESH_ROOM"
+class_name = "MeshRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["MeshRegistry", "MeshRoom"]

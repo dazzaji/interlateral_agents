@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mesh.interlateral.com/schemas/mesh-config.v1.json",
+  "title": "InterMesh Participant Configuration",
+  "description": "Per-participant local receiver configuration. The raw token is intentionally stored separately in the local token file, not in this JSON config.",
+  "type": "object",
+  "required": ["url", "room_ids"],
+  "additionalProperties": false,
+  "properties": {
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^wss://",
+      "description": "InterMesh rendezvous WebSocket URL.",
+      "default": "wss://mesh.interlateral.com",
+      "examples": ["wss://mesh.interlateral.com"]
+    },
+    "room_id": {
+      "$ref": "#/$defs/room_id",
+      "description": "Primary room for simple clients. Must also appear in room_ids when present."
+    },
+    "room_ids": {
+      "type": "array",
+      "description": "Rooms the participant expects this token to be scoped for. Server-side token scope remains authoritative.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/room_id"
+      }
+    },
+    "team_id": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Optional local display hint for the participant team. Server-side token data remains authoritative."
+    },
+    "event_slug": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Optional event slug hint extracted from the room id."
+    },
+    "table_id": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Optional table id hint extracted from the room id."
+    },
+    "topic_id": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Optional topic id hint extracted from the room id."
+    },
+    "jot_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Optional Jot or shared workspace URL associated with the room."
+    },
+    "participant_role": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "default": "participant",
+      "description": "Local role hint for the participant."
+    },
+    "tmux_socket": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional tmux socket path for pane dispatch targets.",
+      "default": "/tmp/interlateral-agents-tmux.sock"
+    },
+    "targets": {
+      "type": "object",
+      "description": "Optional mapping from remote identity to local dispatch target. When absent, delivered frames are logged to the inbound ledger only.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tmux_session": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Local tmux target session/window/pane passed to tmux send-keys."
+          }
+        }
+      },
+      "default": {}
+    },
+    "default_target": {
+      "type": "object",
+      "description": "Reserved future local dispatch target. Current v1 receiver reports readiness when present but dispatches through explicit targets.",
+      "additionalProperties": false,
+      "properties": {
+        "tmux_session": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "room_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[a-z][a-z0-9_-]{0,31}:[a-z0-9][a-z0-9_-]{0,63}(/[a-z][a-z0-9_-]{0,31}:[a-z0-9][a-z0-9_-]{0,63}){0,3}$",
+      "examples": [
+        "event:demo",
+        "event:demo/table:t1",
+        "event:demo/table:t1/topic:strategy"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "url": "wss://mesh.interlateral.com",
+      "room_id": "event:demo/table:t1/topic:strategy",
+      "room_ids": ["event:demo/table:t1/topic:strategy"],
+      "team_id": "demo-team",
+      "event_slug": "demo",
+      "table_id": "t1",
+      "topic_id": "strategy",
+      "jot_url": null,
+      "participant_role": "participant",
+      "targets": {}
+    },
+    {
+      "url": "wss://mesh.interlateral.com",
+      "room_ids": ["event:demo/table:t1"],
+      "targets": {
+        "claude@primary": {
+          "tmux_session": "ia-claude"
+        }
+      }
+    }
+  ]
+}

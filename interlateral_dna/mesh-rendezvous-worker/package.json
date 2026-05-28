@@ -1,0 +1,14 @@
+{
+  "name": "intermesh-rendezvous-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "local-smoke": "node scripts/local-smoke.js",
+    "smoke": "node scripts/local-smoke.js",
+    "deploy": "wrangler deploy --config wrangler.deploy.toml",
+    "dev": "wrangler dev --config wrangler.toml"
+  },
+  "devDependencies": {
+    "wrangler": "4.18.0"
+  }
+}

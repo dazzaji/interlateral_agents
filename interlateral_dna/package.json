@@ -1,13 +1,14 @@
 {
   "name": "interlateral-dna",
-  "version": "0.2.0",
-  "description": "Direct tmux comms control scripts for Interlateral Agents v0.2",
+  "version": "1.0.0",
+  "description": "Open InterMesh rendezvous and local agent mesh tools for Interlateral Agents v1.0",
   "main": "cc.js",
   "scripts": {
     "cc:status": "node cc.js status",
     "codex:status": "node codex.js status",
     "gemini:status": "node gemini.js status",
-    "gemini:read": "node gemini.js read"
+    "gemini:read": "node gemini.js read",
+    "test": "node tests/intermesh-self-test.js"
   },
   "keywords": [
     "claude-code",
