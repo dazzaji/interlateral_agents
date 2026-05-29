@@ -13,6 +13,11 @@ const commands = [
   ['mesh-receiver.js', ['self-test']],
   ['mesh-tail.js', ['self-test']],
   ['mesh-rendezvous-worker/scripts/local-smoke.js', []],
+  ['tests/intermesh-gate-b-local.js', []],
+  ['tests/intermesh-gate-c-local.js', []],
+  ['tests/intermesh-gate-d-local.js', []],
+  ['tests/intermesh-gate-e-local.js', []],
+  ['tests/intermesh-gate-f-local.js', []],
 ];
 
 const results = [];

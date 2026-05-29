@@ -22,8 +22,10 @@ function defaultPaths(homeOverride) {
     dispatchLru: path.join(home, 'dispatch-lru.json'),
     log: path.join(home, 'receiver.log'),
     lock: path.join(home, 'receiver.lock'),
+    sendLock: path.join(home, 'send.lock'),
     outboundLedger: path.join(home, 'outbound-ledger.jsonl'),
     inboundLedger: path.join(home, 'inbound-ledger.jsonl'),
+    messageStore: path.join(home, 'message-store.jsonl'),
   };
 }
 

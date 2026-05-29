@@ -17,13 +17,19 @@ function usage() {
   node interlateral_dna/mesh-admin.js revoke-team --team-id TEAM
   node interlateral_dna/mesh-admin.js close-room --room ROOM
   node interlateral_dna/mesh-admin.js inspect-room --room ROOM
-  node interlateral_dna/mesh-admin.js export-audit --room ROOM
+  node interlateral_dna/mesh-admin.js export-audit --room ROOM [--with-payload --authorize-payload-export]
   node interlateral_dna/mesh-admin.js export-join-package --token-id TOKEN_ID --out DIR
   node interlateral_dna/mesh-admin.js emergency-revoke-all --room ROOM
 
 Options:
   --url URL              HTTPS Worker base URL
   --root-key-file FILE   File containing MESH_ADMIN_ROOT_KEY
+  --audit-file FILE      Local admin-payload export audit JSONL path
+  --fixture-response-file FILE  Local/simulated export-audit response JSON
+
+Notes:
+  inspect-room sockets are an active-socket snapshot only; sockets: [] is not
+  proof that no participant was recently present under WebSocket hibernation.
 `);
 }
 
@@ -74,6 +80,27 @@ function validateRooms(rooms) {
 
 function bodyJson(value) {
   return JSON.stringify(value);
+}
+
+function payloadExportAuthorized(args) {
+  return Boolean(args['authorize-payload-export'] || process.env.INTERMESH_ADMIN_PAYLOAD_EXPORT_LOCAL_OK === 'local-simulated');
+}
+
+function requirePayloadExportAuthorization(args) {
+  if (!args['with-payload']) return;
+  if (!payloadExportAuthorized(args)) {
+    const err = new Error('Admin payload export requires --with-payload plus --authorize-payload-export or INTERMESH_ADMIN_PAYLOAD_EXPORT_LOCAL_OK=local-simulated.');
+    err.code = 'admin_payload_export_authorization_required';
+    throw err;
+  }
+}
+
+function appendAdminAudit(args, row) {
+  const auditFile = args['audit-file'] || process.env.INTERMESH_ADMIN_AUDIT_FILE;
+  if (!auditFile) return null;
+  fs.mkdirSync(path.dirname(auditFile), { recursive: true });
+  fs.appendFileSync(auditFile, JSON.stringify(row) + '\n');
+  return auditFile;
 }
 
 function parseRoomParts(roomId) {
@@ -257,9 +284,32 @@ async function command(args) {
   } else if (cmd === 'inspect-room') {
     validateRooms([args.room]);
     result = await adminFetch(args, 'GET', `/admin/rooms/inspect?room_id=${encodeURIComponent(args.room)}`);
+    result.inspect_room_presence_note = 'sockets is an active-socket snapshot only; sockets: [] is not proof that no participant was recently present under WebSocket hibernation.';
   } else if (cmd === 'export-audit') {
     validateRooms([args.room]);
-    result = await adminFetch(args, 'GET', `/admin/audit?room_id=${encodeURIComponent(args.room)}`);
+    requirePayloadExportAuthorization(args);
+    const query = `room_id=${encodeURIComponent(args.room)}${args['with-payload'] ? '&with_payload=true' : ''}`;
+    result = args['fixture-response-file']
+      ? JSON.parse(fs.readFileSync(args['fixture-response-file'], 'utf8'))
+      : await adminFetch(args, 'GET', `/admin/audit?${query}`);
+    if (args['with-payload']) {
+      const auditRow = {
+        at: new Date().toISOString(),
+        kind: 'admin_payload_export',
+        room_id: args.room,
+        sensitive_output: true,
+        authorization: args['authorize-payload-export'] ? 'explicit-cli-flag' : 'environment',
+      };
+      const auditFile = appendAdminAudit(args, auditRow);
+      result = {
+        status: 'OK',
+        sensitive_output: true,
+        payload_export_authorized: true,
+        local_audit_file: auditFile,
+        local_audit_row: auditRow,
+        response: result,
+      };
+    }
   } else if (cmd === 'export-join-package') {
     result = await adminFetch(args, 'POST', '/admin/join-package', { token_id: args['token-id'] });
     if (args.out) {
@@ -277,7 +327,9 @@ async function command(args) {
   ), 2));
 }
 
-command(parseArgs(process.argv.slice(2))).catch((err) => {
+command(parseArgs(process.argv.slice(2))).then(() => {
+  process.exit(0);
+}).catch((err) => {
   console.error(JSON.stringify({
     status: 'ERROR',
     error: err.message,

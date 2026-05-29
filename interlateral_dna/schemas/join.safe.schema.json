@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interlateral.local/schemas/intermesh/join.safe.schema.json",
+  "title": "InterMesh Safe Join Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "created_at",
+    "identity",
+    "display_name",
+    "team_id",
+    "room_id",
+    "targets",
+    "repo_url",
+    "release_ref",
+    "skill_ref"
+  ],
+  "properties": {
+    "created_at": { "type": "string", "minLength": 10 },
+    "identity": { "type": "string", "minLength": 1 },
+    "display_name": { "type": "string", "minLength": 1 },
+    "team_id": { "type": "string", "minLength": 1 },
+    "room_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*:[^/]+(/[-a-z0-9_]+:[^/]+)*$" },
+    "targets": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "repo_url": { "type": "string", "minLength": 1 },
+    "release_ref": { "type": "string", "minLength": 1 },
+    "skill_ref": { "type": "string", "minLength": 1 },
+    "jot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jot_url", "jot_alias", "jot_home"],
+      "properties": {
+        "jot_url": { "type": "string", "minLength": 1 },
+        "jot_alias": { "type": ["string", "null"] },
+        "jot_home": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

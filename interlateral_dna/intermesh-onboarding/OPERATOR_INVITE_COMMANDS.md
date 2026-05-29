@@ -9,28 +9,45 @@ source ~/.config/interlateral/intermesh-v1.env
 
 ## Issue One Participant Token
 
-Recommended local-only helper. It writes the raw token to a private `0600`
-file under `~/.config/interlateral/intermesh-invites/<identity>/` and prints
-only safe metadata.
+Recommended helper. It writes `INVITE.safe.md`, `join.safe.json`, and a private
+`TOKEN.private.txt` file under `~/.config/interlateral/intermesh-invites/<identity>/`
+or `--out <dir>`, and prints only safe metadata.
 
 ```bash
 export ROOM='event:test/table:t1/topic:t1'
 export TEAM='external-test-team'
 export IDENTITY='participant-agent-1'
 export TARGET_IDENTITY='dazza-primary'
-export BRANCH_OR_TAG='<branch-or-tag-after-Dazza-pushes-InterMesh>'
+export RELEASE_REF='<pinned-tag-or-commit-sha>'
+export SKILL_REF="https://github.com/dazzaji/interlateral_agents/blob/$RELEASE_REF/interlateral_dna/intermesh-onboarding/INTERMESH_AGENT_SKILL.md"
 
 node interlateral_dna/intermesh-onboarding/create-invite-private.js \
   --identity "$IDENTITY" \
   --team "$TEAM" \
   --room "$ROOM" \
   --to "$TARGET_IDENTITY" \
-  --branch "$BRANCH_OR_TAG"
+  --release-ref "$RELEASE_REF" \
+  --skill-ref "$SKILL_REF"
 ```
 
-Send the generated `HANDOFF.safe.md` and `INTERMESH_AGENT_SKILL.md` to the
-participant. Send `TOKEN.private.txt` separately through a private channel.
-Do not commit or attach `TOKEN.private.txt` to shared evidence.
+Send the generated `INVITE.safe.md`, `join.safe.json`, and
+`INTERMESH_AGENT_SKILL.md` to the participant. Send `TOKEN.private.txt`
+separately through a private channel. Do not commit or attach
+`TOKEN.private.txt` to shared evidence.
+
+For local/simulated tests only, avoid live token issuance:
+
+```bash
+node interlateral_dna/intermesh-onboarding/create-invite-private.js \
+  --local-fixture \
+  --identity "$IDENTITY" \
+  --team "$TEAM" \
+  --room "$ROOM" \
+  --to "$TARGET_IDENTITY" \
+  --release-ref "$RELEASE_REF" \
+  --skill-ref "$SKILL_REF" \
+  --out "/tmp/intermesh-invite-$IDENTITY"
+```
 
 Manual fallback: `node interlateral_dna/mesh-admin.js issue ...` redacts the
 token in terminal output by design, so use the helper above unless you are
@@ -51,6 +68,26 @@ find "$OUT" -maxdepth 3 -type f -print
 
 The exported package intentionally omits the raw token. Use it only if the
 participant cannot clone from GitHub yet.
+
+## Optional Jot
+
+Only include Jot fields when the invitation includes a Jot or the human directs
+you to one:
+
+```bash
+node interlateral_dna/intermesh-onboarding/create-invite-private.js \
+  --identity "$IDENTITY" \
+  --team "$TEAM" \
+  --room "$ROOM" \
+  --to "$TARGET_IDENTITY" \
+  --release-ref "$RELEASE_REF" \
+  --skill-ref "$SKILL_REF" \
+  --jot-url "$JOT_URL" \
+  --jot-alias "$JOT_ALIAS" \
+  --jot-home "$JOT_HOME"
+```
+
+Mesh-only invites must not contain placeholder Jot fields.
 
 ## Revoke
 

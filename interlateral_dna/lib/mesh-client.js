@@ -159,7 +159,11 @@ class MeshClient {
   }
 
   close() {
-    if (this.ws) this.ws.close();
+    if (!this.ws) return;
+    try {
+      this.ws.close();
+      if (typeof this.ws.terminate === 'function') this.ws.terminate();
+    } catch {}
   }
 }
 
