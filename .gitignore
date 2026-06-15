@@ -20,6 +20,8 @@ interlateral_dna/**/working_files/
 interlateral_dna/comms.md
 interlateral_dna/*.log
 interlateral_dna/ag_log.md
+# Local desktop mesh handoff evidence (collab artifacts, never versioned)
+.mesh_desktop_handoffs/
 .claude/scheduled_tasks.lock
 .runtime/
 .observability/
