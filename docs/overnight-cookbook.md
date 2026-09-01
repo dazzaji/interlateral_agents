@@ -3,13 +3,13 @@
 ## A Systems Guide to Governable Long-Horizon Agent Work
 
 Daniel “Dazza” Greenwood  
-Public-edition manuscript — version 0.0.3, local consensus edition, 2026; not published (update - I totally did to publish it!)
+Public-edition manuscript — version 0.0.3, early public draft, published August 31, 2026.
 
 > A model does not become reliable because its window stays open. Governable long-horizon work is a property of a deployed system: explicit authority, durable state, manufactured turns, independent supervision, bounded effects, evidence-gated transitions, recoverable ownership, and honest stopping conditions.
 
 ### License and responsibility
 
-Original prose, diagrams, and explanatory material are prepared for release under Creative Commons Attribution 4.0. Original code, schemas, executable examples, and test fixtures are prepared for release under Apache License 2.0. Third-party names and material retain their owners' terms. This local manuscript has not been published.
+Original prose, diagrams, and explanatory material are released under Creative Commons Attribution 4.0. Original code, schemas, executable examples, and test fixtures are released under Apache License 2.0. Third-party names and material retain their owners' terms.
 
 Daniel Greenwood is the responsible human author and editor. Interlateral Agents supplied the experimental setting. Dated OpenAI, Anthropic, Google, xAI, bb, and other systems contributed analysis, implementation, testing, or critique. They are research tools, not silent co-authors and not authorities for these claims.
 
