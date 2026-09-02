@@ -11,7 +11,7 @@ Use `scripts/deploy-skills.sh` after editing the canonical copy, then run
 `scripts/check-skills-parity.sh` to verify `.claude/skills` and `.codex/skills`
 still match the canonical tree.
 
-The current release target ships a 23-skill canonical set. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the starter catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
+The versioned catalog contains 24 canonical skills. Local, uncommitted skill directories are not included in this release count. Three reusable skills (`create-skin`, `evals`, `hyperdomo`) were removed from the starter catalog because they depend on infrastructure that has not shipped yet; they are tracked as deferred in `ROADMAP.md` and will be restored when their supporting systems are ready. `test-4-series` was a one-off project/test skill and is not treated as part of the standing deferred catalog.
 
 `projects/` is reserved for downstream user work. Do not put system skills there.
 
@@ -37,6 +37,7 @@ The current release target ships a 23-skill canonical set. Three reusable skills
 | `negotiation` | `.agent/skills/negotiation/SKILL.md` | Structured trade-off process |
 | `peer-collaboration` | `.agent/skills/peer-collaboration/SKILL.md` | Two-peer collaboration loop |
 | `peer-superset` | `.agent/skills/peer-superset/SKILL.md` | Independent review/redteam plus consensus superset revision list |
+| `peer-synthi` | `.agent/skills/peer-synthi/SKILL.md` | Independent work from 2+ selected peers, combined into a decision brief with useful complements, new synthesis, and material alternatives |
 | `publication-pipeline` | `.agent/skills/publication-pipeline/SKILL.md` | Editorial multi-round pipeline |
 | `ready-rock-quartet` | `.agent/skills/ready-rock-quartet/SKILL.md` | Four-agent visible-terminal launch and role-lock workflow |
 | `search-synth` | `.agent/skills/search-synth/SKILL.md` | Search and synthesis workflow |
@@ -54,6 +55,19 @@ Artifact: path/to/work-plan.md
 ```
 
 After deployment, Claude Code reads from `.claude/skills/` and Codex reads from `.codex/skills/`.
+
+### Peer Synthi discovery
+
+`peer-synthi` combines independent research or proposals from selected peers, retaining useful complements, stronger combined ideas, and material alternatives. Its canonical file is `.agent/skills/peer-synthi/SKILL.md`.
+
+| Consumer | Location for this skill |
+|---|---|
+| Claude Code | `.claude/skills/peer-synthi/SKILL.md` |
+| Codex repository mirrors | `.codex/skills/peer-synthi/SKILL.md` and `.agents/skills/peer-synthi/SKILL.md` |
+| Gemini / Antigravity using the repository catalog | `.agent/skills/peer-synthi/SKILL.md` |
+| Other selected agents, including bb | Read the canonical file explicitly when the environment does not automatically discover repository skills. |
+
+The existing deploy script refreshes the Claude and Codex mirrors. When updating `peer-synthi`, also copy its complete directory, including references, to `.agents/skills/peer-synthi/` and verify those files match the canonical version. This does not require rewriting other skills in `.agents/skills/`.
 
 For repo-agnostic sprint oversight, point the skill at an absolute sprint file path in any working repo and optionally start the mechanical wake-up helper:
 
