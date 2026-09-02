@@ -43,18 +43,19 @@ Avoid adding peers, overseers, gates, or evidence packets unless the task reveal
 
 ## Level 1: Peer Collaboration
 
-Use when two agents can improve quality by comparing notes or co-drafting.
+Use when selected peers can improve quality by comparing notes, independently researching, or co-drafting.
 
 Skill examples:
 
 - `peer-collaboration`;
-- `peer-superset`.
+- `peer-superset`;
+- `peer-synthi` for independent research or proposals with material alternatives.
 
 Typical process:
 
 - each peer reviews or drafts independently when useful;
 - peers exchange findings;
-- one consensus artifact or final answer is produced.
+- one usable artifact or final answer is produced, preserving material alternatives when the task calls for them.
 
 Use for writing, planning, critique, and moderate ambiguity. Do not add quartet or gatekeepers just because two agents disagree; use judgment.
 

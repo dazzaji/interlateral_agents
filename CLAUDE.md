@@ -79,7 +79,7 @@ Current release includes:
 - direct tmux comms
 - Antigravity CLI (`agy`) mesh peer (`agy.js`, `agy-cli-peer` skill)
 - Antigravity desktop-app CDP transport (`ag.js`, `ANTIGRAVITY.md`)
-- 21 skills
+- 24 versioned canonical skills (see `SKILLS.md`)
 - minimal docs and logs
 
 Current release does not include:

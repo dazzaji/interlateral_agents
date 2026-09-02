@@ -192,6 +192,8 @@ Change the manifest version whenever sources change. Recompute hashes at the bou
 
 **Protocol.** For blind peer-superset, freeze one packet; create complete independent originals; hash and verify them before exchange; synthesize additively; have the other peer challenge omissions, overreach, unsafe advice, and privacy; repair once; preserve dissent; obtain exact-hash countersign; rotate synthesizer next time. For gates, use fresh context and provider diversity where consequence warrants it. Give the verifier the contract, artifact, manifest, and tests—not the builder's persuasive narrative.
 
+For independent research, architecture options, or business proposals, use [`peer-synthi`](../.agent/skills/peer-synthi/SKILL.md). It combines useful findings and develops stronger combined ideas while preserving material alternatives. Reviewers confirm faithful representation separately from endorsing every recommendation. A complete advisory report may retain disagreement; missing work or review is delivered as an explicit partial result. This does not change the `peer-superset` review workflow or authorize downstream effects.
+
 When disagreement remains: restate the proposition, separate fact/value/risk/missing evidence, name each falsifier, run the smallest decisive test, and let the human decide unresolved values. Do not add a third agent merely to vote.
 
 **Reference.** Blind drafting of this book exposed a confidently swapped pair of CLI submit sequences. Source inspection resolved it.
@@ -600,6 +602,8 @@ Record exact surface/version/route/generation; reconcile backlog; arm without cl
 Preserve evidence; classify; probe cheaply; apply at most one qualified interrupt; read checkpoint; verify postconditions; transfer lease explicitly; resume only authorized work; record recurrence and correction.
 
 # Appendix D — Collaboration recipes
+
+**Peer Synthi:** independent originals and hashes → evidence/assumption comparison → complements and new combined options → representation review → one decision-ready report, with alternatives only where material. See the [skill](../.agent/skills/peer-synthi/SKILL.md); a disagreement is not a missing deliverable, and a missing review is not consent.
 
 **Blind peer-superset:** frozen common packet → blind complete originals and hashes → exchange → additive synthesis → adversarial challenge → one integration → exact-hash countersign; rotate synthesizer.  
 **Reviewer/breaker/verifier:** reviewer maps contract, breaker seeks false greens and unsafe behavior, one writer repairs, verifier reruns final proof last.  

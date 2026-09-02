@@ -110,6 +110,7 @@ For maximum manual control, run the working-team patterns directly yourself. You
 - `ready-rock-quartet` for a visible four-agent Lead / Reviewer / Breaker / Verifier team
 - `dev-collaboration` for a focused Drafter / Reviewer / Breaker workflow
 - `peer-collaboration` for two agents iterating as equals
+- `peer-synthi` for independent research or proposals that combine strong ideas and retain material alternatives
 - `dev-competition` when you want independent implementations and a judge
 
 Unless the human prompt explicitly selects otherwise, collaboration skills should build their roster from Claude Code and Codex peers. Gemini CLI, Antigravity CLI, and Antigravity Desktop are special opt-in participants, not default capacity.
@@ -121,7 +122,7 @@ For long-running, complex, or high-stakes sprints in any mode, layer `sprint-ove
 Use the lightest process that fits the actual risk. The repo provides process levels as guides, not achievement levels or mandatory gates:
 
 - **Level 0: Solo task.** One agent handles a bounded request.
-- **Level 1: Peer collaboration.** Two agents collaborate, for example with `peer-collaboration` or `peer-superset`.
+- **Level 1: Peer collaboration.** Selected peers collaborate, for example with `peer-collaboration`, `peer-superset`, or `peer-synthi`; more perspectives alone do not require a heavier process.
 - **Level 2: Team collaboration.** Three or more agents use explicit roles, for example a Lead / Reviewer / Breaker / Verifier quartet.
 - **Level 3: Overseen sprint.** Add liveness oversight for longer autonomous work, for example with `sprint-overseer`.
 - **Level 4: Gatekeeper sprint.** Add formal delegated approvals for live, sensitive, mission-critical, public, destructive, or hard-to-reverse work, for example with `gate-keeper`.
@@ -209,7 +210,9 @@ scripts/shutdown.sh
 
 ## Using Skills
 
-The canonical skill source is `.agent/skills/`. Deploy copies live in `.claude/skills/` and `.codex/skills/`.
+The versioned catalog contains 24 skills; see [SKILLS.md](SKILLS.md). The canonical source is `.agent/skills/`. Deploy copies live in `.claude/skills/` and `.codex/skills/`.
+
+For independent multi-agent research and proposals that preserve useful complements and material alternatives, use [`peer-synthi`](.agent/skills/peer-synthi/SKILL.md). Model-specific discovery locations are listed in [SKILLS.md](SKILLS.md#peer-synthi-discovery).
 
 Deploy or refresh them with:
 
