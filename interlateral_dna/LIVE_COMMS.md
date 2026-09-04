@@ -1,5 +1,11 @@
 # LIVE COMMS: Interlateral Agents v0.2.0
 
+Current JS helper behavior and test limits: [Verified Mesh Transport](../docs/MESH-TRANSPORT.md).
+It supersedes older helper descriptions below: use exact registered targets, never
+prefix matching, and inspect DELIVERY_UNCERTAIN before retrying. The shell helpers
+have not acquired these protections. Historical model/version and test tables below
+are observations, not certification of the current installation or new transport.
+
 This is the canonical reference for direct comms in the starter-scope repo. The current release is CLI-first and tmux-first. The default mesh is Claude Code + Codex; optional peers such as Gemini CLI and Antigravity CLI also communicate by injecting directly into tmux panes when Principal Human explicitly selects them.
 
 ## Skill Map
@@ -59,8 +65,10 @@ Desktop peers now participate as tmux peers too, but with one important differen
 - When possible, ACK desktop peers in **both** places:
   1. direct to their tmux session
   2. mirrored to `comms.md`
-- For `codex-desktop`, direct ACKs should target `ia-codex-desktop`.
-- For `claude-desktop`, there is currently no dedicated helper script in `interlateral_dna`; the proven route is direct pane/tty delivery to `ia-claude-desktop` plus a ledger mirror to `@Claude Desktop`.
+- Target each desktop's exact registered unique inbox, including any current task suffix.
+  Generic `ia-codex-desktop` / `ia-claude-desktop` names are examples, not identity rules.
+- The JS helpers can target passive cat inboxes via their session environment variables.
+  They discover the runtime PTY and mirror to the ledger; native task wake is separate.
 - When proving a new desktop peer, use a nonce challenge rather than a generic hello.
 
 Desktop onboarding now lives in the in-repo `desktop-mesh-peer` skill. The `init` skill is the standard CLI bootstrap entrypoint and points operators to `desktop-mesh-peer` and `mesh-comms-core` for desktop and transport-specific live comms.

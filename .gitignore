@@ -12,8 +12,23 @@ package-lock.json
 
 # Scratch / working docs (preserved in git history)
 temp/
-docs/
 sprint_runs/
+
+# Public documentation is explicitly selected; existing tracked docs remain tracked.
+docs/*
+!docs/BB-DESKTOP.md
+!docs/CODEX-ENTRY.md
+!docs/MESH-TRANSPORT.md
+!docs/CONTROLKERNEL.md
+!docs/overnight-cookbook.md
+!docs/overnight-cookbook/
+docs/overnight-cookbook/*
+!docs/overnight-cookbook/README.md
+!docs/overnight-cookbook/CODEX-DESKTOP-HEARTBEAT-WATCH.md
+!docs/overnight-cookbook/CLAUDE-DESKTOP-WAKE-LOOP.md
+!docs/overnight-cookbook/runbooks/
+docs/overnight-cookbook/runbooks/*
+!docs/overnight-cookbook/runbooks/verify-unattended-liveness-rig.md
 interlateral_dna/**/working_files/
 
 # Runtime logs and ledgers
@@ -47,3 +62,11 @@ build/
 *.swp
 *.swo
 *~
+
+# Retained local test artifacts, not product source.
+/interlateral_dna/x/r5-*.sqlite
+/interlateral_dna/x/r5-*.sqlite-shm
+/interlateral_dna/x/r5-*.sqlite-wal
+/scratch-r5f-*.sqlite
+/interlateral_dna/claude-cli-replacement-compact.err
+/sprint-overseer-log.md

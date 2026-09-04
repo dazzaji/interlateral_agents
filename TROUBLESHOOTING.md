@@ -1,3 +1,8 @@
+> Current JS send-helper behavior is documented in [Verified Mesh Transport](docs/MESH-TRANSPORT.md).
+> Shell/unknown targets are refused. DELIVERY_UNCERTAIN requires inspection, not blind resend.
+> These protections do not change the older shell helpers. Model/TUI recipes below are
+> version-specific: verify actual runtime support and a real nonce ACK before relying on them.
+
 # Troubleshooting
 
 ## tmux copy or paste issues
@@ -41,3 +46,18 @@
 - Confirm the session exists on the shared socket.
 - Increase patience and inspect the terminal buffer.
 - Review `scripts/tmux-config.sh` and the launcher timeouts in `me.sh` if you are intentionally changing timeout behavior.
+
+## Agent totally silent AND its scheduled ticks never fired
+
+Differential (in rough priority): session credential death; scheduler/automation expiry or
+disablement; host sleep/power/network; app/harness termination; lifecycle-retirement bug; wedge.
+Credential death is confirmed only by its signature — an authentication-failure record in the
+session transcript. On Claude Code check: transcript for "Failed to authenticate" /
+`isApiErrorMessage`; harness log for token activity (`grep -i oauth ~/Library/Logs/Claude/main.log`);
+supervisor state (`launchctl list | grep <label>`); heartbeat freshness + generation per
+`docs/overnight-cookbook/runbooks/verify-unattended-liveness-rig.md`. Recovery = attempt-and-verify:
+one harmless message via a **tested** ingress → verify authenticated reply, session identity,
+automation registration, one controlled tick → else follow the dated provider runbook
+(reauth/restart/new session) → reconcile missed work, expired automations, leases, and gates before
+resuming. Do not assume a message always re-mints credentials or that jobs survived — verify.
+Prevention: cookbook M3H / M17-as-amended.
