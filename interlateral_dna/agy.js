@@ -6,14 +6,11 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { getIdentity, stampMessage } = require('./identity');
+const { deliverVerified, paneInfo, paneMode } = require('./mesh-transport');
 
 const TMUX_SOCKET = process.env.TMUX_SOCKET || process.env.INTERLATERAL_TMUX_SOCKET || '/tmp/interlateral-agents-tmux.sock';
 const SESSION = process.env.AGY_TMUX_SESSION || 'ia-agy';
-const COMMS_PATH = path.join(__dirname, 'comms.md');
-
-function sleep(ms) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-}
+const COMMS_PATH = process.env.INTERLATERAL_COMMS_PATH || path.join(__dirname, 'comms.md');
 
 function runTmux(args, options = {}) {
   return execFileSync('tmux', ['-S', TMUX_SOCKET, ...args], {
@@ -25,25 +22,16 @@ function runTmux(args, options = {}) {
 }
 
 function sessionExists() {
-  try {
-    runTmux(['has-session', '-t', SESSION], { stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
+  return Boolean(paneInfo(runTmux, SESSION).id);
 }
 
 function paneCommand() {
-  try {
-    return runTmux(['display-message', '-p', '-F', '#{pane_current_command}', '-t', SESSION]).trim();
-  } catch {
-    return '';
-  }
+  return paneInfo(runTmux, SESSION).command;
 }
 
 function panePid() {
   try {
-    const pid = Number(runTmux(['display-message', '-p', '-F', '#{pane_pid}', '-t', SESSION]).trim());
+    const pid = Number(runTmux(['display-message', '-p', '-F', '#{pane_pid}', '-t', paneInfo(runTmux, SESSION).id]).trim());
     return Number.isInteger(pid) && pid > 0 ? pid : null;
   } catch {
     return null;
@@ -52,7 +40,7 @@ function panePid() {
 
 function paneTty() {
   try {
-    return runTmux(['display-message', '-p', '-F', '#{pane_tty}', '-t', SESSION]).trim();
+    return runTmux(['display-message', '-p', '-F', '#{pane_tty}', '-t', paneInfo(runTmux, SESSION).id]).trim();
   } catch {
     return '';
   }
@@ -171,7 +159,7 @@ function agyScreenReady() {
     // Inspect only the tail of the visible pane. A crashed agy that dropped to
     // a shell can leave markers up in scrollback; trusting the whole buffer
     // would let stale or attacker-printed markers pass.
-    const tail = runTmux(['capture-pane', '-t', SESSION, '-p'])
+    const tail = runTmux(['capture-pane', '-t', paneInfo(runTmux, SESSION).id, '-p'])
       .split('\n')
       .slice(-TAIL_LINES);
     const lastLine = [...tail].reverse().find((l) => l.trim().length > 0) || '';
@@ -182,9 +170,10 @@ function agyScreenReady() {
   }
 }
 
-function appendLedger(target, message) {
+function appendLedger(target, message, receipt) {
   const sender = getIdentity().sender || 'relay';
   const timestamp = new Date().toISOString();
+  if (receipt) fs.appendFileSync(COMMS_PATH, JSON.stringify({ timestamp, sender, ...receipt }) + '\n');
   fs.appendFileSync(COMMS_PATH, `\n[${sender}] ${target} [${timestamp}]\n${message}\n\n---\n`);
 }
 
@@ -215,22 +204,20 @@ function read() {
     console.error(`tmux session '${SESSION}' not found on ${TMUX_SOCKET}`);
     process.exit(1);
   }
-  process.stdout.write(runTmux(['capture-pane', '-t', SESSION, '-p', '-S', '-']));
+  process.stdout.write(runTmux(['capture-pane', '-t', paneInfo(runTmux, SESSION).id, '-p', '-S', '-']));
 }
 
-// Stamped messages are always pasted through a tmux buffer. `paste-buffer -r`
-// preserves literal LF bytes; without -r, tmux translates LF to CR, which can
-// submit multi-line prompts line by line in terminal TUIs.
+// Delivery is mode-aware and VERIFIED (M4-INC-03): a cat-style inbox pane gets
+// a direct pane-TTY write (paste-buffer silently no-ops there); the agy TUI
+// gets the buffer paste + plain Enter submit. Either way the pane is
+// re-captured and a send that never rendered exits nonzero, never a success.
 function deliver(text) {
-  const buffer = `agy_send_${process.pid}`;
-  runTmux(['load-buffer', '-b', buffer, '-'], { input: text });
-  try {
-    runTmux(['paste-buffer', '-r', '-t', SESSION, '-b', buffer]);
-  } finally {
-    try { runTmux(['delete-buffer', '-b', buffer]); } catch {}
-  }
-  sleep(1000);
-  runTmux(['send-keys', '-t', SESSION, 'Enter']);
+  return deliverVerified({
+    runTmux,
+    session: SESSION,
+    text,
+    submitKeys: ['Enter'],
+  });
 }
 
 function send(message, force) {
@@ -247,12 +234,12 @@ function send(message, force) {
   const screenReady = agyScreenReady();
   if (!auth.agy_foreground && !force) {
     console.error(`Refusing to send: session '${SESSION}' does not have agy in the pane foreground process group.`);
-    console.error('It may be stopped, backgrounded, or the pane may have dropped to a shell. Re-launch agy, or pass --force to send anyway.');
+    console.error('It may be stopped, backgrounded, or the pane may have dropped to a shell. Investigate the peer. --force never bypasses the transport shell/unknown-process guard.');
     process.exit(1);
   }
   if (!screenReady && !force) {
     console.error(`Refusing to send: session '${SESSION}' has foreground agy, but TUI readiness markers were not visible.`);
-    console.error('Wait for the agy prompt/status line, or pass --force to send anyway.');
+    console.error('Wait for the agy prompt/status line; --force bypasses only this readiness check.');
     process.exit(1);
   }
   if (!screenReady) {
@@ -260,8 +247,14 @@ function send(message, force) {
   }
 
   const stamped = stampMessage(message);
-  deliver(stamped);
-  appendLedger(force ? '@AGY --force' : '@AGY', stamped);
+  const result = deliver(stamped);
+  if (!result.ok) {
+    appendLedger(force ? '@AGY --force' : '@AGY', `${stamped}\n[${result.receipt.state}: ${result.detail}]`, result.receipt);
+    console.error(`ERROR: send to '${SESSION}' NOT confirmed rendered (mode=${result.mode}): ${result.detail}`);
+    process.exit(2);
+  }
+  appendLedger(force ? '@AGY --force' : '@AGY', stamped, result.receipt);
+  console.log(`DELIVERED_RENDERED mode=${result.mode} session=${SESSION}`);
 }
 
 function showUsage() {
