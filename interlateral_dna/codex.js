@@ -3,15 +3,11 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { getIdentity, stampMessage } = require('./identity');
+const { deliverVerified, paneInfo, paneMode } = require('./mesh-transport');
 
 const TMUX_SOCKET = process.env.TMUX_SOCKET || process.env.INTERLATERAL_TMUX_SOCKET || '/tmp/interlateral-agents-tmux.sock';
 const SESSION = process.env.CODEX_TMUX_SESSION || 'ia-codex';
-const COMMS_PATH = path.join(__dirname, 'comms.md');
-const IDLE_SHELLS = new Set(['bash', 'zsh', 'sh', 'fish']);
-
-function sleep(ms) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-}
+const COMMS_PATH = process.env.INTERLATERAL_COMMS_PATH || path.join(__dirname, 'comms.md');
 
 function runTmux(args, options = {}) {
   return execFileSync('tmux', ['-S', TMUX_SOCKET, ...args], {
@@ -23,39 +19,34 @@ function runTmux(args, options = {}) {
 }
 
 function sessionExists() {
-  try {
-    runTmux(['has-session', '-t', SESSION], { stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
+  return Boolean(paneInfo(runTmux, SESSION).id);
 }
 
 function paneCommand() {
-  try {
-    return runTmux(['display-message', '-p', '-F', '#{pane_current_command}', '-t', SESSION]).trim();
-  } catch {
-    return '';
-  }
+  return paneInfo(runTmux, SESSION).command;
 }
 
 function ready() {
   const cmd = paneCommand();
-  return Boolean(cmd) && !IDLE_SHELLS.has(cmd);
+  return ['inbox', 'tui'].includes(paneMode(cmd));
 }
 
-function appendLedger(target, message) {
+function appendLedger(target, message, receipt) {
   const sender = getIdentity().sender || 'relay';
   const timestamp = new Date().toISOString();
+  if (receipt) fs.appendFileSync(COMMS_PATH, JSON.stringify({ timestamp, sender, ...receipt }) + '\n');
   fs.appendFileSync(COMMS_PATH, `\n[${sender}] ${target} [${timestamp}]\n${message}\n\n---\n`);
 }
 
 function getStatus() {
   const exists = sessionExists();
+  const info = exists ? paneInfo(runTmux, SESSION) : { command: '', tty: '' };
   const payload = {
     session: SESSION,
     exists,
-    pane_command: paneCommand() || null,
+    pane_command: info.command || null,
+    pane_mode: paneMode(info.command),
+    pane_tty: info.tty || null,
     ready: exists && ready(),
     tmux_socket: TMUX_SOCKET,
   };
@@ -67,24 +58,20 @@ function read() {
     console.error(`tmux session '${SESSION}' not found on ${TMUX_SOCKET}`);
     process.exit(1);
   }
-  process.stdout.write(runTmux(['capture-pane', '-t', SESSION, '-p', '-S', '-']));
+  process.stdout.write(runTmux(['capture-pane', '-t', paneInfo(runTmux, SESSION).id, '-p', '-S', '-']));
 }
 
-// Stamped messages are always pasted through a tmux buffer. `paste-buffer -r`
-// preserves literal LF bytes; without -r, tmux translates LF to CR, which can
-// submit multi-line prompts line by line in terminal TUIs.
+// Delivery is mode-aware and VERIFIED (M4-INC-03): a cat-style inbox pane gets
+// a direct pane-TTY write (paste-buffer silently no-ops there); a TUI gets the
+// buffer paste + Escape/Enter submit. Either way the pane is re-captured and a
+// send that never rendered exits nonzero instead of reporting success.
 function deliver(text) {
-  const buffer = `codex_send_${process.pid}`;
-  runTmux(['load-buffer', '-b', buffer, '-'], { input: text });
-  try {
-    runTmux(['paste-buffer', '-r', '-t', SESSION, '-b', buffer]);
-  } finally {
-    try { runTmux(['delete-buffer', '-b', buffer]); } catch {}
-  }
-  sleep(1000);
-  runTmux(['send-keys', '-t', SESSION, 'Escape']);
-  sleep(100);
-  runTmux(['send-keys', '-t', SESSION, 'Enter']);
+  return deliverVerified({
+    runTmux,
+    session: SESSION,
+    text,
+    submitKeys: ['Escape', 'Enter'],
+  });
 }
 
 function send(message) {
@@ -98,12 +85,15 @@ function send(message) {
   }
 
   const stamped = stampMessage(message);
-  if (!ready()) {
-    console.error(`Warning: session '${SESSION}' is not running Codex. Sending anyway.`);
-  }
 
-  deliver(stamped);
-  appendLedger('@Codex', stamped);
+  const result = deliver(stamped);
+  if (!result.ok) {
+    appendLedger('@Codex', `${stamped}\n[${result.receipt.state}: ${result.detail}]`, result.receipt);
+    console.error(`ERROR: send to '${SESSION}' NOT confirmed rendered (mode=${result.mode}): ${result.detail}`);
+    process.exit(2);
+  }
+  appendLedger('@Codex', stamped, result.receipt);
+  console.log(`DELIVERED_RENDERED mode=${result.mode} session=${SESSION}`);
 }
 
 function showUsage() {
