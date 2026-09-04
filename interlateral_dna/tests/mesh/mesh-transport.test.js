@@ -176,3 +176,13 @@ test('T13: all simple helpers produce structured receipts', () => {
   assert.ok(rows.some(r => r.sender && r.target === INBOX_SESSION && r.attempt_id &&
     r.payload_sha256 && r.request_nonce && r.state === 'DELIVERED_RENDERED'));
 });
+
+test('T14: native version titles can resolve through exact foreground executable', () => {
+  assert.deepEqual(transport.parseForegroundCli('10 10 20 Ss -zsh\n20 20 20 S+ claude'),
+    { pid: '20', command: 'claude' });
+  assert.equal(transport.parseForegroundCli('20 20 30 S claude'), null);
+  assert.equal(transport.parseForegroundCli('20 20 20 T+ claude'), null);
+  assert.equal(transport.parseForegroundCli('20 20 20 S+ node'), null);
+  assert.equal(transport.parseForegroundCli('20 20 20 S+ zsh'), null);
+  assert.equal(transport.parseForegroundCli('20 20 20 S+ claude\n21 20 20 S+ codex'), null);
+});

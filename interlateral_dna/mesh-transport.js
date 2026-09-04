@@ -1,5 +1,7 @@
 'use strict';
 const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
 const { randomUUID, createHash } = require('crypto');
 const INBOX_COMMANDS = new Set(['cat']);
 const IDLE_SHELLS = new Set(['bash', 'zsh', 'sh', 'fish']);
@@ -26,11 +28,35 @@ function paneInfo(runTmux, session) {
   try {
     const resolved = resolvePane(runTmux, session);
     const query = format => runTmux(['display-message', '-p', '-F', format, '-t', resolved.id]).trim();
-    return { ...resolved, command: query('#{pane_current_command}'),
-      tty: query('#{pane_tty}'), pid: query('#{pane_pid}') };
+    const rawCommand = query('#{pane_current_command}');
+    const tty = query('#{pane_tty}');
+    // Native CLIs can set their process title to a version. Inspect only this
+    // PTY's foreground executable; never infer a CLI from prompt text or "node".
+    const foreground = ['unknown', 'tui'].includes(paneMode(rawCommand))
+      ? foregroundCli(tty) : null;
+    return { ...resolved, rawCommand,
+      command: foreground?.command || (TUI_COMMANDS.has(rawCommand) ? '' : rawCommand),
+      foregroundPid: foreground?.pid || null, tty, pid: query('#{pane_pid}') };
   } catch {
     return { command: '', tty: '', id: null, target: null };
   }
+}
+function parseForegroundCli(output) {
+  const matches = output.split('\n').flatMap(line => {
+    const m = line.match(/^\s*(\d+)\s+(\d+)\s+(-?\d+)\s+(\S+)\s+(.+)$/);
+    if (!m || Number(m[2]) !== Number(m[3]) || /[TZX]/.test(m[4])) return [];
+    const command = path.basename(m[5].trim());
+    return TUI_COMMANDS.has(command) ? [{ pid: m[1], command }] : [];
+  });
+  return matches.length === 1 ? matches[0] : null;
+}
+function foregroundCli(tty) {
+  if (!/^\/dev\/(?:ttys\d+|pts\/\d+)$/.test(tty)) return null;
+  try {
+    return parseForegroundCli(execFileSync('ps',
+      ['-t', tty.replace('/dev/', ''), '-o', 'pid=,pgid=,tpgid=,stat=,comm='],
+      { encoding: 'utf8', timeout: 2000 }));
+  } catch { return null; }
 }
 function paneMode(command) {
   if (INBOX_COMMANDS.has(command)) return 'inbox';
@@ -68,7 +94,8 @@ function deliverVerified({ runTmux, session, text, submitKeys = ['Enter'], verif
   const unchanged = () => {
     const now = paneInfo(runTmux, session);
     if (now.id !== info.id || now.command !== info.command ||
-        now.tty !== info.tty || now.pid !== info.pid) throw new Error('Recipient changed during send');
+        now.tty !== info.tty || now.pid !== info.pid ||
+        now.foregroundPid !== info.foregroundPid) throw new Error('Recipient changed during send');
   };
   try {
     unchanged();
@@ -106,5 +133,5 @@ function deliverVerified({ runTmux, session, text, submitKeys = ['Enter'], verif
     return result(false, `${receipt.state}: ${error.message}; inspect before retrying`);
   }
 }
-module.exports = { deliverVerified, resolvePane, paneInfo, paneMode, verifyRendered,
+module.exports = { deliverVerified, resolvePane, paneInfo, paneMode, verifyRendered, parseForegroundCli,
   normalize, INBOX_COMMANDS, IDLE_SHELLS };

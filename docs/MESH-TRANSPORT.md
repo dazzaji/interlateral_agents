@@ -14,6 +14,11 @@ recognition is a routing guard, not cryptographic authentication or proof of idl
 Check the intended CLI is idle before sending. No terminal transport eliminates every
 process-exit race; do not use it as an authorization/security boundary.
 
+Some native CLIs expose a version as their tmux process title. The helper can recognize
+their named foreground executable using a PTY-scoped ps query and rechecks its PID.
+Background/stopped processes and ambiguous foreground CLI matches do not qualify.
+A generic node executable alone still does not establish which agent is running.
+
 JSON receipt lines in comms.md record sender, requested and resolved target, pane ID,
 request nonce, attempt ID, payload hash, and state:
 - REFUSED: no message write attempted.
