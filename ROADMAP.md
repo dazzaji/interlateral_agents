@@ -251,6 +251,11 @@ These stay in the separate platform repo.
 
 ## Provenance
 
+For the experimental path from AgentO/OTel through TMUX HyperDomo, Hypertree, and
+Interlateral Alpha, see [Historical Lineage](docs/LINEAGE.md). Those sources explain
+design ancestry; they are not current specifications or authorization to revive
+deferred systems.
+
 Capabilities consolidated from five source repos:
 
 | Source Repo | Role |

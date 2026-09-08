@@ -64,6 +64,7 @@ Use the lightest adequate process. Ordinary questions do not require an overnigh
 - [bb Desktop](docs/BB-DESKTOP.md), [Claude adapter](CLAUDE.md), [Codex adapter](docs/CODEX-ENTRY.md).
 - [Transport verification](docs/MESH-TRANSPORT.md) and [troubleshooting](TROUBLESHOOTING.md).
 - [ControlKernel home](docs/CONTROLKERNEL.md): separate development home; not started here.
+- [Historical lineage](docs/LINEAGE.md): how HyperDomo, comtree, and Hypertree informed the maintained mesh.
 - [Roadmap](ROADMAP.md): deferred systems, not an invitation to implement them.
 
 Canonical skills live in `.agent/skills/`; committed mirrors are `.claude/skills/`
