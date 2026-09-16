@@ -1,6 +1,6 @@
 # Skills Catalog
 
-All **27 shipped canonical skills** live in `.agent/skills/<name>/SKILL.md`.
+All **28 shipped canonical skills** live in `.agent/skills/<name>/SKILL.md`.
 Read the chosen file and required references in full. Hosts without discovery can
 read it directly; naming a model or installing a plugin is not required.
 
@@ -14,6 +14,7 @@ supervised sprint 3, delegated gates 4. Ordinary questions stay at level 0.
 | [add-comments](.agent/skills/add-comments/SKILL.md) | Annotate a shared artifact | Artifact and comment location | Commenters | Attributed comments | Writes agreed comment area |
 | [adherence-check](.agent/skills/adherence-check/SKILL.md) | Check a result against a contract | Artifact, requirements and evidence | Checker | Conformance findings | Read-only unless repairs assigned |
 | [agy-cli-peer](.agent/skills/agy-cli-peer/SKILL.md) | Join an explicitly selected agy CLI | Socket, session and work scope | Joining peer | Unique seat and ACK proof | Launch only if authorized |
+| [concierge](.agent/skills/concierge/SKILL.md) | Boot the human's project-aware side-channel CLI above the running system | CLI choice, workdir, launch authorization | Human, concierge CLI, spawning desktop agent | Dual-visible briefed concierge answering status and ad hoc human tasking | Human-authorized launch; no gate authority; team never waits for it |
 | [competition](.agent/skills/competition/SKILL.md) | Compare independent proposals | Problem, candidates and judging criteria | Competitors and judge | Ranked alternatives | Peer creation and writes need permission |
 | [constitutional](.agent/skills/constitutional/SKILL.md) | Draft and ratify shared rules | Draft, stakeholders and ratification rule | Drafters and ratifiers | Constitution and recorded dissent | No external legal or publication effect |
 | [democratic](.agent/skills/democratic/SKILL.md) | Make an agreed group decision | Options, electorate and voting rule | Voters and facilitator | Vote record and decision | Only the authorized decision scope |

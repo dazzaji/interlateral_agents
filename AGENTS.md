@@ -41,7 +41,7 @@ operations on unexpected drift. Verify actual artifacts and tests before accepta
 ## Skills and Process
 
 Read the selected canonical file at .agent/skills/<name>/SKILL.md, including any required
-references. SKILLS.md lists all 27 shipped skills and their input/role/output contracts.
+references. SKILLS.md lists all 28 shipped skills and their input/role/output contracts.
 Hosts without automatic discovery can read these files directly; no plugin is required.
 Use level 0 for ordinary solo questions; levels 1-2 for peer/team work; levels 3-4 only
 when supervision or delegated gates are warranted (templates/sprint/process-levels.md).

@@ -47,6 +47,9 @@ The isolated tmux transport suite itself needs no npm dependencies.
 ## Choose Your Workflow
 
 - One bounded task: solo, no mesh needed.
+- A project-aware CLI side channel above a running agent team, in a terminal you and the desktop agent both see and prompt: `concierge`.
+  Choose Claude Code, Codex, or another explicitly selected CLI; concierges default to
+  the desktop task's project directory. Additional CLI transports require qualification.
 - Compare or review: `peer-collaboration`, `peer-superset`, or `peer-synthi`.
 - Build as a team: `dev-collaboration`, `hierarchical`, or `ready-rock-quartet`.
 - Long unattended work: `overnight-cookbook` selects a topology and requires an
@@ -59,7 +62,7 @@ Use the lightest adequate process. Ordinary questions do not require an overnigh
 ## Find Your Way
 
 - [Agent entry](AGENTS.md): identity, scope, joining, transport and capability boundaries.
-- [All 27 skills](SKILLS.md): purpose, inputs, roles, outputs, and explicit loading.
+- [All 28 skills](SKILLS.md): purpose, inputs, roles, outputs, and explicit loading.
 - [The Overnight Cookbook](docs/overnight-cookbook.md): the single maintained book.
 - [bb Desktop](docs/BB-DESKTOP.md), [Claude adapter](CLAUDE.md), [Codex adapter](docs/CODEX-ENTRY.md).
 - [Transport verification](docs/MESH-TRANSPORT.md) and [troubleshooting](TROUBLESHOOTING.md).
