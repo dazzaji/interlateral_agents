@@ -419,6 +419,9 @@ Discover credentials proactively through authorized metadata, but report only re
 
 **Qualification.** Boundary discipline is demonstrated. Isolation guarantees are environment-specific.
 
+For a dated Grok CLI headless-review recipe and its filesystem/network limits, see Appendix E.11;
+qualify the actual launcher with Appendix I.7 before unattended reliance.
+
 ## 23. Know what is enforced
 
 **Invariant.** State which rules are code-enforced and which rely on cooperation. Cooperative-path safety is not hostile-adversary security.
@@ -1077,6 +1080,75 @@ mark `RETIRED` explicitly rather than silently dropping the surface.
 <!-- ADAPTER-WARP-2026-08-END -->
 
 
+## E.11 Grok CLI — sandboxed headless reviews
+
+<!-- ADAPTER-GROK-CLI-2026-09-BEGIN -->
+
+- **Role:** explicitly authorized, bounded reviewer, breaker, or verifier; not the writer's lease holder.
+- **Maturity:** `EVIDENCE-DERIVED`, limited to the reported controlled filesystem probe below.
+- **Reference version:** installed Grok `1.0.41 (4220f3b224a6)`; revalidate the actual probe's version.
+- **Last checked:** 2026-09-27; installed CLI help and sandbox documentation inspected directly.
+- **Source anchors:** installed `grok --help`, `grok --version`, sandbox user guide
+  (`~/.grok/docs/user-guide/18-sandbox.md`), and the private dated qualification record.
+
+**Observed result and claims boundary.** A controller-reported macOS probe using
+`--permission-mode auto --sandbox workspace` read the disposable checkout, ran Git, wrote a
+probe inside that checkout, and received an OS denial when attempting a write into the real
+repository. Structured output also worked. This is evidence for that tested write boundary,
+not independent verification of every sandbox escape, platform, or future release. Retain raw
+stdout/stderr, command/version/OS records, before/after hashes, and the denied operation in the
+private evidence packet; publish only a sanitized summary.
+
+**Permissions are not confinement.** `auto` governs tool approval; the sandbox profile governs
+OS access. The installed guide describes `workspace` as readable everywhere, writable in CWD,
+Grok state, and temporary directories, subject to its protected-path exceptions. Network remains
+allowed. On macOS, even profiles requesting child-network blocking do not enforce that block.
+This recipe is not credential isolation, network isolation, or a hostile-code execution boundary.
+Use a separately qualified custom deny profile, scrubbed subprocess environment, scoped service
+credentials, or a disposable VM/container when the effect envelope requires stronger protection.
+
+**Fail closed at launch.** Sandbox is off by default. The installed guide warns that built-in
+profiles can warn and continue unenforced when initialization fails; explicitly requested custom
+profiles have a stricter refusal behavior. The controller must reject unenforced or unverified
+launches. A profile name or post-run `git status` comparison is not enforcement proof. A denied
+write probe and content-hash checks are complementary; neither proves all network effects safe.
+
+**Illustrative invocation — qualify locally, not a complete isolation wrapper:**
+
+```bash
+# CWD is one role's disposable checkout; output paths are controller-owned.
+(
+  cd "$REVIEW_ROOT" || exit 1
+  grok --prompt-file "$PROMPT_FILE" \
+    -m "$GROK_MODEL" --reasoning-effort high \
+    --permission-mode auto --sandbox workspace \
+    --json-schema "$(cat "$SCHEMA_FILE")"
+) > "$RESULT_FILE" 2> "$STDERR_FILE"
+```
+
+The controller supplies a hard timeout and bounded retries; verifies actual model route; parses
+the final structured result using the installed version's output format; and checks schema,
+reviewer identity, pinned build/profile hashes, findings/verdict consistency, and process exit.
+Malformed, truncated, stale, or missing output is lane failure, never approval. Put shell comments
+above commands, not after a line-continuation backslash.
+
+Use a separate disposable local clone per parallel role, with pinned input commits, no remote,
+and isolated scratch, ports, and database credentials. Removing a remote reduces accidental
+publication but does not prevent network access or use of credentials readable elsewhere. Linked
+worktrees share Git metadata outside CWD; prefer standalone clones when qualifying write roots.
+Probe files may be written only in scratch; reviewer changes do not become implementation edits.
+
+**Lifecycle.** Record applicable instructions, tools/hooks/MCP configuration, credentials class,
+and effective profile before dispatch. A headless one-shot ends with durable output and an exact
+marker; it is not a desktop wake mechanism. The installed guide says resumed sessions retain
+their saved profile and refuse a different one: start a fresh session when changing isolation,
+and requalify after version, OS, configuration, authentication, or launcher changes. Preserve
+probe evidence, terminate owned children, remove disposable clones, and account for temporary
+files/session records at closeout. See Appendix I.7.
+
+<!-- ADAPTER-GROK-CLI-2026-09-END -->
+
+
 # Appendix F — Failure Museum
 
 Each case records symptom, mistaken inference, actual failure domain, evidence, safe response,
@@ -1539,6 +1611,37 @@ stale takeover, reopened findings, non-convergence, crash during finalization, a
 signature.
 
 <!-- RUNBOOK-OWNERSHIP-FINALIZATION-2026-08-END -->
+
+
+## I.7 Qualify a Grok headless-review lane
+
+<!-- RUNBOOK-GROK-REVIEW-2026-09-BEGIN -->
+
+1. Record CLI/build and OS versions, requested/reported route, exact launcher, permission mode,
+   sandbox profile, effective settings/hooks/tools, input hashes, timeout, credentials class,
+   output schema/parser, and private evidence location. Never record credential values.
+2. Prepare one role-specific disposable clone at the exact commit, with no remote, no real
+   project secrets, separate scratch/ports, and only the service authority required by its probes.
+3. Through the real headless launcher, prove a file read, harmless Git command, permitted scratch
+   write, and kernel-denied write to a disposable sentinel outside the allowed write roots. Use
+   synthetic sentinels, not a real repository or credential file. Verify content hashes afterward.
+4. Capture enforcement diagnostics. Abort on initialization warnings indicating no enforcement,
+   an allowed out-of-root write, or inability to establish the required boundary. Test the
+   launcher's failure handling in a controlled disposable environment. Do not silently fall back
+   to unsandboxed execution or treat a tool-approval denial as proof of an OS denial.
+5. Declare readable paths, writable Grok/temp exceptions, and network exposure explicitly. If
+   stronger confidentiality or network controls are required, qualify them separately with
+   synthetic secret-denial and controlled network tests; `workspace` alone does not provide them.
+6. Prove schema-valid structured output and semantic validation of reviewer identity, target
+   hashes, verdict/findings consistency, and required evidence. Test malformed/missing output,
+   process failure, and timeout; all must fail the lane rather than approve the gate.
+7. If reviews run concurrently, prove independent clones, scratch/ports/databases, and pinned
+   source manifests. No role may consume another role's unsealed output in a blind round.
+8. Prove termination and closeout: tracked children exit, artifacts/hashes are preserved, owned
+   disposable resources are retired, and no scheduled/review task remains. Record PASS only for
+   checks actually exercised; mark untested guarantees separately and requalify on relevant drift.
+
+<!-- RUNBOOK-GROK-REVIEW-2026-09-END -->
 
 
 # Appendix J — Complete Operating Template Kit
