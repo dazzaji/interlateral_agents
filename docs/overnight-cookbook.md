@@ -351,6 +351,11 @@ Replacement follows the lease protocol and resumes only already authorized work.
 
 ## 17. Engineer evidence
 
+**Reuse lesson, 2026-10-22:** retain the working execution/evidence runner instead of rebuilding
+it each sprint. Record command exit separately from required-output capture; a capture failure
+cannot certify success. Pin the actual executable/runtime and source, count assertions, reject
+zero-test/printed-PASS results, and retain independent reruns. See Appendix K for reuse scope.
+
 **Invariant.** State both where evidence came from and how the claim was tested.
 
 **Protocol.** Provenance: primary fact, independent result, project evidence, inference, vendor claim, anecdote, hypothesis. Proof modality: inspection, executable test, adversarial/negative test, operational/restart test, environment/route attestation, external/human acceptance, authority record. Material claims carry one provenance label, one or more modalities, the environment/version, counterevidence, and limits.
@@ -363,6 +368,13 @@ Use the claims ladder: observed; locally reproduced; environment-qualified; oper
 
 ## 18. Dispatch reviews and gates
 
+**Proportionate continuation:** routine engineering decisions belong to the controller. Use an
+on-demand independent judgment for material disputed decisions, not a council vote for every
+retry. A missing optional review or one model refusal must not veto all independent work.
+Diagnose its actual scope, use genuinely permitted alternatives, isolate affected dependencies
+and continue. Do not evade safeguards or manufacture a passing result. A generic warning is not
+evidence that the surrounding legitimate project is malicious.
+
 **Invariant.** Gatekeepers rerun proof and cannot approve their own work.
 
 **Protocol.** Freeze artifact/hash, contract/manifest, role/independence, threat model, commands, severity, output marker, timeout/fallback, and `This gate IS / IS NOT`. Gatekeepers rerun decisive commands read-only and return one consolidated PASS/FAIL/BLOCKED with residual blockers. Governance changes are file-backed before use. Consequential boundaries may use blind provider-diverse dual gates; routine deterministic slices use lighter review. Measure dispatch latency separately from proof runtime.
@@ -372,6 +384,13 @@ Use the claims ladder: observed; locally reproduced; environment-qualified; oper
 **Qualification.** Demonstrated practice. Dispatch clocks are tunable profiles.
 
 ## 19. Repair while converging
+
+**Finish with a punch list:** a usable sprint can close `DELIVERED_WITH_EXCEPTIONS`, listing each
+remaining issue, actual consequence, containment and next action. Keep delivery outcome separate
+from individual test results and release claims. Disable or defer an affected optional capability
+and continue verified independent work. Apply a hold to the affected unit, not automatically the
+whole program. No new human approval cycle is needed for routine contained imperfections within
+the existing scope. Missing core functionality is substantive partial delivery, not a tiny exception.
 
 **Invariant.** Repair should shrink a stable finding set; blockers tied to the threat model are success, while endless review is not.
 
@@ -500,6 +519,12 @@ Use fresh issue-sized judgment contexts and deterministic routine controllers. E
 # Appendix A — Preflight and operating profiles
 
 ## Preflight
+
+- Reuse qualified existing tools where cheaper than repeated manual work; do not build a new framework by default.
+- Check exact runtime, long-message payload/ACK and scoped ledger relay where used; hashes must be real at dispatch.
+- Separate execution qualification from publication qualification so exporter work does not delay qualified local fixes.
+- Keep rollback proportionate: local copies and completeness checks can suffice for reversible local work; encryption/vault/off-device recovery are not universal sprint prerequisites.
+
 
 - Outcome, audience, scope, acceptance, budget, and stop condition are written.
 - Sources are versioned and hashed.
@@ -1150,6 +1175,12 @@ files/session records at closeout. See Appendix I.7.
 
 
 # Appendix F — Failure Museum
+
+Related dated operating pattern, 2026-10-22: one desktop controller/sole publisher, CLI writers
+and independent reviewers/verifiers. Working execution and publication tools were qualified in
+an earlier run; the combination matrix had separate evidence. This is a reuse pattern, not proof
+that every launcher, closeout script, future model or relocated environment is qualified. Resolve
+the retained manifest and adapter versions before operational reuse; see Appendix K.
 
 Each case records symptom, mistaken inference, actual failure domain, evidence, safe response,
 earned doctrine, and maturity. Details are sanitized; private coordinates and identities remain
@@ -1889,3 +1920,40 @@ status:
 ```
 
 <!-- TEMPLATE-KIT-2026-08-END -->
+
+# Appendix K — Reuse the execution runner and PR delivery tools
+
+**Maintained location:** [scripts/sprint-harness](../scripts/sprint-harness/README.md).
+These are the two concrete tool sets extracted from the 2026-10-22 sprint. Use and maintain this
+package for future sprints rather than searching historical run folders or rebuilding it.
+
+The **execution/evidence runner** captures the command's actual result, output-capture status,
+exact source/runtime and expected tests. It rejects misleading green results and preserves
+evidence. The **publication pipeline** exports the accepted changes, scans outgoing history,
+pushes the approved branch, reconciles uncertain effects and verifies the resulting draft PR.
+
+Start with the documented local self-test example; it exercises both sets without changing
+GitHub. Configure the new run explicitly. No yesterday-default repository, deadline, private
+path or credential is carried forward. Core execution checks gate local work; publication checks
+gate publication, not all useful engineering. Preserve original provenance and recheck adaptations.
+
+**Economics:** reuse is a required implementation step when the run selects this package, not a
+vague suggestion. Make the smallest needed adaptations and retain their tests. Do not build a
+new general-purpose orchestration framework as a prerequisite. Measure setup time and repeated
+commands saved; do not claim a ten-minute job or an hour saved without evidence. Update the
+cookbook while lessons are fresh, separately from any later broad skill-system redesign.
+
+**Three observed failure lessons:**
+
+- An unavailable/refused breaker was made a dependency of the whole sprint. Diagnose and isolate
+  that review; continue permitted work and deliver an honest punch list. No disguised safeguard
+  evasion and no invented test PASS.
+- A matrix used a different Node runtime. Pin and verify the executable/version used for the
+  actual process, not just the configured version in prose.
+- A long bootstrap prompt was truncated. Use tested paste-buffer delivery and payload/nonce ACK;
+  ledger append is not delivery. A sandboxed lane needing ledger access gets a scoped append relay,
+  not unrestricted writes. See F.15 for why live multiwriter logs should not be in Dropbox.
+
+**Limits:** the reused tools are not a scheduler, identity service or automatic certification.
+Local regression evidence and original qualification records remain distinct. The README names
+what was extracted, what was changed and what needs per-run integration checking.
