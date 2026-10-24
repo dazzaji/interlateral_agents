@@ -1,6 +1,6 @@
 ---
 name: peer-superset
-description: Run a two-agent independent review/redteam followed by peer collaboration to produce a consensus superset of findings and enumerated revision requests. Use when Codex 5.5 and Claude Opus 4.7 should first critique a matter independently, then exchange work, synthesize the best combined analysis, and finish with a single agreed revision list.
+description: Run a two-agent independent review/redteam followed by peer collaboration to produce a consensus superset of findings and enumerated revision requests. Use when Codex 5.5 and Claude Opus 5.5 should first critique a matter independently, then exchange work, synthesize the best combined analysis, and finish with a single agreed revision list.
 metadata:
   owner: interlateral
   version: "1.1"
@@ -9,7 +9,7 @@ metadata:
 
 # Peer Superset
 
-Compatibility: two live agents with direct comms, preferably Codex 5.5 and Claude Opus 4.7.
+Compatibility: two live agents with direct comms, preferably Codex 5.5 and Claude Opus 5.5.
 
 ## Purpose
 
@@ -59,7 +59,7 @@ All inputs come from the prompt.
 Recommended:
 
 - `codex_session`: default `ps-codex-reviewer` or another Codex 5.5 session
-- `claude_session`: default `ps-claude-reviewer` or another Claude Opus 4.7 session
+- `claude_session`: default `ps-claude-reviewer` or another Claude Opus 5.5 session
 - `final_output`: default `{output_dir}/consensus-final.md`
 - `max_turns`: default 4 consensus exchanges after independent originals
 - `controller`: human or agent responsible for phase advancement
@@ -358,7 +358,7 @@ If fresh peers are needed:
 CODEX_MODEL=gpt-5.5 scripts/launch-codex-peer.sh ps-codex-reviewer \
   "Read AGENTS.md and .codex/skills/peer-superset/SKILL.md, then wait for the peer-superset assignment. Reply READY_FOR_PEER_SUPERSET_CODEX."
 
-CLAUDE_MODEL=claude-opus-4-7 scripts/launch-cc-peer.sh ps-claude-reviewer \
+CLAUDE_MODEL=claude-opus-5-5 CLAUDE_EFFORT=high scripts/launch-cc-peer.sh ps-claude-reviewer \
   "Read CLAUDE.md and .claude/skills/peer-superset/SKILL.md, then wait for the peer-superset assignment. Reply READY_FOR_PEER_SUPERSET_CLAUDE."
 ```
 
