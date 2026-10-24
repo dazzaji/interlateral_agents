@@ -867,6 +867,7 @@ approved; otherwise describe the architecture generically.
 <!-- ADAPTER-CODEX-CLI-2026-08-BEGIN -->
 
 - **Role:** durable CLI worker or reviewer on the shared tmux mesh.
+- **Default model (2026-10-24):** `gpt-6.1-sol` at high reasoning effort and standard speed (`-m gpt-6.1-sol -c model_reasoning_effort=high`), which is what the repository launchers pass. Use Astra only with explicit owner approval, never as a silent substitute. Record the reported model and effort at the first launch.
 - **Maturity:** `PRACTICE`, version- and helper-scoped.
 - **Last verified:** 2026-08-31 against the recorded helper implementation.
 - **Source anchors:** the dated `codex.js` helper, `LIVE_COMMS` matrix, and the installed CLI help
