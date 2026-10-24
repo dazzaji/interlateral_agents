@@ -355,7 +355,7 @@ CLAUDE_SUPERSET_FINAL_DONE
 If fresh peers are needed:
 
 ```bash
-CODEX_MODEL=gpt-5.5 scripts/launch-codex-peer.sh ps-codex-reviewer \
+CODEX_MODEL=gpt-6.1-sol CODEX_EFFORT=high scripts/launch-codex-peer.sh ps-codex-reviewer \
   "Read AGENTS.md and .codex/skills/peer-superset/SKILL.md, then wait for the peer-superset assignment. Reply READY_FOR_PEER_SUPERSET_CODEX."
 
 CLAUDE_MODEL=claude-opus-5-5 CLAUDE_EFFORT=high scripts/launch-cc-peer.sh ps-claude-reviewer \

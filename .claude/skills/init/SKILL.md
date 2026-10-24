@@ -46,14 +46,14 @@ For quartet work, use `ready-rock-quartet`.
 
 Defaults:
 - Claude model: `claude-opus-5-5` (`claude-opus-4-7` is refused)
-- Codex model: `gpt-5.5`
+- Codex model: `gpt-6.1-sol` at high effort (`CODEX_EFFORT=high`); Astra only with explicit owner approval
 - Ready phrase: `Reporting for Duty!`
 - tmux socket: `/tmp/interlateral-agents-tmux.sock`
 
 Model and argument defaults are configurable with environment variables:
 
 ```bash
-CLAUDE_MODEL=claude-opus-5-5 CODEX_MODEL=gpt-5.5 ./me.sh
+CLAUDE_MODEL=claude-opus-5-5 CODEX_MODEL=gpt-6.1-sol CODEX_EFFORT=high ./me.sh
 CLAUDE_ARGS="..." CODEX_ARGS="..." ./me.sh
 ```
 

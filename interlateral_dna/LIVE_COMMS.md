@@ -32,7 +32,7 @@ Pane text alone does not count. A message typed or drafted in an agent terminal 
 `me.sh` boots two agents by default:
 
 - Claude Code: `ia-claude` with `claude-opus-5-5` unless `CLAUDE_MODEL` overrides it (`claude-opus-4-7` variants are refused)
-- Codex: `ia-codex` with `gpt-5.5` unless `CODEX_MODEL` overrides it
+- Codex: `ia-codex` with `gpt-6.1-sol` at high effort unless `CODEX_MODEL`/`CODEX_EFFORT` override it
 
 Gemini CLI is available via `scripts/launch-gemini-peer.sh` and uses session names like `ia-gemini-peer-NN`, but it is an opt-in peer. Antigravity CLI is available via `scripts/launch-agy-peer.sh` / `interlateral_dna/agy.js` and is also opt-in. Do not recruit either for routine skills unless the assignment names that peer.
 
@@ -270,7 +270,7 @@ All three CLIs support a headless mode that bypasses the TUI entirely. This is u
 
 | Mode | Command |
 |------|---------|
-| Headless one-shot | `codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox "task"` |
+| Headless one-shot | `codex exec -m gpt-6.1-sol -c model_reasoning_effort=high --dangerously-bypass-approvals-and-sandbox "task"` |
 | Resume session | `codex resume SESSION_ID` |
 
 **Gemini CLI:**
@@ -357,7 +357,7 @@ These flags are required for unattended multi-agent operation. Without them, age
 | CLI | Default model | Notes |
 |-----|--------------|-------|
 | Claude Code | Opus 5.5 | `me.sh` and `scripts/launch-cc-peer.sh` specify `--model claude-opus-5-5` by default; Opus 4.7 is refused |
-| Codex | gpt-5.5 | `me.sh` specifies `-m gpt-5.5` by default |
+| Codex | gpt-6.1-sol (high) | `me.sh` specifies `-m gpt-6.1-sol -c model_reasoning_effort=high` by default |
 | Gemini CLI | gemini-3.1-pro-preview | Specify with `-m gemini-3.1-pro-preview` |
 | Antigravity CLI | Gemini 3.5 Flash | Provided by `agy`; launch via `scripts/launch-agy-peer.sh` when explicitly selected |
 
@@ -369,7 +369,9 @@ Other models are available for specific use cases. Requirements from the user or
 
 | Model | Flag | Characteristics |
 |-------|------|-----------------|
-| gpt-5.5 (default) | `-m gpt-5.5` | Frontier reasoning, general work |
+| gpt-6.1-sol (default) | `-m gpt-6.1-sol -c model_reasoning_effort=high` | Default for this repo: strong reasoning at lower token cost; standard speed |
+| gpt-6-astra | `-m gpt-6-astra` | Use only with explicit owner approval; never as a silent substitute |
+| gpt-5.5 | `-m gpt-5.5` | Earlier default; general work |
 | gpt-5.4 | `-m gpt-5.4` | Strong fallback when 5.5 is unavailable |
 | gpt-5.3-codex-spark | `-m gpt-5.3-codex-spark` | Faster output (~1000 tok/s), lighter reasoning |
 
@@ -408,9 +410,9 @@ scripts/launch-cc-peer.sh --effort max ia-claude-peer-02 "Read CLAUDE.md first, 
 
 | Mode | Command |
 |------|---------|
-| Interactive (repo default) | `codex -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox` |
-| Interactive + first prompt | `codex -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox "prompt"` |
-| Headless one-shot | `codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox "task"` |
+| Interactive (repo default) | `codex -m gpt-6.1-sol -c model_reasoning_effort=high --dangerously-bypass-approvals-and-sandbox` |
+| Interactive + first prompt | `codex -m gpt-6.1-sol -c model_reasoning_effort=high --dangerously-bypass-approvals-and-sandbox "prompt"` |
+| Headless one-shot | `codex exec -m gpt-6.1-sol -c model_reasoning_effort=high --dangerously-bypass-approvals-and-sandbox "task"` |
 | Resume session | `codex resume SESSION_ID` |
 
 **Gemini CLI (this repo uses `--approval-mode=auto_edit`):**

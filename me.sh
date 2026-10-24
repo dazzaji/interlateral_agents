@@ -11,7 +11,8 @@ unset TMUX
 CLAUDE_SESSION="${CC_TMUX_SESSION:-$CC_SESSION}"
 CODEX_SESSION="${CODEX_TMUX_SESSION:-$CODEX_SESSION}"
 CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-5-5}"
-CODEX_MODEL="${CODEX_MODEL:-gpt-5.5}"
+CODEX_MODEL="${CODEX_MODEL:-gpt-6.1-sol}"
+CODEX_EFFORT="${CODEX_EFFORT:-high}"
 READY_PHRASE="${READY_PHRASE:-Reporting for Duty!}"
 INTERLATERAL_TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
 LAUNCH_SESSION_ID="${INTERLATERAL_SESSION_ID:-session_$(date +%s)}"
@@ -27,9 +28,10 @@ Usage:
 
 Environment overrides:
   CLAUDE_MODEL       Default: claude-opus-5-5 (any claude-opus-4-7 variant is refused)
-  CODEX_MODEL        Default: gpt-5.5
+  CODEX_MODEL        Default: gpt-6.1-sol
+  CODEX_EFFORT       Default: high (passed as -c model_reasoning_effort=...)
   CLAUDE_ARGS        Default: --dangerously-skip-permissions --model "$CLAUDE_MODEL"
-  CODEX_ARGS         Default: --no-alt-screen -m "$CODEX_MODEL" --dangerously-bypass-approvals-and-sandbox -C "$REPO_ROOT"
+  CODEX_ARGS         Default: --no-alt-screen -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_EFFORT" --dangerously-bypass-approvals-and-sandbox -C "$REPO_ROOT"
   READY_PHRASE       Default: Reporting for Duty!
 
 This launches only the standard two-agent CLI mesh: ia-claude and ia-codex.
@@ -134,6 +136,7 @@ warn_if_help_missing codex "--dangerously-bypass-approvals-and-sandbox"
 
 CLAUDE_MODEL_Q="$(shell_quote "$CLAUDE_MODEL")"
 CODEX_MODEL_Q="$(shell_quote "$CODEX_MODEL")"
+CODEX_EFFORT_Q="$(shell_quote "$CODEX_EFFORT")"
 REPO_ROOT_Q="$(shell_quote "$REPO_ROOT")"
 TMUX_SOCKET_Q="$(shell_quote "$TMUX_SOCKET")"
 TEAM_ID_Q="$(shell_quote "$INTERLATERAL_TEAM_ID")"
@@ -143,7 +146,7 @@ CLAUDE_LAUNCH_ID_Q="$(shell_quote "${LAUNCH_SESSION_ID}_claude")"
 CODEX_LAUNCH_ID_Q="$(shell_quote "${LAUNCH_SESSION_ID}_codex")"
 
 CLAUDE_ARGS="${CLAUDE_ARGS:---dangerously-skip-permissions --model $CLAUDE_MODEL_Q}"
-CODEX_ARGS="${CODEX_ARGS:---no-alt-screen -m $CODEX_MODEL_Q --dangerously-bypass-approvals-and-sandbox -C $REPO_ROOT_Q}"
+CODEX_ARGS="${CODEX_ARGS:---no-alt-screen -m $CODEX_MODEL_Q -c model_reasoning_effort=$CODEX_EFFORT_Q --dangerously-bypass-approvals-and-sandbox -C $REPO_ROOT_Q}"
 
 CLAUDE_PROMPT="Read CLAUDE.md in this repo for your operating instructions. Do not explore yet. First send Codex exactly \"ACK from Claude. Can you hear me?\" using node interlateral_dna/codex.js send \"ACK from Claude. Can you hear me?\", then wait for Codex ACK, then print exactly $READY_PHRASE, then stop and wait for Principal Human's assignment."
 CODEX_PROMPT="Read AGENTS.md in this repo for your operating instructions. Do not explore yet. Wait for a direct message in this Codex pane from Claude containing \"ACK from Claude. Can you hear me?\". Use interlateral_dna/comms.md only as the audit ledger, not as the wake-up trigger. Do not treat that phrase inside this boot prompt as the signal. When the direct Claude message arrives, reply exactly using node interlateral_dna/cc.js send \"ACK from Codex. I can hear you.\", then print exactly $READY_PHRASE, then stop and wait for Principal Human's assignment."
@@ -158,7 +161,7 @@ print_version codex
 echo
 echo "Standard mesh duo:"
 echo "  Claude session: $CLAUDE_SESSION (model: $CLAUDE_MODEL)"
-echo "  Codex session: $CODEX_SESSION (model: $CODEX_MODEL)"
+echo "  Codex session: $CODEX_SESSION (model: $CODEX_MODEL, effort: $CODEX_EFFORT)"
 echo "  Socket: $TMUX_SOCKET"
 echo "  Ready phrase: $READY_PHRASE"
 echo
