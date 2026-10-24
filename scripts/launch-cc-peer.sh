@@ -7,7 +7,8 @@ DNA_DIR="$REPO_ROOT/interlateral_dna"
 DEFAULT_PROMPT="Read CLAUDE.md first, then wait for instructions."
 DEFAULT_CLAUDE_MODEL="claude-opus-5-5"
 DEFAULT_CLAUDE_EFFORT="high"
-VALID_EFFORTS="low medium high xhigh max"
+VALID_EFFORT_LIST=(low medium high xhigh max)
+VALID_EFFORTS="${VALID_EFFORT_LIST[*]}"
 
 usage() {
     cat <<'USAGE'
@@ -74,20 +75,30 @@ if [[ "$MODEL_LC" =~ opus[-_.]?4[-_.]7 ]]; then
     exit 1
 fi
 
-case " $VALID_EFFORTS " in
-    *" $CLAUDE_EFFORT "*) ;;
-    *)
-        echo "Error: invalid effort '$CLAUDE_EFFORT' (expected one of: $VALID_EFFORTS)" >&2
-        exit 2
-        ;;
-esac
+# Exact, quoted equality against each allowed value: no pattern or substring match.
+EFFORT_OK=0
+for allowed in "${VALID_EFFORT_LIST[@]}"; do
+    if [[ "$CLAUDE_EFFORT" == "$allowed" ]]; then
+        EFFORT_OK=1
+        break
+    fi
+done
+if [[ "$EFFORT_OK" != "1" ]]; then
+    echo "Error: invalid effort '$CLAUDE_EFFORT' (expected one of: $VALID_EFFORTS)" >&2
+    exit 2
+fi
 
 source "$SCRIPT_DIR/tmux-config.sh"
 unset TMUX
 
 SESSION_NAME="${1:-}"
+SESSION_NOTE=""
 if [[ -n "$SESSION_NAME" ]]; then
     shift
+elif [[ "$DRY_RUN" == "1" ]]; then
+    # Dry run must not touch tmux, so do not list sessions to pick the next name.
+    SESSION_NAME="ia-claude-peer-NN"
+    SESSION_NOTE=" (placeholder: the next free ia-claude-peer-NN is chosen at launch)"
 else
     SESSION_NAME="$(next_peer_session_name "ia-claude-peer")"
 fi
@@ -113,7 +124,10 @@ if [[ "$DRY_RUN" != "1" ]]; then
             exit 1
         fi
     done
-    if ! claude --help 2>&1 | grep -q -- "--effort"; then
+    # Read the whole help text before matching. Piping into grep -q under
+    # pipefail can SIGPIPE claude and report a false "flag missing".
+    CLAUDE_HELP="$(claude --help 2>&1 || true)"
+    if [[ "$CLAUDE_HELP" != *"--effort"* ]]; then
         echo "Warning: this claude CLI has no --effort flag; launching without it." >&2
         echo "Warning: ask for effort '$CLAUDE_EFFORT' in the session's first message instead." >&2
         EFFORT_ARG=""
@@ -125,7 +139,7 @@ LAUNCH_CMD="cd '$REPO_ROOT' && export TMUX_SOCKET='$TMUX_SOCKET' INTERLATERAL_TM
 if [[ "$DRY_RUN" == "1" ]]; then
     echo "Dry run: no tmux session created, Claude not started"
     echo "Socket: $TMUX_SOCKET"
-    echo "Session: $SESSION_NAME"
+    echo "Session: $SESSION_NAME$SESSION_NOTE"
     echo "Model: $CLAUDE_MODEL"
     echo "Effort: $CLAUDE_EFFORT"
     echo "Command: $LAUNCH_CMD"
