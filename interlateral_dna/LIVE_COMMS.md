@@ -31,7 +31,7 @@ Pane text alone does not count. A message typed or drafted in an agent terminal 
 
 `me.sh` boots two agents by default:
 
-- Claude Code: `ia-claude` with `claude-opus-4-7` unless `CLAUDE_MODEL` overrides it
+- Claude Code: `ia-claude` with `claude-opus-5-5` unless `CLAUDE_MODEL` overrides it (`claude-opus-4-7` variants are refused)
 - Codex: `ia-codex` with `gpt-5.5` unless `CODEX_MODEL` overrides it
 
 Gemini CLI is available via `scripts/launch-gemini-peer.sh` and uses session names like `ia-gemini-peer-NN`, but it is an opt-in peer. Antigravity CLI is available via `scripts/launch-agy-peer.sh` / `interlateral_dna/agy.js` and is also opt-in. Do not recruit either for routine skills unless the assignment names that peer.
@@ -261,8 +261,8 @@ All three CLIs support a headless mode that bypasses the TUI entirely. This is u
 
 | Mode | Command |
 |------|---------|
-| Headless one-shot | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task"` |
-| Headless follow-up (same conversation) | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 --continue "next"` |
+| Headless one-shot | `claude -p --dangerously-skip-permissions --model claude-opus-5-5 "task"` |
+| Headless follow-up (same conversation) | `claude -p --dangerously-skip-permissions --model claude-opus-5-5 --continue "next"` |
 | Resume by session ID | `claude -p --resume SESSION_ID "continue"` |
 | Capture session ID | `session_id=$(claude -p --output-format json "task" \| jq -r '.session_id')` |
 
@@ -284,7 +284,7 @@ All three CLIs support a headless mode that bypasses the TUI entirely. This is u
 
 ```bash
 tmux send-keys -t "$SESSION" \
-  'claude --print --dangerously-skip-permissions --model claude-opus-4-7 "task" 2>&1 | tee /tmp/output.txt' Enter
+  'claude --print --dangerously-skip-permissions --model claude-opus-5-5 "task" 2>&1 | tee /tmp/output.txt' Enter
 ```
 
 ### Bound Runtime (Prevent Stuck Agents)
@@ -293,10 +293,10 @@ When dispatching headless agents, use a hard timeout so a hung process cannot bl
 
 ```bash
 # Linux
-timeout 420 claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task" | tee /tmp/output.txt
+timeout 420 claude -p --dangerously-skip-permissions --model claude-opus-5-5 "task" | tee /tmp/output.txt
 
 # macOS (requires: brew install coreutils)
-gtimeout 420 claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task" | tee /tmp/output.txt
+gtimeout 420 claude -p --dangerously-skip-permissions --model claude-opus-5-5 "task" | tee /tmp/output.txt
 ```
 
 Exit codes: `0` = completed normally, `124` = killed by timeout.
@@ -308,7 +308,7 @@ For autonomous work where an agent should keep picking up tasks:
 ```bash
 while true; do
   claude -p --dangerously-skip-permissions --continue \
-    --model claude-opus-4-7 \
+    --model claude-opus-5-5 \
     "Continue working. Read TASKS.md for context and update it when done."
   sleep 1
 done
@@ -356,7 +356,7 @@ These flags are required for unattended multi-agent operation. Without them, age
 
 | CLI | Default model | Notes |
 |-----|--------------|-------|
-| Claude Code | Opus 4.7 | `me.sh` specifies `--model claude-opus-4-7` by default |
+| Claude Code | Opus 5.5 | `me.sh` and `scripts/launch-cc-peer.sh` specify `--model claude-opus-5-5` by default; Opus 4.7 is refused |
 | Codex | gpt-5.5 | `me.sh` specifies `-m gpt-5.5` by default |
 | Gemini CLI | gemini-3.1-pro-preview | Specify with `-m gemini-3.1-pro-preview` |
 | Antigravity CLI | Gemini 3.5 Flash | Provided by `agy`; launch via `scripts/launch-agy-peer.sh` when explicitly selected |
@@ -383,7 +383,14 @@ Other models are available for specific use cases. Requirements from the user or
 
 **Claude Code variants:**
 
-`me.sh` defaults to `claude-opus-4-7` through `--model`. Override with `CLAUDE_MODEL` when the installed Claude CLI expects a different model name.
+`me.sh` and `scripts/launch-cc-peer.sh` default to `claude-opus-5-5` through `--model`. Override with `CLAUDE_MODEL` when the installed Claude CLI expects a different model name. Both launchers refuse any `claude-opus-4-7` variant.
+
+`scripts/launch-cc-peer.sh` also passes `--effort` (default `high`). Override with `CLAUDE_EFFORT` or a leading `--effort LEVEL` flag (`low`, `medium`, `high`, `xhigh`, `max`). If the installed CLI has no `--effort` flag, the launcher warns and omits it; request the effort level in the session's first message instead. Use `--dry-run` (or `LAUNCH_DRY_RUN=1`) to print the resolved `Model:`, `Effort:` and launch command without starting tmux:
+
+```bash
+CLAUDE_EFFORT=xhigh scripts/launch-cc-peer.sh --dry-run ia-claude-peer-01
+scripts/launch-cc-peer.sh --effort max ia-claude-peer-02 "Read CLAUDE.md first, then wait for instructions."
+```
 
 ### Full CLI Launch Reference
 
@@ -391,10 +398,10 @@ Other models are available for specific use cases. Requirements from the user or
 
 | Mode | Command |
 |------|---------|
-| Interactive (repo default) | `claude --dangerously-skip-permissions --model claude-opus-4-7` |
-| Interactive + first prompt | `claude --dangerously-skip-permissions --model claude-opus-4-7 "prompt"` |
-| Headless one-shot | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 "task"` |
-| Headless follow-up | `claude -p --dangerously-skip-permissions --model claude-opus-4-7 --continue "next"` |
+| Interactive (repo default) | `claude --dangerously-skip-permissions --model claude-opus-5-5` |
+| Interactive + first prompt | `claude --dangerously-skip-permissions --model claude-opus-5-5 "prompt"` |
+| Headless one-shot | `claude -p --dangerously-skip-permissions --model claude-opus-5-5 "task"` |
+| Headless follow-up | `claude -p --dangerously-skip-permissions --model claude-opus-5-5 --continue "next"` |
 | Resume by session | `claude -p --resume SESSION_ID "continue"` |
 
 **Codex (this repo uses `--dangerously-bypass-approvals-and-sandbox`):**

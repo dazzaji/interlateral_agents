@@ -10,7 +10,7 @@ unset TMUX
 
 CLAUDE_SESSION="${CC_TMUX_SESSION:-$CC_SESSION}"
 CODEX_SESSION="${CODEX_TMUX_SESSION:-$CODEX_SESSION}"
-CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-4-7}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-5-5}"
 CODEX_MODEL="${CODEX_MODEL:-gpt-5.5}"
 READY_PHRASE="${READY_PHRASE:-Reporting for Duty!}"
 INTERLATERAL_TEAM_ID="${INTERLATERAL_TEAM_ID:-agents}"
@@ -26,7 +26,7 @@ Usage:
   ./me.sh [--force]
 
 Environment overrides:
-  CLAUDE_MODEL       Default: claude-opus-4-7
+  CLAUDE_MODEL       Default: claude-opus-5-5 (any claude-opus-4-7 variant is refused)
   CODEX_MODEL        Default: gpt-5.5
   CLAUDE_ARGS        Default: --dangerously-skip-permissions --model "$CLAUDE_MODEL"
   CODEX_ARGS         Default: --no-alt-screen -m "$CODEX_MODEL" --dangerously-bypass-approvals-and-sandbox -C "$REPO_ROOT"
@@ -114,6 +114,13 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 if [[ $# -gt 1 || ( $# -eq 1 && "${1:-}" != "--force" ) ]]; then
     usage >&2
+    exit 1
+fi
+
+# House rule: Claude Opus 4.7 must not be used. Refuse any spelling of it.
+if [[ "$(printf '%s %s' "$CLAUDE_MODEL" "${CLAUDE_ARGS:-}" | tr '[:upper:]' '[:lower:]')" =~ opus[-_.]?4[-_.]7 ]]; then
+    echo "Error: refusing to launch: CLAUDE_MODEL/CLAUDE_ARGS select Claude Opus 4.7, which is not permitted." >&2
+    echo "Unset CLAUDE_MODEL to use the default (claude-opus-5-5), or choose another model." >&2
     exit 1
 fi
 

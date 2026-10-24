@@ -1,6 +1,6 @@
 ---
 name: init
-description: Initialize the standard Interlateral two-agent CLI mesh from a bootstrap agent by running me.sh, launching Claude Opus 4.7 plus Codex 5.5, proving live ACK, and waiting for "Reporting for Duty!". The bootstrap agent is not part of the mesh.
+description: Initialize the standard Interlateral two-agent CLI mesh from a bootstrap agent by running me.sh, launching Claude Opus 5.5 plus Codex 5.5, proving live ACK, and waiting for "Reporting for Duty!". The bootstrap agent is not part of the mesh.
 metadata:
   owner: interlateral
   version: "1.0"
@@ -45,7 +45,7 @@ For quartet work, use `ready-rock-quartet`.
 `me.sh` owns the launch mechanics and prints the exact commands before starting the sessions.
 
 Defaults:
-- Claude model: `claude-opus-4-7`
+- Claude model: `claude-opus-5-5` (`claude-opus-4-7` is refused)
 - Codex model: `gpt-5.5`
 - Ready phrase: `Reporting for Duty!`
 - tmux socket: `/tmp/interlateral-agents-tmux.sock`
@@ -53,7 +53,7 @@ Defaults:
 Model and argument defaults are configurable with environment variables:
 
 ```bash
-CLAUDE_MODEL=claude-opus-4-7 CODEX_MODEL=gpt-5.5 ./me.sh
+CLAUDE_MODEL=claude-opus-5-5 CODEX_MODEL=gpt-5.5 ./me.sh
 CLAUDE_ARGS="..." CODEX_ARGS="..." ./me.sh
 ```
 
