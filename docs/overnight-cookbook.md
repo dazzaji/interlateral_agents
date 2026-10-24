@@ -1342,7 +1342,6 @@ macOS; the named remote-access tools are practical examples, not required archit
 
 # Appendix G — Qualified Deterministic-Control Reference
 
-
 ## G.1 What the kernel is
 
 The reference ControlKernel is a deterministic **refuser and recorder**, not the executor of
@@ -1425,7 +1424,7 @@ window.
 
 ## H.3 Source-family disposition
 
-| Source family | Unique substance | 0.0.3 destination | Treatment |
+| Source family | Unique substance | Destination | Treatment |
 |---|---|---|---|
 | Operational cookbook | M-rules, profiles, templates, cases | Chapters and Apps E–J | CARRY |
 | LIVE_COMMS | send/safety/idle/headless/launch matrices | App E | CARRY, dated |
@@ -1442,6 +1441,7 @@ window.
 | embedded Pi harness | application-scoped deployment | App E | REFERENCE |
 | Warp records | historical surface | App E | UNVERIFIED pending ACTIVE/RETIRED decision |
 | 0.0.1 and 0.0.2 | predecessor drafts | Git history | PRESERVE |
+| sprint execution and publication tools (0.0.4) | evidence runner, publication pipeline | App K and `scripts/sprint-harness` | CARRY, adapted with provenance |
 
 ## H.4 Anti-loss and maintenance controls
 
@@ -1485,6 +1485,10 @@ review.
   browser operation while terminal work remained healthy.
 - Removed a disproportionate version-and-build doctrine and recorded in F.18.1 how the attempted
   correction became documentation cruft.
+- Added reuse lessons from the 2026-10-22 sprint: keep the qualified execution/evidence runner
+  (chapter 17), proportionate continuation (chapter 18), finishing with a punch list (chapter 19),
+  four preflight checks, and a dated operating pattern at the start of Appendix F.
+- Added Appendix K and the maintained tools it describes in `scripts/sprint-harness/`.
 
 ## H.8 Source and fidelity note
 
