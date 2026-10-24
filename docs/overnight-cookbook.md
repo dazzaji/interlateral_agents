@@ -3,7 +3,7 @@
 ## A Systems Guide to Governable Long-Horizon Agent Work
 
 Daniel “Dazza” Greenwood  
-Public-edition manuscript — version 0.0.3, early public draft, published August 31, 2026.
+Public-edition manuscript — version 0.0.4, early public draft, published September 12, 2026.
 
 > A model does not become reliable because its window stays open. Governable long-horizon work is a property of a deployed system: explicit authority, durable state, manufactured turns, independent supervision, bounded effects, evidence-gated transitions, recoverable ownership, and honest stopping conditions.
 
@@ -261,6 +261,14 @@ A backstop that starts doing the real work becomes a second worker with stale co
 
 **Qualification.** Demonstrated on dated reference surfaces; adapter facts are perishable.
 
+### Keep the host reachable while you are away
+
+For an overnight or long-running session, prepare the computer as well as the agent. Connect it to power, leave the laptop open, and prevent system sleep for the intended run—for example, with a bounded `caffeinate` command or a keep-awake utility. Test this before leaving; do not assume that an active agent will keep the computer awake.
+
+If the work may require an authenticated browser or another desktop application, establish remote access in advance. Tools such as [Jump Desktop](https://jumpdesktop.com/), [Screens](https://www.edovia.com/en/screens/), or Apple’s built-in [Screen Sharing](https://support.apple.com/guide/mac-help/share-the-screen-of-another-mac-mh14066/mac) can let you connect from another device, unlock the Mac, restore the browser session, and allow the agent to continue—for example, when a Cloudflare operation requires the authenticated browser.
+
+Test the actual recovery path from the phone, tablet, or computer you will have with you: connect remotely, unlock the Mac, open the required application, and verify that the agent can resume from its checkpoint. Keeping the computer awake prevents one class of failure; tested remote access lets you recover from another. Neither changes what the agent is authorized to do.
+
 ## 11. Keep one lifecycle sentinel alive
 
 **Invariant.** Lifecycle automation belongs to the run, not a phase. Intermediate states retarget it; terminal handback retires it.
@@ -351,6 +359,11 @@ Replacement follows the lease protocol and resumes only already authorized work.
 
 ## 17. Engineer evidence
 
+**Reuse lesson, 2026-10-22:** retain the working execution/evidence runner instead of rebuilding
+it each sprint. Record command exit separately from required-output capture; a capture failure
+cannot certify success. Pin the actual executable/runtime and source, count assertions, reject
+zero-test/printed-PASS results, and retain independent reruns. See Appendix K for reuse scope.
+
 **Invariant.** State both where evidence came from and how the claim was tested.
 
 **Protocol.** Provenance: primary fact, independent result, project evidence, inference, vendor claim, anecdote, hypothesis. Proof modality: inspection, executable test, adversarial/negative test, operational/restart test, environment/route attestation, external/human acceptance, authority record. Material claims carry one provenance label, one or more modalities, the environment/version, counterevidence, and limits.
@@ -363,6 +376,13 @@ Use the claims ladder: observed; locally reproduced; environment-qualified; oper
 
 ## 18. Dispatch reviews and gates
 
+**Proportionate continuation:** routine engineering decisions belong to the controller. Use an
+on-demand independent judgment for material disputed decisions, not a council vote for every
+retry. A missing optional review or one model refusal must not veto all independent work.
+Diagnose its actual scope, use genuinely permitted alternatives, isolate affected dependencies
+and continue. Do not evade safeguards or manufacture a passing result. A generic warning is not
+evidence that the surrounding legitimate project is malicious.
+
 **Invariant.** Gatekeepers rerun proof and cannot approve their own work.
 
 **Protocol.** Freeze artifact/hash, contract/manifest, role/independence, threat model, commands, severity, output marker, timeout/fallback, and `This gate IS / IS NOT`. Gatekeepers rerun decisive commands read-only and return one consolidated PASS/FAIL/BLOCKED with residual blockers. Governance changes are file-backed before use. Consequential boundaries may use blind provider-diverse dual gates; routine deterministic slices use lighter review. Measure dispatch latency separately from proof runtime.
@@ -372,6 +392,13 @@ Use the claims ladder: observed; locally reproduced; environment-qualified; oper
 **Qualification.** Demonstrated practice. Dispatch clocks are tunable profiles.
 
 ## 19. Repair while converging
+
+**Finish with a punch list:** a usable sprint can close `DELIVERED_WITH_EXCEPTIONS`, listing each
+remaining issue, actual consequence, containment and next action. Keep delivery outcome separate
+from individual test results and release claims. Disable or defer an affected optional capability
+and continue verified independent work. Apply a hold to the affected unit, not automatically the
+whole program. No new human approval cycle is needed for routine contained imperfections within
+the existing scope. Missing core functionality is substantive partial delivery, not a tiny exception.
 
 **Invariant.** Repair should shrink a stable finding set; blockers tied to the threat model are success, while endless review is not.
 
@@ -462,14 +489,7 @@ HASH_CAPTURE → MANIFEST_WRITE → MANIFEST_VERIFY → FINAL_CHECKPOINT → WOR
 
 One finalization owner operates under freshness protection. Verify artifacts unchanged since PASS; record acceptance, roles/routes/fallbacks, findings, residual risks, untested areas, human decisions, budget actuals, and automation/lease/sandbox/credential disposition. Retire lifecycle automation with a tombstone. Close every material handoff. Give the human outcome, limits, and next decision in plain language.
 
-Signed artifacts are immutable. A correction, amendment, or provider-note update creates a new
-versioned copy; it never overwrites the bytes that received consensus. A release manifest binds
-the source hash to every derived Markdown, PDF, archive, and signature. This rule was added after
-an amendment was mistakenly written into an already countersigned manuscript. Recovery succeeded
-because the frozen synthesis and exact patch record could reproduce the original hash. The safer
-system refuses the mutation in the first place.
-
-**Reference.** Exact-hash co-signing and stale-writer refusal prevented finalization forks from corrupting immutable masters.
+**Reference.** Exact-hash co-signing and stale-writer refusal prevented finalization forks and ambiguous ownership.
 
 **Qualification.** Demonstrated practice.
 
@@ -500,6 +520,11 @@ Use fresh issue-sized judgment contexts and deterministic routine controllers. E
 # Appendix A — Preflight and operating profiles
 
 ## Preflight
+
+- Reuse qualified existing tools where cheaper than repeated manual work; do not build a new framework by default.
+- Check exact runtime, long-message payload/ACK and scoped ledger relay where used; hashes must be real at dispatch.
+- Separate execution qualification from publication qualification so exporter work does not delay qualified local fixes.
+- Keep rollback proportionate: local copies and completeness checks can suffice for reversible local work; encryption/vault/off-device recovery are not universal sprint prerequisites.
 
 - Outcome, audience, scope, acceptance, budget, and stop condition are written.
 - Sources are versioned and hashed.
@@ -1151,6 +1176,12 @@ files/session records at closeout. See Appendix I.7.
 
 # Appendix F — Failure Museum
 
+Related dated operating pattern, 2026-10-22: one desktop controller/sole publisher, CLI writers
+and independent reviewers/verifiers. Working execution and publication tools were qualified in
+an earlier run; the combination matrix had separate evidence. This is a reuse pattern, not proof
+that every launcher, closeout script, future model or relocated environment is qualified. Resolve
+the retained manifest and adapter versions before operational reuse; see Appendix K.
+
 Each case records symptom, mistaken inference, actual failure domain, evidence, safe response,
 earned doctrine, and maturity. Details are sanitized; private coordinates and identities remain
 in the evidence crosswalk.
@@ -1264,13 +1295,53 @@ attestation comes from harness/provider evidence, not model self-report.
 ## F.18 The Amended Master
 
 After exact-hash consensus, useful bb material and a version stamp were written directly into the
-signed manuscript. The content was valuable; the mutation was still wrong. The original was
-reconstructed from its frozen synthesis and recorded patch and verified by hash. **Rule:** signed
-bytes are immutable; amendments create a successor version; every derivative records its source
-hash.
+reviewed manuscript. Git preserved both states, so no work was lost. The narrow issue was simply
+that the later material had not received the earlier review. Instead of recording that fact
+plainly, the agents elevated it into a broad doctrine about immutable signed bytes and successor
+artifacts.
+
+### F.18.1 When the correction became cruft
+
+The overreaction spread into the finalization chapter, the Failure Museum, the source-disposition
+table, and a long version-and-build section. It surfaced again while adding a short, practical
+lesson about a Mac that stayed awake but could not be unlocked remotely: an ordinary Git edit
+became a distracting discussion about immutable manuscripts and mandatory successor versions.
+
+Dazza identified the category error. The Cookbook is one living file at one stable URL; Git
+records its changes, and its visible version number changes when the editor judges an update
+material enough. He kept the 0.0.4 bump because the host-continuity lesson was material, but called
+for the disproportionate doctrine to be removed from the places where it had taken hold.
+
+**Earned doctrine:** incident response can itself create documentation failure. With heavy agent
+participation, a narrow correction can harden into impressive-sounding policy, spread through
+cross-references, and bend later work around itself. Before adding doctrine, ask whether it is
+new, portable, useful to the intended reader, and proportionate to the failure. If ordinary
+version control already handles the problem, use ordinary version control. The human editor owns
+the final call to prune agent-generated cruft.
+
+## F.19 The awake Mac that could not be operated remotely
+
+**Symptom:** an authorized browser operation could not continue while the human was away, even
+though the Mac and its terminal processes were still running. **Mistaken inference:** keeping the
+computer awake would also keep every required application remotely usable. **Actual failure
+domain:** the macOS user session was locked, the authenticated browser was unavailable to the
+agent, and no tested remote-unlock path had been prepared. **Evidence:** terminal and CLI access
+remained healthy, but the browser-dependent operation stopped at the locked desktop rather than
+at a task or network failure.
+
+**Safe response:** stop at the browser boundary, preserve the exact pending action, and ask the
+human to unlock the Mac; do not bypass the lock or substitute unapproved credentials. **Prevention
+and recovery:** before leaving, connect the host to power, prevent system sleep for the bounded
+run, and test a remote-access tool from the device the human will actually carry. If the desktop
+later locks, the human can connect remotely, unlock it, restore the required application, and let
+the agent resume from its checkpoint. **Earned doctrine:** an awake computer is not necessarily a
+remotely operable computer. Long-running work intended to continue while the human is away needs
+both a keep-awake plan and a tested remote-recovery path. **Maturity:** incident-demonstrated on
+macOS; the named remote-access tools are practical examples, not required architecture.
 
 
 # Appendix G — Qualified Deterministic-Control Reference
+
 
 ## G.1 What the kernel is
 
@@ -1366,11 +1437,11 @@ window.
 | troubleshooting guide | symptom and recovery cards | App I/F | CARRY |
 | ControlKernel/RUNNER_Q | deterministic mechanics and HOLDs | App G | CONDENSE WITH CLAIM BOUNDARY |
 | revision records | mechanisms and numerical profiles | Apps H–J | CARRY with maturity |
-| blind reviews/consensus | provenance | release manifest | REFERENCE |
+| blind reviews/consensus | provenance | review records | REFERENCE |
 | raw Pi sessions | usage facts and sensitive evidence | sanitized facts only | PRIVATE EVIDENCE ONLY |
 | embedded Pi harness | application-scoped deployment | App E | REFERENCE |
 | Warp records | historical surface | App E | UNVERIFIED pending ACTIVE/RETIRED decision |
-| 0.0.1 and signed 0.0.2 | immutable predecessors | version archive | PRESERVE BY HASH |
+| 0.0.1 and 0.0.2 | predecessor drafts | Git history | PRESERVE |
 
 ## H.4 Anti-loss and maintenance controls
 
@@ -1392,30 +1463,7 @@ unapproved quotations, or sensitive operational-capacity measurements. Raw harne
 outside Git. Publish useful aggregate measurements only after privacy and operational-security
 review.
 
-## H.6 Version and build discipline
-
-Version 0.0.1 is the original local manuscript. Version 0.0.2 is the exact peer-consensus file
-identified by SHA-256 in the release manifest. Version 0.0.3 is a new successor that restores the
-operator-grade material identified by the independent under-carry audits. Signed predecessors
-remain immutable.
-
-The build concatenates the core manuscript and ordered canonical appendices. The release manifest
-records every source hash, build command, generated Markdown hash, rendered PDF hash, reviewer,
-and exact-hash countersign. Rebuilding from unchanged sources must reproduce the Markdown bytes.
-
-From the version directory, the reference recipe is:
-
-```text
-scripts/build-manuscript.sh
-scripts/build-pdf.sh
-scripts/verify-release.sh
-```
-
-The PDF builder stamps the exact generated-Markdown SHA-256 onto the rendered title page. The
-verification gate checks that stamp, the predecessor, source-block sentinels, rendered table
-column counts, public-safety patterns, and extractable PDF text.
-
-## H.7 0.0.3 changelog
+## H.6 0.0.3 changelog
 
 - Restored and expanded bb task steering, persistent-terminal control, and overnight features.
 - Added standalone Pi and embedded-Pi application adapters with honest maturity boundaries.
@@ -1428,6 +1476,15 @@ column counts, public-safety patterns, and extractable PDF text.
   session exports.
 - Added the Dropbox race, bb surface confusion, Pi route mismatch, and Amended Master cases.
 - Replaced omnibus preservation claims with per-surface dispositions and reproducible versioning.
+
+## H.7 0.0.4 changelog
+
+- Added concise, practical guidance for keeping a consumer Mac awake and recovering access remotely
+  during an overnight or long-running session.
+- Added Failure Museum case F.19 documenting the locked desktop that stopped an authenticated
+  browser operation while terminal work remained healthy.
+- Removed a disproportionate version-and-build doctrine and recorded in F.18.1 how the attempted
+  correction became documentation cruft.
 
 ## H.8 Source and fidelity note
 
@@ -1889,3 +1946,40 @@ status:
 ```
 
 <!-- TEMPLATE-KIT-2026-08-END -->
+
+# Appendix K — Reuse the execution runner and PR delivery tools
+
+**Maintained location:** [scripts/sprint-harness](../scripts/sprint-harness/README.md).
+These are the two concrete tool sets extracted from the 2026-10-22 sprint. Use and maintain this
+package for future sprints rather than searching historical run folders or rebuilding it.
+
+The **execution/evidence runner** captures the command's actual result, output-capture status,
+exact source/runtime and expected tests. It rejects misleading green results and preserves
+evidence. The **publication pipeline** exports the accepted changes, scans outgoing history,
+pushes the approved branch, reconciles uncertain effects and verifies the resulting draft PR.
+
+Start with the documented local self-test example; it exercises both sets without changing
+GitHub. Configure the new run explicitly. No yesterday-default repository, deadline, private
+path or credential is carried forward. Core execution checks gate local work; publication checks
+gate publication, not all useful engineering. Preserve original provenance and recheck adaptations.
+
+**Economics:** reuse is a required implementation step when the run selects this package, not a
+vague suggestion. Make the smallest needed adaptations and retain their tests. Do not build a
+new general-purpose orchestration framework as a prerequisite. Measure setup time and repeated
+commands saved; do not claim a ten-minute job or an hour saved without evidence. Update the
+cookbook while lessons are fresh, separately from any later broad skill-system redesign.
+
+**Three observed failure lessons:**
+
+- An unavailable/refused breaker was made a dependency of the whole sprint. Diagnose and isolate
+  that review; continue permitted work and deliver an honest punch list. No disguised safeguard
+  evasion and no invented test PASS.
+- A matrix used a different Node runtime. Pin and verify the executable/version used for the
+  actual process, not just the configured version in prose.
+- A long bootstrap prompt was truncated. Use tested paste-buffer delivery and payload/nonce ACK;
+  ledger append is not delivery. A sandboxed lane needing ledger access gets a scoped append relay,
+  not unrestricted writes. See F.15 for why live multiwriter logs should not be in Dropbox.
+
+**Limits:** the reused tools are not a scheduler, identity service or automatic certification.
+Local regression evidence and original qualification records remain distinct. The README names
+what was extracted, what was changed and what needs per-run integration checking.
