@@ -103,6 +103,6 @@ Not included: the old project simulator, matrix adapter, session launcher, globa
 lane policy, private run records, destinations or credentials. These are not needed to reuse the
 two requested tool sets. Existing orchestration can call these APIs; this is not a new scheduler.
 
-See PROVENANCE.md and SOURCE-LICENSE.txt. Keep future changes small, retain the self-tests, and
+See PROVENANCE.md; the package is covered by this repository's Apache-2.0 license (../../LICENSE). Keep future changes small, retain the self-tests, and
 add a regression for changed behavior. Document lessons promptly; do not delay cookbook notes
 until a generic tool release is polished.

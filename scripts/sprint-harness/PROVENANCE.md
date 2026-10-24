@@ -1,8 +1,7 @@
 # Provenance and adaptation boundary
 
-Derived from controller tooling used in the 2026-10-22 accountable-agent framework fix sprint.
-The original run accepted execution bundle core-05 and publication bundle pub-05. Those verdicts
-covered exact historical tool hashes and assumptions, not this portable adaptation.
+Adapted from independently developed local sprint-controller tooling. Historical qualification
+covered exact earlier tool versions, not this portable adaptation.
 
 Retained: execution/capture separation, trusted Node test-event reporter, exact input/test pins,
 STOP/deadline control, clean export, outgoing-history scan, publisher lease and candidate/tool
@@ -19,5 +18,5 @@ mutation. They include missing capture, failed tests, source/policy identity, ST
 deleted-at-tip private history, wrong destinations, branch restrictions and restart reconciliation.
 They are development regression evidence, not independent acceptance of every future use.
 
-Source attribution/license is retained in SOURCE-LICENSE.txt. The original private manifest and
-gate artifacts remain with their owning run; local program planning records their exact paths.
+This package is covered by this repository's license (Apache-2.0; see [../../LICENSE](../../LICENSE)).
+The original run records are not part of this repository.
