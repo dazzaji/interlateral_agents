@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+exec "${SPRINT_HARNESS_NODE:?controller must supply pinned Node executable}" "$(dirname "$0")/../publication-hook.mjs" "$@"
