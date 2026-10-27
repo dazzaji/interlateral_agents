@@ -3,7 +3,7 @@
 ## A Systems Guide to Governable Long-Horizon Agent Work
 
 Daniel “Dazza” Greenwood  
-Public-edition manuscript — version 0.0.4, early public draft, published September 12, 2026.
+Public-edition manuscript — version 0.0.5, early public draft, published October 27, 2026.
 
 > A model does not become reliable because its window stays open. Governable long-horizon work is a property of a deployed system: explicit authority, durable state, manufactured turns, independent supervision, bounded effects, evidence-gated transitions, recoverable ownership, and honest stopping conditions.
 
@@ -87,6 +87,8 @@ Each chapter follows four layers: the portable invariant, the protocol that real
 Separate direct human instruction, a cited human decision, and agent interpretation. Only the first two can carry human authority. A relay that reverses the latest direct instruction pauses the affected branch.
 
 Enumerate reserved effects: commit, push, merge, release, publish, deploy, file, sign, pay, delete, or contact an outsider. They remain human-only unless the exact act is authorized. Professional work has its own boundary: agents may research, prepare, test, and package; they do not sign, file, send, attest, or bind the professional.
+
+Unattended tests can also require consequential setup. Name the test identities, ordinary login paths, temporary roles, grantor, lifetime, and cleanup before launch. A worker's technical ability to create an account or grant a role is not human authorization, and a tool-execution guard may make that distinction at the moment of the call. See F.20 and Appendix L.
 
 The inverse rule matters. Reserve escalation for scope or topology changes, external/destructive/paid/irreversible effects, contract exhaustion, security or professional concerns, and human value choices. A routine PASS inside the envelope means:
 
@@ -531,6 +533,7 @@ Use fresh issue-sized judgment contexts and deterministic routine controllers. E
 - Deployed model/routes/harnesses/permissions are recorded.
 - Roles and one-writer leases are assigned.
 - External/destructive/paid/public/professional effects are allowed or forbidden explicitly.
+- Test identities, normal login paths, least-privilege grants, execution-permission mode, named human authority, and verified cleanup are preflighted for unattended external tests.
 - The first executable slice and material-artifact deadline are named.
 - Local proof is separated from external acceptance.
 - Each material handoff has nonce, direct/durable paths, ACK, action proof, and receipt owner.
@@ -952,6 +955,18 @@ predicate, credential death, child-command stall, wrong pane, submit-key mismatc
 and resume-to-new-session all fail closed. Close from a qualified idle state, capture hashes,
 release the lease, retire watchers/backstops, and prove no tracked child or queued input remains.
 
+**Dated auto-mode note, 2026-10-27 (Claude Code 2.1.310):** a protocol-first Interlateral
+development sprint hit Claude Code's separate tool-execution check while preparing temporary
+test-account authority. The installed built-in auto-mode defaults included a `Permission Grant`
+rule, and the denied tool result named that category. Inspect the installed version and effective
+rules for each run; capture the exact proposed call and denial before diagnosing it. A category
+does not disclose the checker's full reasoning or prove that a narrower downstream grant was
+attempted. In headless work, an unplanned approval boundary can stop external qualification even
+after local build and deployment. Use the supported approval path, not a disguised retry or a
+weaker permission mode. See F.20 and Appendix L; this note does not requalify the rest of E.5.
+Sources: [Anthropic auto-mode configuration](https://code.claude.com/docs/en/auto-mode-config),
+[permission modes](https://code.claude.com/docs/en/permission-modes).
+
 <!-- ADAPTER-CLAUDE-CODE-2026-08-END -->
 
 
@@ -1340,6 +1355,24 @@ remotely operable computer. Long-running work intended to continue while the hum
 both a keep-awake plan and a tested remote-recovery path. **Maturity:** incident-demonstrated on
 macOS; the named remote-access tools are practical examples, not required architecture.
 
+## F.20 The test-host grant that stopped external qualification
+
+**Symptom:** a protocol-first Interlateral platform sprint built and deployed its candidate but
+stopped before authenticated public-web tests. **Mistaken inference:** email verification or the
+platform's agent authorization system had failed. **Actual failure domain:** Claude Code auto
+mode denied a proposed tool call under its built-in `Permission Grant` rule. The first call would
+have created an instance administrator and directly minted a session, although the test needed
+only normal login and temporary event-creator rights. A later, narrower plan was denied at the
+controller's worker-dispatch call; that denial does not prove the narrower grant itself failed.
+
+**Safe response:** Dazza requested the exact calls and rule, then authorized a bounded test-host
+path. Normal login and the narrower grant succeeded, and external testing resumed. That is not
+proof of final acceptance. **Earned doctrine:** tool-execution policy is a distinct autonomy
+failure domain. Preflight consequential test grants and preserve human approval through handoffs;
+on denial, report what was attempted and what did not run. Do not bypass the guard or call every
+denial a false positive. **Maturity:** observed local incident; see Appendix L for the investigation,
+remediation, and communication lessons.
+
 
 # Appendix G — Qualified Deterministic-Control Reference
 
@@ -1491,7 +1524,15 @@ review.
   four preflight checks, and a dated operating pattern at the start of Appendix F.
 - Added Appendix K and the maintained tools it describes in `scripts/sprint-harness/`.
 
-## H.8 Source and fidelity note
+## H.8 0.0.5 changelog
+
+- Added F.20 and Appendix L on the Claude Code auto-mode `Permission Grant` halt during
+  protocol-first Interlateral Platform Beta development, including the exact claim boundary,
+  investigation path, bounded remediation, and request for clearer provider diagnostics.
+- Added test-identity and least-privilege grant preflight guidance to chapter 2 and Appendix A,
+  plus a version-scoped Claude Code adapter note in E.5.
+
+## H.9 Source and fidelity note
 
 This edition carries transferable operating knowledge in full. Only secrets, live mutable
 coordinates, private identity/project crosswalks, raw unredacted evidence, personal schedules,
@@ -1988,3 +2029,145 @@ cookbook while lessons are fresh, separately from any later broad skill-system r
 **Limits:** the reused tools are not a scheduler, identity service or automatic certification.
 Local regression evidence and original qualification records remain distinct. The README names
 what was extracted, what was changed and what needs per-run integration checking.
+
+# Appendix L — The tool-permission gate that an autonomous sprint did not preflight
+
+## L.1 Why this case belongs in the cookbook
+
+This was a lean Accountable Agents integration into Interlateral Platform Beta, intended as a
+**protocol-first, federated, open-source implementation**. The sprint had built, locally
+qualified, reviewed, and deployed a candidate. It still needed authenticated external journeys
+before acceptance. A test host had to sign in and create an event; temporary registry test users
+also needed bounded access. The run had planned the journey but had not settled the precise
+test-account grants and approval path before its unattended phase.
+
+The failure was a new *class for this operating guide*: a provider-supplied, model-based
+tool-execution rule can stop an otherwise live controller at a proposed tool call, independently
+of the application's own authorization and independently of whether code and local tests pass.
+The rule is valuable when it stops an overbroad action. It is also an availability dependency:
+in a headless run, a denial without an actionable owner-approval route may strand the remaining
+work. This case is published so future sprint owners can recognize, preflight, and explain that
+boundary instead of losing hours to an apparently mysterious halt.
+
+Three permission systems must not be collapsed:
+
+| System | Question it answers | Role in this incident |
+|---|---|---|
+| Platform roles | May this account create an event or administer the instance? | The test needed `event_creator`, not instance administrator. |
+| Agent mandate and registry | What may the test agent do in the event? | Under test, but not the source of the tool denial. |
+| Claude Code auto mode | May the coding agent execute this proposed tool call? | Denied the first setup call and later the controller dispatch. |
+
+[Anthropic's permission-mode documentation](https://code.claude.com/docs/en/permission-modes)
+describes auto mode as using a second model to review actions. The installed Claude Code 2.1.310
+defaults included a `Permission Grant` rule; the local denial result named that category. The
+rule concerns granting or widening access. **`Permission Grant` was the denial category, not a
+record that permission had been granted.** The category alone does not reveal the checker's full
+reasoning, and this case does not establish which classifier model handled either call.
+
+## L.2 The two denied calls and the true stop point
+
+The first proposed command used a bootstrap script for a synthetic test host. Source inspection
+showed that script granted `instance_staff:admin`. The command also included a helper to insert
+an eight-hour session directly into the identity database. Its rationale was conserving the
+small test-email budget. The tool-execution checker denied the command before it ran. No
+administrator was created and no session was minted by that call. The guard had a substantial
+reason to intervene: the test did not require another administrator or a fabricated login, and
+that shortcut would not have exercised the normal sign-in journey.
+
+The controller then drafted a narrower path: ordinary email login, temporary `event_creator`
+rights, bounded registry test identities, and cleanup. It tried to resume the worker with that
+plan through an outer shell command. **The outer dispatch call** was denied under the same
+category. The evidence does not show the worker attempting the narrower application grant, nor
+does it prove why the checker rejected the dispatch. A controller's assertion that it
+"authorizes" an action is not itself a direct human authorization. Whether that distinction
+caused this second denial is an inference, not an observed classifier explanation.
+
+The controller checkpointed `PARTIAL` with the authenticated external gates unrun. At that point
+no test emails had been sent, so "email verification failed" was the wrong diagnosis. Local
+build, review, and deployment evidence did not make the unrun journeys pass. The pause from
+checkpoint to resumption was about 44 minutes; that is a timeline interval, not a measured
+engineering-cost or a claim that every minute was caused by the rule.
+
+## L.3 How the source of the rule was found
+
+The initial status descriptions were too vague: "host permission" concealed the administrator
+bootstrap and made an execution denial sound like an application denial. Dazza pressed for the
+actual operation and the source of the rule. The investigation followed an evidence chain:
+
+1. Read the checkpoint and external-test record to distinguish incomplete gates from failed tests.
+2. Match each denied tool result to its proposed tool call and execution boundary in the raw session evidence.
+3. Read the bootstrap script and identity-service implementation to determine the exact role and session effects requested.
+4. Check the installed CLI version and inspect `claude auto-mode defaults` and the effective auto-mode configuration; the local `Permission Grant` rule matched the built-in default, not a discovered project-authored policy.
+5. Compare those observations with [Anthropic's auto-mode configuration reference](https://code.claude.com/docs/en/auto-mode-config) and [engineering explanation](https://www.anthropic.com/research/claude-code-auto-mode), while withholding claims about the private reasoning behind either individual denial.
+
+That method changed the question from "why did email or Beta fail?" to "which agent proposed
+which grant through which tool, under whose authority, and what exactly was blocked?" It also
+exposed the second failure at a controller-to-worker handoff. The full logs and private identity
+crosswalk remain outside this public manuscript; a sanitized incident record supports this
+account. Future reports should retain a correlation ID, proposed call, exact denial, harness
+version, applicable rule, authority reference, and downstream work that remained unrun.
+
+## L.4 Remediation without weakening the guard
+
+Dazza gave direct, specific authorization for one synthetic host to use normal email login and
+receive temporary event-creator rights only. It also bounded two registry test addresses, email
+use, server-side retrieval of their test messages, and post-test removal of roles, sessions,
+event powers, credentials, and allowlist entries. The controller carried that instruction into
+the resumed work. Normal login verified successfully; a separate browser-state-saving bug
+required a retry. The `event_creator` grant then succeeded while the instance administrator
+count stayed at one, and external qualification resumed.
+
+This is a narrower solution, not a classifier bypass. Nobody needed to disable auto mode, hide
+the grant inside another command, or replace a denial with an unapproved tool path. Equally,
+"resumed" does not mean external tests, cleanup, independent sign-off, or Dazza's UAT had all
+passed. Those claims require their own evidence.
+
+## L.5 What the provider and the operator each need to communicate
+
+Anthropic's rule is understandable as a protection against an agent enlarging access on its own.
+Its [engineering account](https://www.anthropic.com/research/claude-code-auto-mode) describes
+that design goal. But a short category label is materially inadequate for an operator running
+an unattended sprint. Anthropic should identify, on the product
+surface actually in use: the operation and target the checker understood, the matched rule,
+whether it is conditional, the approval context it recognized or lacked, which outer or inner
+call was stopped, and the supported one-action recovery path. It should distinguish a policy
+decision from checker unavailability. This request does not require disclosure of private
+chain-of-thought; it asks for an actionable reason summary. Documentation should explain what
+specific owner authorization can and cannot carry through controller-to-worker handoffs and how
+headless runs should checkpoint and resume after a denial.
+
+Until that improves, the sprint's own communication must be precise. A useful stop report says:
+
+```text
+Proposed action -> tool/checker decision -> exact unexecuted effect ->
+existing owner authority -> smallest missing decision -> still-unrun gates ->
+safe state -> supported resume path
+```
+
+Do not say only "security blocked us," "email failed," or "the platform rejected the host."
+Share a **sanitized** incident pattern with future sprint operators: harness/version, rule
+category, action class, required approval, safe resolution, and claim boundary. Never publish
+raw logs, credentials, test addresses, private infrastructure paths, or reusable sessions.
+
+## L.6 Launch and denial checklist
+
+Before `GO`, name each test principal and agent, its ordinary login method, the minimum role,
+the grantor, target environment, lifetime, email/retry budget, and who verifies revocation.
+Record the actual human's approval beside the run authority; distinguish it from the
+controller's interpretation. Inspect the installed execution-permission mode and effective
+rules, and exercise a bounded, authorized fixture setup while the owner is present if the run
+will later depend on it. A harmless read probe does not prove a future grant will be allowed.
+
+On denial, preserve the exact proposed call and result. Determine whether the call executed at
+all, whether the requested power exceeded the need, and whether the owner actually approved that
+specific operation. Reduce scope where possible. Use the supported approval path for missing
+authority; if it is unavailable in a headless session, checkpoint and ask the owner instead of
+silently changing mode or routing around the guard. Continue only independent safe work. On
+resumption, verify both the intended grant and its eventual removal, including sessions and
+event-scoped powers. Do not mark external qualification or the sprint complete merely because
+the blocked call was replaced.
+
+**Claims boundary:** this is one observed incident, not a measured rate of classifier error.
+The first denial protected a real boundary; the second denial's private rationale remains
+unknown. The portable lesson is to make test authority and execution-policy dependencies
+explicit, and to communicate denials with enough evidence to make a safe decision.
